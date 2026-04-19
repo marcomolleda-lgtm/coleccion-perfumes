@@ -502,7 +502,7 @@
       </div>
       <button class="icon-btn" onclick="toggleFilters()" title="Filtros">🔍</button>
       <button class="icon-btn" onclick="openFieldMgr()" title="Gestionar campos">🗂</button>
-      <button class="icon-btn" onclick="openWishlist()" title="Lista de deseos">💘</button>
+      <button class="icon-btn" onclick="openWishlist()" title="Listas">📓</button>
       <div id="settings-menu-wrap" style="position:relative">
         <button class="icon-btn" id="settings-menu-btn" onclick="toggleSettingsMenu()" title="Ajustes">⚙️</button>
         <div id="settings-menu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:8px;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,0.13);z-index:500;">
@@ -1737,7 +1737,7 @@ function renderWishlist() {
   const tabsHtml = `
     <div id="wl-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
       ${data.lists.map(l => `
-        <button onclick="switchWishlist('${l.id}')" style="padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:${l.id===data.activeList?'var(--accent)':'var(--surface-alt)'};color:${l.id===data.activeList?'#fff':'var(--text)'};font-size:12px;cursor:pointer;font-family:inherit">${l.name}</button>
+        <button onclick="switchWishlist('${l.id}')" style="padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:${l.id===data.activeList?'var(--accent)':'var(--surface-alt)'};color:${l.id===data.activeList?'#fff':'var(--text)'};font-size:12px;cursor:pointer;font-family:inherit">${l.name} <span style="opacity:.7">(${(l.items||[]).length})</span></button>
       `).join('')}
       <button onclick="createWishlist()" title="Nueva lista" style="width:28px;height:28px;border-radius:50%;border:1px dashed var(--border);background:none;color:var(--accent);font-size:18px;cursor:pointer;line-height:1;padding:0">＋</button>
     </div>
@@ -1761,7 +1761,10 @@ function renderWishlist() {
           ${item.price ? `<div class="wish-price">${item.price}</div>` : ''}
           ${item.url ? `<a class="wish-link" href="${item.url}" target="_blank" rel="noopener">🔗 Ver en tienda</a>` : ''}
         </div>
-        <button class="wish-del" onclick="deleteWishItem(${i})" title="Eliminar">✕</button>
+        <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+          <button class="wish-del" onclick="editWishItem(${i})" title="Editar" style="background:var(--accent-bg);color:var(--accent);border-color:var(--accent-light)">✏️</button>
+          <button class="wish-del" onclick="deleteWishItem(${i})" title="Eliminar">✕</button>
+        </div>
       </div>`).join('');
 
   container.innerHTML = tabsHtml + itemsHtml;
@@ -1810,7 +1813,35 @@ function deleteWishlist() {
 function toggleWishForm() {
   const f = document.getElementById('wish-form');
   f.style.display = f.style.display === 'none' ? 'block' : 'none';
-  if (f.style.display === 'block') document.getElementById('wf-name').focus();
+  if (f.style.display === 'block') {
+    // Reset to "new" mode
+    document.getElementById('wish-form').dataset.editIndex = '';
+    document.getElementById('wish-form-title').textContent = '＋ Añadir perfume';
+    document.getElementById('wf-save-btn').textContent = '✦ Guardar';
+    ['wf-name','wf-brand','wf-price','wf-url','wf-photo'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('wf-name').focus();
+  }
+}
+
+function editWishItem(i) {
+  const data = loadWishlists();
+  const active = getActiveList(data);
+  if (!active) return;
+  const item = active.items[i];
+  if (!item) return;
+  const f = document.getElementById('wish-form');
+  f.style.display = 'block';
+  f.dataset.editIndex = i;
+  document.getElementById('wish-form-title').textContent = '✏️ Editar perfume';
+  document.getElementById('wf-save-btn').textContent = '✦ Actualizar';
+  document.getElementById('wf-name').value = item.name || '';
+  document.getElementById('wf-brand').value = item.brand || '';
+  document.getElementById('wf-price').value = item.price || '';
+  document.getElementById('wf-url').value = item.url || '';
+  document.getElementById('wf-photo').value = item.photo || '';
+  document.getElementById('wf-name').focus();
+  // Scroll to form
+  f.scrollIntoView({behavior:'smooth'});
 }
 
 function saveWishItem() {
@@ -1819,17 +1850,24 @@ function saveWishItem() {
   const data = loadWishlists();
   const active = getActiveList(data);
   if (!active) return;
-  active.items.push({
+  const editIndex = document.getElementById('wish-form').dataset.editIndex;
+  const itemData = {
     name,
     brand: document.getElementById('wf-brand').value.trim(),
     price: document.getElementById('wf-price').value.trim(),
     url:   document.getElementById('wf-url').value.trim(),
     photo: document.getElementById('wf-photo').value.trim(),
     added: new Date().toISOString().split('T')[0]
-  });
+  };
+  if (editIndex !== '' && editIndex !== undefined) {
+    active.items[parseInt(editIndex)] = {...active.items[parseInt(editIndex)], ...itemData};
+  } else {
+    active.items.push(itemData);
+  }
   saveWishlists(data);
   ['wf-name','wf-brand','wf-price','wf-url','wf-photo'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('wish-form').style.display = 'none';
+  document.getElementById('wish-form').dataset.editIndex = '';
   renderWishlist();
 }
 
@@ -1879,13 +1917,13 @@ if('serviceWorker' in navigator) {
 <div class="modal-overlay" id="modal-wishlist">
   <div class="modal" style="max-width:500px">
     <div class="modal-header">
-      <span class="modal-title">💘 Listas de deseos</span>
+      <span class="modal-title">📓 Listas</span>
       <button class="modal-close" onclick="closeModal('modal-wishlist')">✕</button>
     </div>
     <div class="modal-body">
       <div id="wishlist-items"></div>
       <div style="margin-top:10px">
-        <button class="btn-secondary" style="width:100%;margin-bottom:12px" onclick="toggleWishForm()">＋ Añadir perfume</button>
+        <button class="btn-secondary" style="width:100%;margin-bottom:12px" onclick="toggleWishForm()"><span id="wish-form-title">＋ Añadir perfume</span></button>
         <div id="wish-form" style="display:none" class="wish-add-form">
           <div class="field-grid" style="grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
             <div class="field-group" style="grid-column:1/-1;margin-bottom:0">
@@ -1910,7 +1948,7 @@ if('serviceWorker' in navigator) {
             </div>
           </div>
           <div class="btn-row" style="margin-top:10px">
-            <button class="btn-primary" onclick="saveWishItem()">✦ Guardar</button>
+            <button class="btn-primary" id="wf-save-btn" onclick="saveWishItem()">✦ Guardar</button>
             <button class="btn-secondary" onclick="toggleWishForm()">Cancelar</button>
           </div>
         </div>
