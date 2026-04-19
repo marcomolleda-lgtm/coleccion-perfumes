@@ -1760,10 +1760,10 @@ function renderWishlist() {
           <div class="wish-name">${item.name}</div>
           ${item.price ? `<div class="wish-price">${item.price}</div>` : ''}
           ${item.url ? `<a class="wish-link" href="${item.url}" target="_blank" rel="noopener">🔗 Ver en tienda</a>` : ''}
-        </div>
-        <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
-          <button class="wish-del" onclick="editWishItem(${i})" title="Editar" style="background:var(--accent-bg);color:var(--accent);border-color:var(--accent-light)">✏️</button>
-          <button class="wish-del" onclick="deleteWishItem(${i})" title="Eliminar">✕</button>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button onclick="editWishItem(${i})" style="flex:1;padding:5px 0;border-radius:8px;border:1px solid var(--accent-light);background:var(--accent-bg);color:var(--accent);font-size:12px;cursor:pointer;font-family:inherit">✏️ Editar</button>
+            <button onclick="deleteWishItem(${i})" style="flex:1;padding:5px 0;border-radius:8px;border:1px solid var(--border);background:var(--surface-alt);color:var(--text-muted);font-size:12px;cursor:pointer;font-family:inherit">🗑 Eliminar</button>
+          </div>
         </div>
       </div>`).join('');
 
