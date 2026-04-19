@@ -1751,7 +1751,7 @@ function renderWishlist() {
   const itemsHtml = items.length === 0
     ? `<div style="text-align:center;padding:20px 0;color:var(--text-light)"><div style="font-size:36px;margin-bottom:8px">💘</div><div style="font-size:12px;letter-spacing:1px">Esta lista está vacía</div></div>`
     : items.map((item, i) => `
-      <div class="wish-item">
+      <div class="wish-item" onclick="openWishDetail(${i})" style="cursor:pointer">
         ${item.photo
           ? `<img class="wish-photo" src="${item.photo}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="wish-photo-placeholder" style="display:none">💘</div>`
           : `<div class="wish-photo-placeholder">💘</div>`}
@@ -1759,12 +1759,9 @@ function renderWishlist() {
           <div class="wish-brand">${(item.brand||'').toUpperCase()}</div>
           <div class="wish-name">${item.name}</div>
           ${item.price ? `<div class="wish-price">${item.price}</div>` : ''}
-          ${item.url ? `<a class="wish-link" href="${item.url}" target="_blank" rel="noopener">🔗 Ver en tienda</a>` : ''}
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button onclick="editWishItem(${i})" style="flex:1;padding:5px 0;border-radius:8px;border:1px solid var(--accent-light);background:var(--accent-bg);color:var(--accent);font-size:12px;cursor:pointer;font-family:inherit">✏️ Editar</button>
-            <button onclick="deleteWishItem(${i})" style="flex:1;padding:5px 0;border-radius:8px;border:1px solid var(--border);background:var(--surface-alt);color:var(--text-muted);font-size:12px;cursor:pointer;font-family:inherit">🗑 Eliminar</button>
-          </div>
+          ${item.url ? `<a class="wish-link" href="${item.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 Ver en tienda</a>` : ''}
         </div>
+        <span style="color:var(--text-light);font-size:18px;flex-shrink:0">›</span>
       </div>`).join('');
 
   container.innerHTML = tabsHtml + itemsHtml;
@@ -1871,6 +1868,32 @@ function saveWishItem() {
   renderWishlist();
 }
 
+function openWishDetail(i) {
+  const data = loadWishlists();
+  const active = getActiveList(data);
+  if (!active) return;
+  const item = active.items[i];
+  if (!item) return;
+
+  document.getElementById('wish-detail-body').innerHTML = `
+    <div style="text-align:center;margin-bottom:16px">
+      ${item.photo
+        ? `<img src="${item.photo}" style="width:120px;height:120px;object-fit:cover;border-radius:12px;margin-bottom:10px" onerror="this.style.display='none'"/>`
+        : `<div style="width:120px;height:120px;border-radius:12px;background:var(--surface-alt);display:flex;align-items:center;justify-content:center;font-size:48px;margin:0 auto 10px">💘</div>`}
+      <div style="font-size:11px;letter-spacing:2px;color:var(--text-muted);font-weight:600">${(item.brand||'').toUpperCase()}</div>
+      <div style="font-size:22px;font-weight:700;color:var(--text);margin:4px 0">${item.name}</div>
+      ${item.price ? `<div style="font-size:16px;color:var(--accent);font-weight:600">${item.price}</div>` : ''}
+    </div>
+    ${item.url ? `<a href="${item.url}" target="_blank" rel="noopener" style="display:block;text-align:center;padding:8px;border-radius:10px;background:var(--surface-alt);color:var(--accent);font-size:13px;margin-bottom:14px;text-decoration:none">🔗 Ver en tienda</a>` : ''}
+    ${item.added ? `<div style="font-size:11px;color:var(--text-light);text-align:center;margin-bottom:16px">Añadido el ${item.added}</div>` : ''}
+    <div style="display:flex;gap:10px">
+      <button onclick="closeModal('modal-wish-detail');editWishItem(${i})" class="btn-primary" style="flex:1">✏️ Editar</button>
+      <button onclick="closeModal('modal-wish-detail');deleteWishItem(${i})" class="btn-danger" style="flex:1;padding:10px;border-radius:10px;border:none;background:#fdf0f0;color:var(--danger);font-family:inherit;font-size:14px;cursor:pointer">🗑 Eliminar</button>
+    </div>
+  `;
+  openModal('modal-wish-detail');
+}
+
 function deleteWishItem(i) {
   if (!confirm('¿Eliminar este perfume de la lista?')) return;
   const data = loadWishlists();
@@ -1957,6 +1980,17 @@ if('serviceWorker' in navigator) {
         💡 Los precios no se actualizan automáticamente — añade el enlace directo a la tienda para consultarlos fácilmente.
       </p>
     </div>
+  </div>
+</div>
+
+<!-- ══ WISH DETAIL MODAL ══ -->
+<div class="modal-overlay" id="modal-wish-detail">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <span class="modal-title">💘 Detalle</span>
+      <button class="modal-close" onclick="closeModal('modal-wish-detail')">✕</button>
+    </div>
+    <div class="modal-body" id="wish-detail-body"></div>
   </div>
 </div>
 
