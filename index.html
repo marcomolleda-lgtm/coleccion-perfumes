@@ -131,10 +131,11 @@
     background:var(--surface); border:1px solid var(--border);
     border-radius:var(--radius); overflow:hidden; cursor:pointer;
     box-shadow:var(--shadow); transition:transform .25s, box-shadow .25s;
+    display:flex; flex-direction:column; height:240px;
   }
   .card:active { transform:scale(.98); }
   .card-photo {
-    height:150px; display:flex; align-items:center; justify-content:center;
+    height:150px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
     overflow:hidden; position:relative; background:linear-gradient(135deg,#f0ebe555,#e8e0d555);
   }
   .card-photo img { width:100%; height:100%; object-fit:cover; }
@@ -144,7 +145,7 @@
     background:rgba(138,117,96,.85); color:#fff;
     font-size:10px; padding:2px 8px; border-radius:20px; letter-spacing:1px;
   }
-  .card-body { padding:12px 14px 14px; }
+  .card-body { padding:12px 14px 14px; flex:1; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; }
   .card-brand { font-size:13px; color:var(--text-muted); letter-spacing:1px; margin-bottom:3px; font-family:'Jost',sans-serif; font-weight:600; }
   .card-name { font-size:var(--font-size-card); font-family:'Jost',sans-serif; font-weight:600; font-weight:700; color:var(--text); line-height:1.2; margin-bottom:4px; }
   .card-perfumer { font-size:13px; color:var(--text-muted); margin-bottom:8px; }
@@ -455,6 +456,38 @@
     background:var(--accent); color:#fff;
   }
   /* ── NOTAS: tarjetas ── */
+  /* ── BARCODE SCANNER ── */
+  #modal-barcode .modal { max-width:380px; }
+  #barcode-video-wrap {
+    position:relative; background:#000; border-radius:12px;
+    overflow:hidden; aspect-ratio:1/1; margin-bottom:14px;
+  }
+  #barcode-video { width:100%; height:100%; object-fit:cover; display:block; }
+  #barcode-aim {
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  #barcode-aim::before {
+    content:'';
+    width:60%; height:30%; border:2px solid rgba(255,255,255,.7);
+    border-radius:6px; box-shadow:0 0 0 1000px rgba(0,0,0,.4);
+  }
+  #barcode-status {
+    text-align:center; font-size:12px; letter-spacing:1px;
+    color:var(--text-muted); margin-bottom:10px; min-height:1.4em;
+  }
+  .barcode-input-wrap {
+    display:flex; gap:8px; align-items:center;
+  }
+  .barcode-input-wrap .field-input { flex:1; }
+  .barcode-scan-btn {
+    background:var(--accent); color:#fff; border:none;
+    border-radius:10px; padding:0 14px; height:42px; font-size:18px;
+    cursor:pointer; flex-shrink:0; display:flex; align-items:center;
+    justify-content:center; transition:opacity .2s;
+  }
+  .barcode-scan-btn:active { opacity:.8; }
+
   .note-card {
     background:var(--surface); border:1px solid var(--border);
     border-radius:12px; padding:14px 16px; margin-bottom:10px;
@@ -734,6 +767,14 @@
       </div>
 
       <!-- Tags -->
+      <div class="field-group" id="fg-barcode">
+        <label class="field-label">CÓDIGO DE BARRAS</label>
+        <div class="barcode-input-wrap">
+          <input class="field-input" id="pf-barcode" placeholder="EAN / UPC" inputmode="numeric"/>
+          <button class="barcode-scan-btn" onclick="openBarcodeScanner()" title="Escanear con cámara">📷</button>
+        </div>
+      </div>
+
       <div class="field-group">
         <label class="field-label">ETIQUETAS</label>
         <div class="tags-row" id="edit-tags"></div>
@@ -819,6 +860,7 @@ let state = {
     {key:"myOpinion",label:"Mi opinión",visible:true},
     {key:"comments",label:"Comentarios",visible:true},
     {key:"inCollection",label:"¿Está en colección?",visible:true},
+    {key:"barcode",label:"Código de barras",visible:true},
   ],
   nextId: 10,
   sort: 'date',
@@ -1372,6 +1414,7 @@ function openEdit(id) {
   editRating = p ? (p.rating||0) : 0;
   editTags = p ? [...(p.tags||[])] : [];
   editLists = p ? [...(p.lists||[])] : [];
+  document.getElementById('pf-barcode').value = p ? (p.barcode||'') : '';
 
   document.getElementById('edit-title').textContent = p ? '✦ Editar perfume' : '✦ Nuevo perfume';
   document.getElementById('btn-delete').style.display = p ? 'block' : 'none';
@@ -1525,6 +1568,7 @@ function savePerfume() {
     rating: editRating,
     tags: [...editTags],
     lists: [...editLists],
+    barcode: document.getElementById('pf-barcode').value.trim(),
     inCollection: document.getElementById('f-incollection').checked,
     notes: document.getElementById('f-notes').value,
     myOpinion: document.getElementById('f-opinion').value,
@@ -1777,6 +1821,76 @@ function saveWishlists(data) {
 }
 function getActiveList(data) {
   return data.lists.find(l => l.id === data.activeList) || data.lists[0];
+}
+
+// ══ ESCÁNER CÓDIGO DE BARRAS ══════════════════════════════════
+let _barcodeStream = null;
+let _barcodeDetector = null;
+let _barcodeRaf = null;
+
+async function openBarcodeScanner() {
+  const overlay = document.getElementById('modal-barcode');
+  overlay.style.display = 'flex';
+  const status = document.getElementById('barcode-status');
+
+  // Check BarcodeDetector support
+  if (!('BarcodeDetector' in window)) {
+    status.textContent = '⚠ Escáner no disponible en este navegador. Introduce el código manualmente.';
+    return;
+  }
+
+  status.textContent = 'Iniciando cámara…';
+
+  try {
+    _barcodeStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    const video = document.getElementById('barcode-video');
+    video.srcObject = _barcodeStream;
+    await video.play();
+
+    _barcodeDetector = new BarcodeDetector({
+      formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf','qr_code']
+    });
+
+    status.textContent = 'Apunta al código de barras del perfume…';
+    _scanFrame();
+  } catch(e) {
+    status.textContent = '⚠ No se pudo acceder a la cámara. Introduce el código manualmente.';
+  }
+}
+
+function _scanFrame() {
+  const video = document.getElementById('barcode-video');
+  if (!video || !_barcodeDetector || !_barcodeStream) return;
+
+  _barcodeDetector.detect(video).then(barcodes => {
+    if (barcodes && barcodes.length > 0) {
+      const code = barcodes[0].rawValue;
+      document.getElementById('pf-barcode').value = code;
+      document.getElementById('barcode-status').textContent = '✓ Código detectado: ' + code;
+      // Small vibration feedback if available
+      if (navigator.vibrate) navigator.vibrate(100);
+      setTimeout(() => closeBarcodeScanner(), 800);
+      return;
+    }
+    _barcodeRaf = requestAnimationFrame(_scanFrame);
+  }).catch(() => {
+    _barcodeRaf = requestAnimationFrame(_scanFrame);
+  });
+}
+
+function closeBarcodeScanner() {
+  if (_barcodeRaf) { cancelAnimationFrame(_barcodeRaf); _barcodeRaf = null; }
+  if (_barcodeStream) {
+    _barcodeStream.getTracks().forEach(t => t.stop());
+    _barcodeStream = null;
+  }
+  _barcodeDetector = null;
+  const video = document.getElementById('barcode-video');
+  if (video) video.srcObject = null;
+  document.getElementById('modal-barcode').style.display = 'none';
+  document.getElementById('barcode-status').textContent = 'Apunta la cámara al código de barras';
 }
 
 // ══ PESTAÑA ACTIVA EN LISTAS/NOTAS ════════════════════════════
@@ -2202,6 +2316,26 @@ if('serviceWorker' in navigator) {
       <button class="modal-close" onclick="closeModal('modal-wish-detail')">✕</button>
     </div>
     <div class="modal-body" id="wish-detail-body"></div>
+  </div>
+</div>
+
+<!-- ── MODAL ESCÁNER CÓDIGO DE BARRAS ── -->
+<div class="modal-overlay" id="modal-barcode">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <span class="modal-title">📷 Escanear código de barras</span>
+      <button class="modal-close" onclick="closeBarcodeScanner()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="barcode-video-wrap">
+        <video id="barcode-video" autoplay playsinline muted></video>
+        <div id="barcode-aim"></div>
+      </div>
+      <div id="barcode-status">Apunta la cámara al código de barras</div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="closeBarcodeScanner()">Cancelar</button>
+      </div>
+    </div>
   </div>
 </div>
 
