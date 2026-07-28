@@ -169,7 +169,7 @@
     background:var(--surface); border:1px solid var(--border); border-radius:12px;
     padding:0; cursor:pointer; display:flex; align-items:stretch; gap:0;
     box-shadow:var(--shadow); transition:background .15s; overflow:hidden;
-    height:76px; min-height:76px; max-height:76px;
+    height:92px; min-height:92px; max-height:92px;
   }
   .row:active { background:var(--surface-alt); }
   .row-thumb {
@@ -876,8 +876,8 @@
 
 <script>
 // ══ STATE ══════════════════════════════════════════════════════
-const FAMILIES = ["Floral","Oriental","Amaderado","Fresco","Cítrico","Fougère","Chipre","Gourmand","Acuático","Especiado","Cuero","Vegetal","Almizclado","Animálico"];
-const CONCENTRATIONS = ["Parfum","EDP","EDT","EDC","Splash","Solid","Cologne"];
+const FAMILIES = ["Floral","Oriental","Amaderado","Fresco","Cítrico","Fougère","Chipre","Gourmand","Acuático","Especiado","Cuero","Vegetal","Almizclado","Animálico","Ambarado"];
+const CONCENTRATIONS = ["Aceite","Colonia","EDT","EDP","Perfume","Extracto de perfume","Sólido"];
 const GENDERS = ["Masculino","Femenino","Unisex"];
 
 let state = {
@@ -1019,15 +1019,8 @@ async function initState() {
   const saved = load('pf_state');
   if (saved) {
     state = saved;
-    // Always ensure theme is a valid object (old saves may not have it)
-    state.theme = state.theme || {};
-    // Load theme from dedicated key and merge (more reliable)
-    const savedTheme = load('pf_theme');
-    if (savedTheme && typeof savedTheme === 'object') {
-      state.theme = {...state.theme, ...savedTheme};
-    }
     // Ensure each perfume has photos array placeholder
-    state.perfumes = state.perfumes.map(p => ({...p, photos: [null,null,null,null,null,null], coverIndex: 0}));
+    state.perfumes = state.perfumes.map(p => ({...p, photos: [null,null,null], coverIndex: 0}));
     // Load all photos from IDB
     const allPhotos = await idbGetAll();
     state.perfumes.forEach(p => {
@@ -1037,13 +1030,6 @@ async function initState() {
         p.coverIndex = allPhotos[key].coverIndex || 0;
       }
     });
-  }
-  // If no saved state, still try to load theme from dedicated key
-  if (!saved) {
-    const savedTheme = load('pf_theme');
-    if (savedTheme && typeof savedTheme === 'object') {
-      state.theme = savedTheme;
-    }
   }
   applyTheme();
   applyViewSort();
@@ -1193,29 +1179,13 @@ function openTheme() {
     </div>`;
   openModal('modal-theme');
 }
-function setThemeVar(k,v) {
-  state.theme = state.theme || {};
-  state.theme[k]=v;
-  applyTheme();
-  // Save theme to its own key (more reliable than bundling with full state)
-  try { localStorage.setItem('pf_theme', JSON.stringify(state.theme)); } catch(e){}
-  save();
-}
+function setThemeVar(k,v) { state.theme[k]=v; applyTheme(); save(); }
 function resetThemeKey(k, defVal) {
-  state.theme = state.theme || {};
   delete state.theme[k];
-  applyTheme();
-  try { localStorage.setItem('pf_theme', JSON.stringify(state.theme)); } catch(e){}
-  save();
-  openTheme();
+  applyTheme(); save();
+  openTheme(); // re-render panel so slider updates
 }
-function resetTheme() {
-  state.theme={};
-  applyTheme();
-  try { localStorage.removeItem('pf_theme'); } catch(e){}
-  save();
-  openTheme();
-}
+function resetTheme() { state.theme={}; applyTheme(); save(); openTheme(); }
 applyTheme();
 
 // ══ FIELD MANAGER ══════════════════════════════════════════════
