@@ -456,6 +456,21 @@
     background:var(--accent); color:#fff;
   }
   /* ── NOTAS: tarjetas ── */
+  /* ── FAMILY CHIPS ── */
+  .family-chips {
+    display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;
+  }
+  .family-chip {
+    font-size:11px; letter-spacing:1px; padding:5px 12px;
+    border-radius:20px; border:1.5px solid var(--border);
+    background:var(--surface-alt); color:var(--text-muted);
+    cursor:pointer; transition:all .15s; user-select:none;
+    font-family:inherit;
+  }
+  .family-chip.selected {
+    background:var(--accent); color:#fff; border-color:var(--accent);
+  }
+
   /* ── BARCODE SCANNER ── */
   #modal-barcode .modal { max-width:380px; }
   #barcode-video-wrap {
@@ -702,7 +717,7 @@
     <div class="modal-body">
 
       <!-- Photos -->
-      <div class="field-label">FOTOS (hasta 3)</div>
+      <div class="field-label">FOTOS (hasta 6)</div>
       <div class="photo-grid">
         <label class="photo-slot" id="slot-0">
           <input type="file" accept="image/*" onchange="handlePhoto(0,this)"/>
@@ -715,6 +730,18 @@
         <label class="photo-slot" id="slot-2">
           <input type="file" accept="image/*" onchange="handlePhoto(2,this)"/>
           <div class="photo-placeholder"><span>📷</span><small>FOTO 3</small></div>
+        </label>
+        <label class="photo-slot" id="slot-3">
+          <input type="file" accept="image/*" onchange="handlePhoto(3,this)"/>
+          <div class="photo-placeholder"><span>📷</span><small>FOTO 4</small></div>
+        </label>
+        <label class="photo-slot" id="slot-4">
+          <input type="file" accept="image/*" onchange="handlePhoto(4,this)"/>
+          <div class="photo-placeholder"><span>📷</span><small>FOTO 5</small></div>
+        </label>
+        <label class="photo-slot" id="slot-5">
+          <input type="file" accept="image/*" onchange="handlePhoto(5,this)"/>
+          <div class="photo-placeholder"><span>📷</span><small>FOTO 6</small></div>
         </label>
       </div>
 
@@ -837,9 +864,9 @@ const GENDERS = ["Masculino","Femenino","Unisex"];
 
 let state = {
   perfumes: [
-    {id:1,name:"Santal 33",brand:"Le Labo",concentration:"EDP",capacity:"100ml",launch:"2011",perfumer:"Frank Voelkl",bottleDesigner:"Le Labo Studio",family:"Amaderado",gender:"Unisex",notes:"Cardamomo, Violeta · Iris, Ambrox · Sándalo, Cuero",boughtAt:"Boutique Le Labo Madrid",price:"310€",inCollectionSince:"2023-04-12",rating:5,bottleCount:1,bottleStatus:"Medio",myOpinion:"Un clásico moderno imprescindible.",comments:"Lo reservo para ocasiones especiales.",inCollection:true,tags:["favorito","especial"],lists:["Favoritos"],photos:[null,null,null],added:"2023-04-12"},
-    {id:2,name:"Baccarat Rouge 540",brand:"MFK",concentration:"EDP",capacity:"70ml",launch:"2015",perfumer:"Francis Kurkdjian",bottleDesigner:"Georges Chevalier",family:"Floral",gender:"Unisex",notes:"Azafrán, Jazmín · Ambroxan, Cedro · Musgo",boughtAt:"El Corte Inglés",price:"395€",inCollectionSince:"2023-09-01",rating:5,bottleCount:1,bottleStatus:"Lleno",myOpinion:"Sofisticado y adictivo.",comments:"",inCollection:true,tags:["lujo"],lists:["Favoritos"],photos:[null,null,null],added:"2023-09-01"},
-    {id:3,name:"Oud Wood",brand:"Tom Ford",concentration:"EDP",capacity:"50ml",launch:"2007",perfumer:"Richard Herpin",bottleDesigner:"Tom Ford Beauty",family:"Oriental",gender:"Masculino",notes:"Palo de Rosa · Oud, Sándalo · Vainilla, Ámbar",boughtAt:"Tom Ford Online",price:"280€",inCollectionSince:"2024-01-20",rating:4,bottleCount:2,bottleStatus:"Casi vacío",myOpinion:"Cálido y envolvente.",comments:"Perfecto para invierno.",inCollection:true,tags:["invierno","noche"],lists:[],photos:[null,null,null],added:"2024-01-20"},
+    {id:1,name:"Santal 33",brand:"Le Labo",concentration:"EDP",capacity:"100ml",launch:"2011",perfumer:"Frank Voelkl",bottleDesigner:"Le Labo Studio",family:"Amaderado",gender:"Unisex",notes:"Cardamomo, Violeta · Iris, Ambrox · Sándalo, Cuero",boughtAt:"Boutique Le Labo Madrid",price:"310€",inCollectionSince:"2023-04-12",rating:5,bottleCount:1,bottleStatus:"Medio",myOpinion:"Un clásico moderno imprescindible.",comments:"Lo reservo para ocasiones especiales.",inCollection:true,tags:["favorito","especial"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-04-12"},
+    {id:2,name:"Baccarat Rouge 540",brand:"MFK",concentration:"EDP",capacity:"70ml",launch:"2015",perfumer:"Francis Kurkdjian",bottleDesigner:"Georges Chevalier",family:"Floral",gender:"Unisex",notes:"Azafrán, Jazmín · Ambroxan, Cedro · Musgo",boughtAt:"El Corte Inglés",price:"395€",inCollectionSince:"2023-09-01",rating:5,bottleCount:1,bottleStatus:"Lleno",myOpinion:"Sofisticado y adictivo.",comments:"",inCollection:true,tags:["lujo"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-09-01"},
+    {id:3,name:"Oud Wood",brand:"Tom Ford",concentration:"EDP",capacity:"50ml",launch:"2007",perfumer:"Richard Herpin",bottleDesigner:"Tom Ford Beauty",family:"Oriental",gender:"Masculino",notes:"Palo de Rosa · Oud, Sándalo · Vainilla, Ámbar",boughtAt:"Tom Ford Online",price:"280€",inCollectionSince:"2024-01-20",rating:4,bottleCount:2,bottleStatus:"Casi vacío",myOpinion:"Cálido y envolvente.",comments:"Perfecto para invierno.",inCollection:true,tags:["invierno","noche"],lists:[],photos:[null,null,null,null,null,null],added:"2024-01-20"},
   ],
   fields: [
     {key:"name",label:"Nombre",visible:true,required:true},
@@ -868,7 +895,7 @@ let state = {
   theme: {}
 };
 
-let editPhotos=[null,null,null];
+let editPhotos=[null,null,null,null,null,null];
 var editCoverIndex=0;
 let editRating = 0;
 let editTags = [];
@@ -1246,8 +1273,8 @@ function getFiltered() {
   const lst = document.getElementById('f-list').value;
 
   return state.perfumes.filter(p=>{
-    if(q && !`${p.name} ${p.brand} ${p.perfumer} ${p.family}`.toLowerCase().includes(q)) return false;
-    if(fam && p.family!==fam) return false;
+    const pfam=Array.isArray(p.family)?p.family.join(' '):(p.family||''); if(q && !`${p.name} ${p.brand} ${p.perfumer} ${pfam}`.toLowerCase().includes(q)) return false;
+    if(fam){ const fams=Array.isArray(p.family)?p.family:(p.family?[p.family]:[]); if(!fams.includes(fam)) return false; }
     if(gen && p.gender!==gen) return false;
     if(rat && (p.rating||0)<rat) return false;
     if(col==='1' && !p.inCollection) return false;
@@ -1264,7 +1291,7 @@ function starsHTML(n, cls='') {
 
 function render() {
   // Update filter dropdowns
-  const allFamilies=[...new Set(state.perfumes.map(p=>p.family).filter(Boolean))];
+  const allFamilies=[...new Set(state.perfumes.flatMap(p=>Array.isArray(p.family)?p.family:(p.family?[p.family]:[])).filter(Boolean))];
   const selFam=document.getElementById('f-family');
   const curFam=selFam.value;
   selFam.innerHTML=`<option value="">Familia</option>`+[...new Set([...FAMILIES,...allFamilies])].map(f=>`<option${curFam===f?' selected':''}>${f}</option>`).join('');
@@ -1325,7 +1352,7 @@ function render() {
         <div class="row-info">
           <div class="row-brand">${p.brand||''}</div>
           <div class="row-name">${p.name}</div>
-          <div class="row-sub">${[p.perfumer,p.family].filter(Boolean).join(' · ')}</div>
+          <div class="row-sub">${[p.perfumer,Array.isArray(p.family)?p.family.join(', '):(p.family||'')].filter(Boolean).join(' · ')}</div>
         </div>
         <div class="row-right">
           ${starsHTML(p.rating||0)}
@@ -1361,10 +1388,10 @@ function openDetail(id) {
         <span class="${p.inCollection?'badge-in':'badge-out'}">${p.inCollection?'✓ En colección':'✗ No en colección'}</span>
       </div>
       <div class="detail-fields">
-        ${vf.filter(f=>p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null).map(f=>`
+        ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
           <div>
             <div class="detail-field-label">${f.label.toUpperCase()}</div>
-            <div class="detail-field-value">${p[f.key]}</div>
+            <div class="detail-field-value">${f.key==='family'?(Array.isArray(p.family)?p.family.join(' · '):(p.family||'')):p[f.key]}</div>
           </div>`).join('')}
       </div>
       ${p.notes?`<div class="detail-block"><div class="detail-block-label">NOTAS OLFATIVAS</div><div class="detail-block-value">${p.notes}</div></div>`:''}
@@ -1409,7 +1436,7 @@ function rteSetHtml(id, html) { document.getElementById(id).innerHTML = html || 
 function openEdit(id) {
   const p = id ? state.perfumes.find(x=>x.id===id) : null;
   editId = p ? p.id : null;
-  editPhotos = p ? [...(p.photos||[null,null,null])] : [null,null,null];
+  editPhotos = p ? [...(p.photos||[null,null,null,null,null,null])].concat([null,null,null,null,null,null]).slice(0,6) : [null,null,null,null,null,null];
   editCoverIndex = p ? (p.coverIndex||0) : 0;
   editRating = p ? (p.rating||0) : 0;
   editTags = p ? [...(p.tags||[])] : [];
@@ -1446,7 +1473,11 @@ function openEdit(id) {
     let inner=`<label class="field-label">${f.label.toUpperCase()}</label>`;
     const val = p?p[f.key]||'':'';
     if(f.key==='concentration') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${CONCENTRATIONS.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}</select>`;
-    else if(f.key==='family') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${FAMILIES.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}</select>`;
+    else if(f.key==='family') {
+      // families stored as array; support legacy string
+      const selectedFams = Array.isArray(val) ? val : (val ? [val] : []);
+      inner += `<div class="family-chips" id="ef-family-chips">${FAMILIES.map(fam=>`<button type="button" class="family-chip${selectedFams.includes(fam)?' selected':''}" onclick="toggleFamilyChip(this,'${fam}')">${fam}</button>`).join('')}</div>`;
+    }
     else if(f.key==='gender') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${GENDERS.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}</select>`;
     else if(f.key==='inCollectionSince') inner+=`<input class="field-input" type="date" id="ef-${f.key}" value="${val}"/>`;
     else if(f.key==='bottleCount') inner+=`<input class="field-input" type="number" min="0" id="ef-${f.key}" value="${val}"/>`;
@@ -1551,6 +1582,10 @@ function addList(){ const v=document.getElementById('list-input').value.trim(); 
 function removeList(l){ editLists=editLists.filter(x=>x!==l); renderEditLists(); }
 
 function getFieldVal(key) {
+  if(key==='family'){
+    const chips=document.querySelectorAll('#ef-family-chips .family-chip.selected');
+    return chips.length ? [...chips].map(c=>c.textContent) : [];
+  }
   const el=document.getElementById('ef-'+key);
   return el?el.value:'';
 }
@@ -1608,7 +1643,7 @@ function closeEdit(){ closeModal('modal-edit'); }
 function shareWA(id) {
   const p=state.perfumes.find(x=>x.id===id);
   if(!p) return;
-  const txt=`✦ ${p.name} — ${p.brand||''}\n👤 ${p.perfumer||''}\n🌸 ${p.family||''}\n💶 ${p.price||''}\n⭐ ${p.rating||0}/5\n📝 ${p.myOpinion||''}`;
+  const txt=`✦ ${p.name} — ${p.brand||''}\n👤 ${p.perfumer||''}\n🌸 ${Array.isArray(p.family)?p.family.join(', '):(p.family||'')}\n💶 ${p.price||''}\n⭐ ${p.rating||0}/5\n📝 ${p.myOpinion||''}`;
   window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 }
 function shareWhatsApp() {
@@ -1821,6 +1856,11 @@ function saveWishlists(data) {
 }
 function getActiveList(data) {
   return data.lists.find(l => l.id === data.activeList) || data.lists[0];
+}
+
+// ══ FAMILIA OLFATIVA — CHIPS ═══════════════════════════════════
+function toggleFamilyChip(btn, fam) {
+  btn.classList.toggle('selected');
 }
 
 // ══ ESCÁNER CÓDIGO DE BARRAS ══════════════════════════════════
