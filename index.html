@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>Parfumerie — Mi Colección</title>
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Yantramanav:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<title>perfumes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Jost:wght@300;400;500;600;700&family=Yantramanav:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 <link rel="manifest" href="./manifest.json"/>
 <meta name="theme-color" content="#8a7560"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-<meta name="apple-mobile-web-app-title" content="Parfumerie"/>
+<meta name="apple-mobile-web-app-title" content="perfumes"/>
 <link rel="apple-touch-icon" href="./icon-192.png"/>
 <style>
   :root {
-    --bg: #f4f3f1;
-    --surface: #ffffff;
-    --surface-alt: #f9f8f6;
-    --border: #e8e4de;
-    --accent: #8a7560;
-    --accent-dark: #5c4d3c;
-    --accent-light: #c4ab8f;
-    --text: #2c2520;
-    --text-muted: #9a8f85;
-    --text-light: #c4bab2;
+    --bg: #ede9df;
+    --surface: #f4f1ea;
+    --surface-alt: #ede9df;
+    --border: #d4cfc4;
+    --accent: #7b4a35;
+    --accent-dark: #5a3223;
+    --accent-light: #a06a55;
+    --text: #1a1e1e;
+    --text-muted: #878880;
+    --text-light: #b0aba3;
     --star: #c9973a;
     --danger: #c0392b;
     --font-size-base: 14px;
@@ -33,7 +33,7 @@
     --shadow: 0 2px 12px rgba(0,0,0,0.07);
   }
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body { background:var(--bg); font-family:var(--font-family,'Jost'),sans-serif; color:var(--text); min-height:100vh; font-size:var(--font-size-base); }
+  body { background:var(--bg); font-family:'Jost',sans-serif; color:var(--text); min-height:100vh; font-size:14px; }
   ::-webkit-scrollbar { width:5px; }
   ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
 
@@ -45,7 +45,7 @@
   }
   #header-top { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
   #logo { flex:1; }
-  #logo-title { font-family:'Jost',sans-serif; font-weight:600; font-size:20px; font-weight:700; color:var(--accent-dark); }
+  #logo-title { font-family:'Playfair Display',serif; font-weight:400; font-size:20px; color:var(--text); letter-spacing:.02em; }
   #logo-sub { font-size:10px; color:var(--text-light); letter-spacing:3px; }
 
   #view-menu-wrap { position:relative; }
@@ -608,7 +608,7 @@
 <div id="header">
   <div id="header-top">
     <div id="logo">
-      <img src="data:image/png;base64,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" alt="Parfumerie" style="height:68px;width:68px;object-fit:contain;flex-shrink:0;"/>
+      <img src="data:image/png;base64,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" alt="perfumes" style="height:68px;width:68px;object-fit:contain;flex-shrink:0;"/>
     </div>
     <div id="icon-row">
       <div id="view-menu-wrap">
@@ -628,7 +628,6 @@
       <div id="settings-menu-wrap" style="position:relative">
         <button class="icon-btn" id="settings-menu-btn" onclick="toggleSettingsMenu()" title="Ajustes">⚙️</button>
         <div id="settings-menu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:8px;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,0.13);z-index:500;">
-          <button class="dropdown-item" onclick="openTheme();closeSettingsMenu()">Personalización</button>
           <button class="dropdown-item" onclick="showExportMenu();closeSettingsMenu()">Exportar</button>
           <button class="dropdown-item" onclick="importJSON();closeSettingsMenu()">Importar</button>
         </div>
@@ -848,16 +847,6 @@
   </div>
 </div>
 
-<!-- ══ THEME MODAL ══ -->
-<div class="modal-overlay" id="modal-theme">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header">
-      <span class="modal-title">🎨 Personalizar</span>
-      <button class="modal-close" onclick="closeModal('modal-theme')">✕</button>
-    </div>
-    <div class="modal-body" id="theme-body"></div>
-  </div>
-</div>
 
 <!-- ══ FIELD MANAGER MODAL ══ -->
 <div class="modal-overlay" id="modal-fields">
@@ -990,7 +979,7 @@ function save() {
     localStorage.setItem('pf_state', JSON.stringify(slim));
   } catch(e) {
     showToast('❌ Error al guardar los datos. Espacio insuficiente.', 6000);
-    console.error('Parfumerie: error localStorage', e);
+    console.error('perfumes: error localStorage', e);
   }
 }
 
@@ -1031,7 +1020,6 @@ async function initState() {
       }
     });
   }
-  applyTheme();
   applyViewSort();
   render();
 }
@@ -1051,142 +1039,6 @@ function showToast(msg, duration) {
   clearTimeout(t._timer);
   t._timer = setTimeout(() => { t.style.opacity = '0'; }, duration);
 }
-
-// ══ THEME ══════════════════════════════════════════════════════
-const THEME_DEFAULTS = {
-  '--bg':'#f4f3f1','--surface':'#ffffff','--surface-alt':'#f9f8f6',
-  '--border':'#e8e4de','--accent':'#8a7560','--accent-dark':'#5c4d3c',
-  '--text':'#2c2520','--text-muted':'#9a8f85','--text-light':'#c4bab2','--star':'#c9973a'
-};
-const THEME_LABELS = {
-  '--bg':'Fondo general','--surface':'Tarjetas','--surface-alt':'Fondo alt.',
-  '--border':'Bordes','--accent':'Color acento','--accent-dark':'Acento oscuro',
-  '--text':'Texto','--text-muted':'Texto secundario','--text-light':'Texto claro','--star':'Estrellas'
-};
-function applyTheme() {
-  const t = {...THEME_DEFAULTS, ...state.theme};
-  // Apply color vars
-  Object.entries(t).forEach(([k,v])=>{
-    if(k.startsWith('--')) document.documentElement.style.setProperty(k,v);
-  });
-  // Apply font family
-  const fontFamily = state.theme['--font-family']||'Jost';
-  document.documentElement.style.setProperty('--font-family', fontFamily);
-  document.body.style.fontFamily = fontFamily + ',sans-serif';
-  // Base font size
-  const sizeBase = parseInt(state.theme['--font-size-base'])||14;
-  document.getElementById('main').style.fontSize = sizeBase + 'px';
-  // Per-element sizes (use override if set, otherwise scale from base)
-  const sz = k => parseInt(state.theme[k]);
-  const styleId = 'dynamic-font-style';
-  let styleEl = document.getElementById(styleId);
-  if(!styleEl) { styleEl = document.createElement('style'); styleEl.id = styleId; document.head.appendChild(styleEl); }
-  styleEl.textContent = `
-    .card-name { font-size: ${sz('--sz-card-name') || 17}px !important; }
-    .card-brand { font-size: ${sz('--sz-card-brand') || Math.round(sizeBase * 0.93)}px !important; }
-    .card-perfumer { font-size: ${Math.round(sizeBase * 0.93)}px !important; }
-    .card-bottom .star { font-size: ${Math.round(sizeBase * 1.1)}px !important; }
-    .row-name { font-size: ${sz('--sz-row-name') || 17}px !important; }
-    .row-brand { font-size: ${sz('--sz-row-brand') || 11}px !important; }
-    .row-sub { font-size: ${sz('--sz-row-sub') || 13}px !important; }
-    .field-input, .field-select, .field-textarea { font-size: ${sizeBase}px !important; }
-    .field-label { font-size: ${Math.round(sizeBase * 0.92)}px !important; }
-    .modal-title { font-size: ${sz('--sz-modal-title') || Math.round(sizeBase * 1.3)}px !important; }
-    .detail-field-label { font-size: ${Math.round(sizeBase * 0.92)}px !important; }
-    .detail-field-value { font-size: ${sizeBase}px !important; }
-    .detail-block-label { font-size: ${Math.round(sizeBase * 0.92)}px !important; }
-    .detail-block-value { font-size: ${sz('--sz-notes') || sizeBase}px !important; }
-    .btn-primary, .btn-secondary { font-size: ${sizeBase}px !important; }
-    .tag-chip { font-size: ${Math.round(sizeBase * 0.85)}px !important; }
-    #search-bar { font-size: ${sizeBase}px !important; }
-    #btn-add { font-size: ${Math.round(sizeBase * 1.05)}px !important; }
-    .switch-label { font-size: ${Math.round(sizeBase * 0.92)}px !important; }
-    .badge-in, .badge-out { font-size: ${Math.round(sizeBase * 0.85)}px !important; }
-    #count-label { font-size: ${sz('--sz-count-label') || 13}px !important; }
-    .detail-title { font-size: ${sz('--sz-detail-title') || 28}px !important; }
-  `;
-}
-function openTheme() {
-  const t = {...THEME_DEFAULTS, ...state.theme};
-  const fonts = ['Jost','Georgia','Verdana','Trebuchet MS','Arial','Courier New','Palatino'];
-  const curFont = state.theme['--font-family']||'Jost';
-  const curSizeBase = parseInt(state.theme['--font-size-base'])||14;
-  const curSizeCard = parseInt(state.theme['--font-size-card'])||17;
-
-  // Per-element size overrides (stored in state.theme as --sz-xxx)
-  const szItems = [
-    { key: '--sz-card-name',    label: 'Nombre en tarjeta',  def: 17, min: 12, max: 28 },
-    { key: '--sz-card-brand',   label: 'Marca en tarjeta',   def: 13, min: 9,  max: 20 },
-    { key: '--sz-row-name',     label: 'Nombre en lista',    def: 17, min: 12, max: 26 },
-    { key: '--sz-row-brand',    label: 'Marca en lista',     def: 11, min: 8,  max: 16 },
-    { key: '--sz-row-sub',      label: 'Info. secundaria',   def: 13, min: 9,  max: 18 },
-    { key: '--sz-detail-title', label: 'Título detalle',     def: 28, min: 18, max: 42 },
-    { key: '--sz-modal-title',  label: 'Título modal',       def: 20, min: 14, max: 28 },
-    { key: '--sz-notes',        label: 'Notas olfativas',    def: 14, min: 10, max: 20 },
-    { key: '--sz-opinion',      label: 'Mi opinión',         def: 14, min: 10, max: 20 },
-    { key: '--sz-count-label',  label: 'Contador perfumes',  def: 13, min: 9,  max: 18 },
-  ];
-
-  function sliderRow(k, label, def, min, max) {
-    const cur = parseInt(state.theme[k]) || def;
-    return `<div class="theme-row" style="align-items:center">
-      <span style="flex:1">${label}</span>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:11px;color:var(--text-light);min-width:28px;text-align:right" id="lbl${k}">${cur}px</span>
-        <input type="range" min="${min}" max="${max}" value="${cur}"
-          oninput="document.getElementById('lbl${k}').textContent=this.value+'px';setThemeVar('${k}',this.value+'px')"
-          style="width:80px"/>
-        <button onclick="resetThemeKey('${k}','${def}')" title="Restaurar" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:0 2px">↺</button>
-      </div>
-    </div>`;
-  }
-
-  document.getElementById('theme-body').innerHTML =
-    `<div style="font-size:12px;color:var(--text-muted);letter-spacing:2px;margin-bottom:10px;font-weight:600">COLORES</div>` +
-    Object.entries(THEME_LABELS).map(([k,l])=>`
-      <div class="theme-row">
-        <span>${l}</span>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:11px;color:var(--text-light)">${t[k]||''}</span>
-          <input type="color" value="${t[k]||'#000000'}" onchange="setThemeVar('${k}',this.value)"/>
-        </div>
-      </div>`).join('') +
-
-    `<div style="font-size:12px;color:var(--text-muted);letter-spacing:2px;margin:18px 0 10px;font-weight:600">TIPOGRAFÍA GLOBAL</div>
-    <div class="theme-row">
-      <span>Fuente</span>
-      <select onchange="setThemeVar('--font-family',this.value)" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface-alt);font-size:13px;outline:none;cursor:pointer">
-        ${fonts.map(f=>`<option value="${f}"${curFont===f?' selected':''}>${f}</option>`).join('')}
-      </select>
-    </div>
-    <div class="theme-row" style="align-items:center">
-      <span>Tamaño base (px)</span>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:11px;color:var(--text-light);min-width:28px;text-align:right" id="lbl-size-base">${curSizeBase}px</span>
-        <input type="range" min="11" max="20" value="${curSizeBase}"
-          oninput="document.getElementById('lbl-size-base').textContent=this.value+'px';setThemeVar('--font-size-base',this.value+'px')"
-          style="width:80px"/>
-        <button onclick="resetThemeKey('--font-size-base','14')" title="Restaurar" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:0 2px">↺</button>
-      </div>
-    </div>
-
-    <div style="font-size:12px;color:var(--text-muted);letter-spacing:2px;margin:18px 0 10px;font-weight:600">TAMAÑOS POR ELEMENTO</div>` +
-    szItems.map(s => sliderRow(s.key, s.label, s.def, s.min, s.max)).join('') +
-
-    `<div class="btn-row" style="margin-top:18px">
-      <button class="btn-secondary" style="flex:1" onclick="resetTheme()">Restaurar todo</button>
-      <button class="btn-primary" onclick="closeModal('modal-theme')">Cerrar</button>
-    </div>`;
-  openModal('modal-theme');
-}
-function setThemeVar(k,v) { state.theme[k]=v; applyTheme(); save(); }
-function resetThemeKey(k, defVal) {
-  delete state.theme[k];
-  applyTheme(); save();
-  openTheme(); // re-render panel so slider updates
-}
-function resetTheme() { state.theme={}; applyTheme(); save(); openTheme(); }
-applyTheme();
 
 // ══ FIELD MANAGER ══════════════════════════════════════════════
 var fmDragSrc = null;
@@ -1747,7 +1599,7 @@ async function exportJSON() {
   const data = JSON.stringify(perfumesWithPhotos, null, 2);
   const a = document.createElement('a');
   a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(data);
-  a.download = 'mi_coleccion_parfumerie.json';
+  a.download = 'mi_coleccion_perfumes.json';
   a.click();
 }
 
@@ -1762,7 +1614,7 @@ function exportCSV() {
   const csv = [headers,...rows].join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
-  a.download = 'mi_coleccion_parfumerie.csv';
+  a.download = 'mi_coleccion_perfumes.csv';
   a.click();
 }
 
@@ -1777,7 +1629,7 @@ function exportXLSX() {
   const tsv = [headers,...rows].join('\n');
   const a = document.createElement('a');
   a.href = 'data:application/vnd.ms-excel;charset=utf-8,\uFEFF' + encodeURIComponent(tsv);
-  a.download = 'mi_coleccion_parfumerie.xls';
+  a.download = 'mi_coleccion_perfumes.xls';
   a.click();
 }
 
@@ -1829,7 +1681,7 @@ function handleImport(input) {
       save(); render();
       alert('✓ Importación completada: ' + imported.length + ' perfumes.');
     } catch(err) {
-      alert('Error al leer el archivo. Asegúrate de que es un archivo JSON exportado desde Parfumerie.');
+      alert('Error al leer el archivo. Asegúrate de que es un archivo JSON exportado desde perfumes.');
     }
   };
   reader.readAsText(file);
