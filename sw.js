@@ -1,9 +1,9 @@
-const CACHE = 'perfumes-v2';
+const CACHE = 'perfumes-v3';
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(CACHE).then(function(cache) {
-      return cache.addAll(['./index.html', './manifest.json', './icon-192-v3.png', './icon-512-v3.png']);
+      return cache.addAll(['./index.html', './manifest.json', './icon-192-v4.png', './icon-512-v4.png']);
     })
   );
   self.skipWaiting();
