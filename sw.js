@@ -1,4 +1,4 @@
-const CACHE = 'parfumerie-v5';
+const CACHE = 'perfumes-v1';
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
@@ -10,6 +10,14 @@ self.addEventListener('install', function(e) {
 });
 
 self.addEventListener('activate', function(e) {
+  e.waitUntil(
+    caches.keys().then(function(keys) {
+      return Promise.all(
+        keys.filter(function(key) { return key !== CACHE; })
+            .map(function(key) { return caches.delete(key); })
+      );
+    })
+  );
   self.clients.claim();
 });
 
