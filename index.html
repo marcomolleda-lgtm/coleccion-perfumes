@@ -6,7 +6,7 @@
 <title>perfumes</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Playfair+Display:wght@400;700&family=Jost:wght@300;400;500;600;700&family=Yantramanav:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 <link rel="manifest" href="./manifest.json"/>
-<meta name="theme-color" content="#8a7560"/>
+<meta name="theme-color" content="#d9a79b"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="perfumes"/>
@@ -17,13 +17,13 @@
     --surface: #f4f1ea;
     --surface-alt: #ede9df;
     --border: #d4cfc4;
-    --accent: #7b4a35;
-    --accent-dark: #5a3223;
-    --accent-light: #a06a55;
+    --accent: #d9a79b;
+    --accent-dark: #b87d70;
+    --accent-light: #e8c6bc;
     --text: #1a1e1e;
     --text-muted: #878880;
     --text-light: #b0aba3;
-    --star: #7b4a35;
+    --star: #d9a79b;
     --danger: #c0392b;
     --font-size-base: 14px;
     --font-size-card: 17px;
@@ -1367,7 +1367,7 @@ function openEdit(id) {
   for(let i=0;i<3;i++) renderPhotoSlot(i);
 
   // Build dynamic fields
-  const skipKeys = ['name','brand','rating','inCollection','notes','myOpinion','comments'];
+  const skipKeys = ['name','brand','rating','inCollection','notes','myOpinion','comments','barcode'];
   const dynFields = state.fields.filter(f=>f.visible && !skipKeys.includes(f.key));
   const grid = document.getElementById('fields-grid');
   grid.innerHTML = '';
