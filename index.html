@@ -1975,14 +1975,14 @@ function renderWishlist() {
       <button onclick="createWishlist()" title="Nueva lista" style="width:28px;height:28px;border-radius:50%;border:1px dashed var(--border);background:none;color:var(--accent);font-size:18px;cursor:pointer;line-height:1;padding:0">＋</button>
     </div>
     <div style="display:flex;gap:6px;margin-bottom:14px">
-      <button onclick="renameWishlist()" class="btn-secondary" style="flex:1;font-size:11px;padding:5px 0">✏️ Renombrar lista</button>
+      <button onclick="renameWishlist()" class="btn-secondary" style="flex:1;font-size:11px;padding:5px 0">Renombrar lista</button>
       ${data.lists.length > 1 ? `<button onclick="deleteWishlist()" class="btn-secondary" style="flex:1;font-size:11px;padding:5px 0;color:var(--danger)">🗑 Eliminar lista</button>` : ''}
     </div>`;
 
   // ── Items ──
   const items = active ? active.items || [] : [];
   const itemsHtml = items.length === 0
-    ? `<div style="text-align:center;padding:20px 0;color:var(--text-light)"><div style="font-size:36px;margin-bottom:8px">💘</div><div style="font-size:12px;letter-spacing:1px">Esta lista está vacía</div></div>`
+    ? `<div style="text-align:center;padding:20px 0;color:var(--text-light)"><div style="font-size:12px;letter-spacing:1px">Esta lista está vacía</div></div>`
     : items.map((item, i) => `
       <div class="wish-item" onclick="editWishItem(${i})" style="cursor:pointer">
         ${item.photo
@@ -2181,8 +2181,8 @@ if('serviceWorker' in navigator) {
     <div class="modal-body">
       <!-- Pestañas -->
       <div class="wl-tab-bar">
-        <button id="tab-btn-lists" class="active" onclick="switchWlTab('lists')">🗒 Listas</button>
-        <button id="tab-btn-notes" onclick="switchWlTab('notes')">📝 Notas</button>
+        <button id="tab-btn-lists" class="active" onclick="switchWlTab('lists')">Listas</button>
+        <button id="tab-btn-notes" onclick="switchWlTab('notes')">Notas</button>
       </div>
 
       <!-- Pestaña Listas -->
@@ -2223,9 +2223,6 @@ if('serviceWorker' in navigator) {
             </div>
           </div>
         </div>
-        <p style="font-size:11px;color:var(--text-light);letter-spacing:1px;margin-top:14px;line-height:1.7">
-          💡 Los precios no se actualizan automáticamente — añade el enlace directo a la tienda para consultarlos fácilmente.
-        </p>
       </div>
 
       <!-- Pestaña Notas -->
