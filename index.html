@@ -436,24 +436,25 @@
   /* LIGHTBOX */
   #lightbox {
     display:none; position:fixed; inset:0; z-index:999;
-    background:rgba(0,0,0,.93); align-items:center; justify-content:center;
-    flex-direction:column; gap:16px;
+    background:#faf8f5; align-items:center; justify-content:center;
+    flex-direction:column;
   }
   #lightbox.open { display:flex; }
-  #lightbox-img { max-width:95vw; max-height:78vh; object-fit:contain; border-radius:12px; }
+  #lightbox-carousel {
+    display:flex; overflow-x:auto; scroll-snap-type:x mandatory; width:100%; height:100%;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  }
+  #lightbox-carousel::-webkit-scrollbar { display:none; }
+  .lb-slide { flex:0 0 100%; scroll-snap-align:start; display:flex; align-items:center; justify-content:center; height:100%; }
+  .lb-slide img { max-width:95vw; max-height:85vh; object-fit:contain; border-radius:12px; }
   #lightbox-close {
-    position:absolute; top:16px; right:16px;
-    background:rgba(255,255,255,.15); border:none; color:#fff;
-    font-size:22px; width:42px; height:42px; border-radius:50%; cursor:pointer;
+    position:absolute; top:16px; left:16px; z-index:5;
+    background:rgba(255,255,255,.8); backdrop-filter:blur(4px); border:none; color:var(--text);
+    font-size:20px; width:38px; height:38px; border-radius:50%; cursor:pointer;
   }
-  #lightbox-counter { color:rgba(255,255,255,.6); font-size:13px; margin-top:-8px; }
-  #lightbox-nav { display:flex; gap:12px; }
-  #lightbox-nav button {
-    background:rgba(255,255,255,.15); border:none; color:#fff;
-    padding:8px 20px; border-radius:20px; cursor:pointer; font-size:14px;
-    font-family:'Jost',sans-serif;
-  }
-  #lightbox-nav button:disabled { opacity:.25; cursor:default; }
+  #lightbox-dots { position:absolute; bottom:20px; left:0; right:0; display:flex; justify-content:center; gap:6px; z-index:5; }
+  .lb-dot { width:6px; height:6px; border-radius:50%; background:rgba(0,0,0,.2); transition:background .2s,transform .2s; }
+  .lb-dot.active { background:var(--accent); transform:scale(1.3); }
   .photo-cover-btn {
     position:absolute; bottom:4px; left:4px; z-index:3;
     background:rgba(0,0,0,.6); color:#fff; border:none; border-radius:20px;
@@ -716,14 +717,10 @@
 </div>
 
 <!-- LIGHTBOX -->
-<div id="lightbox" onclick="if(event.target===this)closeLightbox()">
-  <button id="lightbox-close" onclick="closeLightbox()">&#10005;</button>
-  <img id="lightbox-img" src="" alt=""/>
-  <div id="lightbox-counter"></div>
-  <div id="lightbox-nav">
-    <button id="lb-prev" onclick="lbNav(-1)">&#8592; Anterior</button>
-    <button id="lb-next" onclick="lbNav(1)">Siguiente &#8594;</button>
-  </div>
+<div id="lightbox">
+  <button id="lightbox-close" onclick="closeLightbox()">&#8592;</button>
+  <div id="lightbox-carousel" onscroll="onLightboxScroll()"></div>
+  <div id="lightbox-dots"></div>
 </div>
 
 <!-- EXPORT MENU -->
@@ -1626,17 +1623,20 @@ function openLightbox(photos,idx){
   lbPhotos=(photos||[]).filter(Boolean);
   if(!lbPhotos.length) return;
   lbIndex=Math.min(idx||0,lbPhotos.length-1);
-  renderLightbox();
+  document.getElementById('lightbox-carousel').innerHTML = lbPhotos.map((ph,i)=>`<div class="lb-slide" onclick="if(event.target===this)closeLightbox()"><img src="${ph}" alt=""/></div>`).join('');
+  document.getElementById('lightbox-dots').innerHTML = lbPhotos.length>1 ? lbPhotos.map((_,i)=>`<span class="lb-dot${i===lbIndex?' active':''}"></span>`).join('') : '';
   document.getElementById('lightbox').classList.add('open');
+  const car = document.getElementById('lightbox-carousel');
+  car.scrollLeft = lbIndex * car.clientWidth;
 }
 function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); }
-function renderLightbox(){
-  document.getElementById('lightbox-img').src=lbPhotos[lbIndex];
-  document.getElementById('lb-prev').disabled=lbIndex===0;
-  document.getElementById('lb-next').disabled=lbIndex===lbPhotos.length-1;
-  document.getElementById('lightbox-counter').textContent=lbPhotos.length>1?(lbIndex+1)+' / '+lbPhotos.length:'';
+function onLightboxScroll(){
+  const el = document.getElementById('lightbox-carousel');
+  const dots = document.getElementById('lightbox-dots');
+  if(!el||!dots) return;
+  lbIndex = Math.round(el.scrollLeft / el.clientWidth);
+  dots.querySelectorAll('.lb-dot').forEach((d,i)=>d.classList.toggle('active', i===lbIndex));
 }
-function lbNav(dir){ lbIndex=Math.max(0,Math.min(lbPhotos.length-1,lbIndex+dir)); renderLightbox(); }
 function setCover(i){ editCoverIndex=i; [0,1,2].forEach(function(j){renderPhotoSlot(j);}); }
 
 // ══ EXPORT / IMPORT ════════════════════════════════════════════
