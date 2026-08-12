@@ -184,9 +184,9 @@
     flex:1; min-width:0; padding:10px 0 10px 12px;
     display:flex; flex-direction:column; justify-content:center; gap:2px; overflow:hidden;
   }
-  .row-brand { font-size:12px; color:var(--text-muted); letter-spacing:2px; font-family:'Jost',sans-serif; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .row-name { font-size:19px; font-family:'Cormorant Garamond',serif; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .row-sub { font-size:14px; color:var(--text-light); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row-brand { font-size:13px; color:var(--text-muted); letter-spacing:2px; font-family:'Jost',sans-serif; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row-name { font-size:20px; font-family:'Cormorant Garamond',serif; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row-sub { font-size:15px; color:var(--text-light); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .row-right {
     text-align:right; flex-shrink:0; padding:10px 14px 10px 0;
     display:flex; flex-direction:column; justify-content:center; align-items:flex-end; gap:4px;
@@ -1266,13 +1266,13 @@ function render() {
           ${p.photos&&p.photos[p.coverIndex||0]?`<img src="${p.photos[p.coverIndex||0]}" alt="${p.name}"/>`:`<span class="no-photo">🫙</span>`}
         </div>
         <div class="row-info">
-          <div class="row-brand">${p.brand||''}</div>
           <div class="row-name">${p.name}</div>
-          <div class="row-sub">${[p.perfumer,Array.isArray(p.family)?p.family.join(', '):(p.family||'')].filter(Boolean).join(' · ')}</div>
+          <div class="row-brand">${p.brand||''}</div>
+          <div class="row-sub">${p.launch || (Array.isArray(p.family)?p.family.join(', '):(p.family||''))}</div>
         </div>
         <div class="row-right">
           ${starsHTML(p.rating||0)}
-          <div style="font-size:11px;color:var(--text-light)">${[p.concentration,p.capacity].filter(Boolean).join(' ')}</div>
+          <div style="font-size:12px;color:var(--text-light)">${[p.concentration,p.capacity].filter(Boolean).join(' ')}</div>
         </div>
       </div>`).join('');
   }
