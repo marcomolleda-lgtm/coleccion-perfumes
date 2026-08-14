@@ -1,24 +1,21 @@
 {
-  "name": "perfumes",
-  "short_name": "perfumes",
-  "description": "Mi archivo personal de perfumes",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#ede9df",
-  "theme_color": "#d9a79b",
-  "orientation": "portrait",
+  "short_name": "Mi App",
+  "name": "Mi Aplicación Web",
   "icons": [
     {
-      "src": "./icon-192-v4.png",
-      "sizes": "192x192",
+      "src": "icon-192.png",
       "type": "image/png",
-      "purpose": "any maskable"
+      "sizes": "192x192"
     },
     {
-      "src": "./icon-512-v4.png",
-      "sizes": "512x512",
+      "src": "icon-512.png",
       "type": "image/png",
-      "purpose": "any maskable"
+      "sizes": "512x512"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait"
 }
