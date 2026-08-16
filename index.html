@@ -558,7 +558,7 @@
   /* ── HOME VIEW ── */
   #home-view {
     position: fixed; inset: 0; z-index: 700;
-    background: #dedede;
+    background: #fdfdfc;
     display: flex; flex-direction: column; align-items: center;
     padding-top: 150px;
   }
@@ -574,14 +574,14 @@
   }
   #home-logo-btn:active { opacity: .7; }
   #home-search {
-    margin-top: 34px; width: min(78vw, 320px);
-    padding: 13px 20px; border-radius: 999px;
-    border: 1px solid var(--border); background: var(--surface);
+    margin-top: 34px; width: min(48vw, 190px);
+    padding: 12px 18px; border-radius: 999px;
+    border: 1.5px solid #000; background: #fff;
     font-family: 'Cormorant Garamond', serif; font-size: 17px;
     color: var(--text); text-align: center;
   }
   #home-search::placeholder { color: var(--text-light); }
-  #home-search:focus { outline: none; border-color: var(--text-light); }
+  #home-search:focus { outline: none; border-color: #000; }
   #home-add-btn {
     position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%);
     width: 62px; height: 62px; border-radius: 50%;
