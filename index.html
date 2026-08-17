@@ -608,14 +608,13 @@
 
   /* ── HOME MEGA PANEL (3 columns, no shadow, blends with page) ── */
   #home-menu-bar.home-mega-panel {
-    display: none; position: absolute; top: calc(100% + 24px);
-    left: 50%; transform: translateX(-50%);
-    width: min(92vw, 400px);
+    display: none; position: fixed; top: 14px;
+    left: 52px; right: 16px; width: auto;
     background: #ffffff; border: none; box-shadow: none;
-    padding: 0 12px 0 40px; border-radius: 0;
+    padding: 0; border-radius: 0;
     grid-template-columns: repeat(3, 1fr);
     gap: 18px;
-    z-index: 900;
+    z-index: 950;
   }
   #home-menu-bar.home-mega-panel.open { display: grid; }
   .home-mega-col {
