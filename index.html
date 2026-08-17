@@ -621,13 +621,13 @@
   .home-mega-col {
     display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
   }
-  .home-mega-icons { align-items: flex-start; gap: 18px; }
+  .home-mega-icons { align-items: flex-start; gap: 18px; padding: 5px 0 0 6px; }
   .home-mega-icon-btn {
     background: none; border: none; cursor: pointer; color: var(--text);
     padding: 0; display: flex; align-items: center; justify-content: center;
   }
   .home-mega-icon-btn svg { width: 22px; height: 22px; }
-  .home-mega-icon-btn img { width: 20px; height: 20px; }
+  .home-mega-icon-btn img { width: 21px; height: auto; }
   .home-mega-icon-btn:active { opacity: .6; }
   .home-mega-item {
     background: none; border: none; cursor: pointer; text-align: left;
@@ -672,7 +672,7 @@
   <div id="home-menu-bar" class="home-mega-panel">
     <div class="home-mega-col home-mega-icons">
       <button class="home-mega-icon-btn" onclick="closeHomeMenu();showHome()" title="Inicio">
-        <svg viewBox="0 0 100 100" fill="none"><polygon points="5,45 50,5 95,45" fill="currentColor"/><rect x="15" y="45" width="70" height="50" fill="currentColor"/><rect x="42" y="70" width="16" height="25" fill="#ffffff"/></svg>
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAADZUlEQVR4nO2bW1ITQRSGv8ToAhTlyQ2grMLLJnwRcCFcXISPBMplcLHcAlUEXn2FvCmWhISHOe0cRsDQJz0zmTlf1amkkpnp7i89/ZPJAPWjq55/kbrtPecWHsnjE6APTKT68prexinQk8dF4BuZuJHURF5bLGzrCEHIa+CUTNgl+QwMz09lG71P6wki3gND/pVXlDiUbfW+raRDvp59Aq7IT9uivEnhvSvZBzlGp7Re14Qu+aA/k0kZk0u8r65k24nsixyrNQmtk3aXfGYFKdPUmHw27tKihA5r1gvgkLvXu2kr7Hsox9RtNA6dtCfY5RUlntDghA4Desf9SWuVOJQ2dJtzjU7aNfJ1676kjS197DVpc64TWiftFg9L2tjSCb0lbc9lQodZ9xjYIS5pY0sn9I70Qfep9uikPWD2691D18UD5iihQwdfAQOqk1eUOJA+6T7WjtCxt8A51csrSjyXvum+1gKdtKukTdrY0n1alb7WIqF10m6SdTJ10saWTuhN6XOlCV1l0sZWbRI6rCHPgX1urjXzUKGv+zIGPabkhIaWqEfSWiUOZCx6bMmoa9JaJSZPaJ20K9QzaWNLj2VFxjjThNZJuyGN1TVpY0sn9IaMdSYJrZM2/E5b96SNLZ3QfWaQ0GEtWGA+kza2dEIvFFw8WN4ScNwieUWJx0QkdNjwDXDWQnlFiWfi4r8SddJ+VAdoQtLGVhj7pTiBOxJaJ+267NS0pI0tndDr4uhGQodZ1wO2lfkmJm1s6YTeJj+V/yb0M2BPNmjjejdtBTd74gyAZeBI3vhT0qeZslL3Pzg6ApY7ZN8Dn4rd1F+mg8CU6PU8FSOyP7SHHbJFMjTsTM8YMmkjXF4MXWBUxnRvMh2feUZcoBEXaMQFGnGBRlygERdoxAUacYFGqrjNq4yLCaVRhcBGzfoe+aWZlIzJxP0APpBd1kpBB/gKvFRtpmTUI91gbuMn8L2ENspiUvYp3CWb7WOy2TKrDy8cq0sL1sDwK1cKgWWeTUDDFvQqcIFGXKARF2jEBRpxgUZcoBEXaMQFGnGBRlygERdoxAUacYFGXKARF2jEBRpxgUZcoBEXaMQFGnGBRlygERdoxAUaKetWiNBGGf/UE9ooZVw94Bfpb4kId0r9TtwO0sYF5dyddXENVRxhyvduQ8gAAAAASUVORK5CYII=" alt="Inicio">
       </button>
       <div id="panel-lang-wrap" style="position:relative;">
         <button class="home-mega-icon-btn" onclick="toggleLangMenu2()" title="Idioma">
