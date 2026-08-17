@@ -612,8 +612,8 @@
     left: 50%; transform: translateX(-50%);
     width: min(92vw, 400px);
     background: #ffffff; border: none; box-shadow: none;
-    padding: 0; border-radius: 0;
-    grid-template-columns: 0.7fr 1fr 1fr;
+    padding: 0 12px 0 40px; border-radius: 0;
+    grid-template-columns: repeat(3, 1fr);
     gap: 18px;
     z-index: 900;
   }
@@ -631,7 +631,7 @@
   .home-mega-icon-btn:active { opacity: .6; }
   .home-mega-item {
     background: none; border: none; cursor: pointer; text-align: left;
-    font-family: 'Jost', sans-serif; font-size: 17px; font-weight: 400;
+    font-family: 'Jost', sans-serif; font-size: 18px; font-weight: 400;
     color: var(--text); padding: 0; text-transform: lowercase;
   }
   .home-mega-item:active { opacity: .6; }
@@ -672,7 +672,7 @@
   <div id="home-menu-bar" class="home-mega-panel">
     <div class="home-mega-col home-mega-icons">
       <button class="home-mega-icon-btn" onclick="closeHomeMenu();showHome()" title="Inicio">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>
+        <svg viewBox="0 0 100 100" fill="none"><polygon points="5,45 50,5 95,45" fill="currentColor"/><rect x="15" y="45" width="70" height="50" fill="currentColor"/><rect x="42" y="70" width="16" height="25" fill="#ffffff"/></svg>
       </button>
       <div id="panel-lang-wrap" style="position:relative;">
         <button class="home-mega-icon-btn" onclick="toggleLangMenu2()" title="Idioma">
