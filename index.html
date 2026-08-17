@@ -596,7 +596,8 @@
 
   /* ── HOME DOTS MENU (import/export) ── */
   #home-dots-wrap {
-    position: fixed; top: 22px; left: 50%; transform: translateX(-50%);
+    position: fixed; top: 22px; left: 0; right: 0;
+    display: flex; justify-content: center;
     z-index: 750;
   }
   #home-dots-btn {
@@ -609,7 +610,7 @@
   /* ── HOME MEGA PANEL (3 columns, no shadow, blends with page) ── */
   #home-menu-bar.home-mega-panel {
     display: none; position: fixed; top: 14px;
-    left: 52px; right: 16px; width: auto;
+    left: 24px; right: 16px; width: auto;
     background: #ffffff; border: none; box-shadow: none;
     padding: 0; border-radius: 0;
     grid-template-columns: repeat(3, 1fr);
