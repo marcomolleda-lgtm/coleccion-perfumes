@@ -621,7 +621,7 @@
   .home-mega-col {
     display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
   }
-  .home-mega-icons { align-items: center; gap: 18px; padding: 5px 0 0 0; }
+  .home-mega-icons { align-items: flex-start; gap: 18px; padding: 5px 0 0 6px; }
   .home-mega-icon-btn {
     background: none; border: none; cursor: pointer; color: var(--text);
     padding: 0; display: flex; align-items: center; justify-content: center;
@@ -2151,19 +2151,38 @@ function applyViewSort() {
 }
 
 // ══ HOME VIEW NAVIGATION ═══════════════════════════════════════
+function _renderView(view) {
+  if (view === 'home') {
+    document.getElementById('home-view').classList.remove('hidden');
+    document.getElementById('header').classList.add('app-hidden');
+    document.getElementById('main').classList.add('app-hidden');
+    closeHomeMenu();
+  } else {
+    document.getElementById('home-view').classList.add('hidden');
+    document.getElementById('header').classList.remove('app-hidden');
+    document.getElementById('main').classList.remove('app-hidden');
+    closeHomeMenu();
+    render();
+  }
+}
 function showHome() {
-  document.getElementById('home-view').classList.remove('hidden');
-  document.getElementById('header').classList.add('app-hidden');
-  document.getElementById('main').classList.add('app-hidden');
-  closeHomeMenu();
+  if (history.state && history.state.view === 'perfumes') {
+    history.back();
+  } else {
+    _renderView('home');
+    history.replaceState({view:'home'}, '');
+  }
 }
 function showPerfumes() {
-  document.getElementById('home-view').classList.add('hidden');
-  document.getElementById('header').classList.remove('app-hidden');
-  document.getElementById('main').classList.remove('app-hidden');
-  closeHomeMenu();
-  render();
+  _renderView('perfumes');
+  if (!history.state || history.state.view !== 'perfumes') {
+    history.pushState({view:'perfumes'}, '');
+  }
 }
+window.addEventListener('popstate', function(e) {
+  const view = (e.state && e.state.view) || 'home';
+  _renderView(view);
+});
 function toggleHomeMenu() {
   document.getElementById('home-menu-bar').classList.toggle('open');
 }
@@ -2239,6 +2258,7 @@ function applyLanguage(lang) {
 (function init() {
   initState();
   applyLanguage(localStorage.getItem('scentic-lang') || 'es');
+  if (!history.state) history.replaceState({view:'home'}, '');
 })();
 </script>
 
