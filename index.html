@@ -337,6 +337,15 @@
   .field-mgr-row.drag-over { box-shadow:0 0 0 2px var(--accent); background:var(--surface); }
   .field-mgr-drag-handle { color:var(--text-light); font-size:16px; cursor:grab; flex-shrink:0; line-height:1; }
   .field-mgr-row input[type=checkbox] { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
+  .field-mgr-delete { background:none; border:none; cursor:pointer; font-size:15px; opacity:.55; flex-shrink:0; padding:4px; }
+  .field-mgr-delete:active { opacity:.9; }
+  .family-mgr-list { display:flex; flex-direction:column; gap:2px; max-height:50vh; overflow-y:auto; }
+  .family-mgr-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:9px 4px; border-bottom:1px solid var(--border);
+    font-size:15px; color:var(--text);
+  }
+  .family-mgr-row:last-child { border-bottom:none; }
   .field-mgr-row input[type=text] { flex:1; border:none; background:transparent; font-size:14px; color:var(--text); font-family:'Jost',sans-serif; outline:none; }
 
   /* Empty state */
@@ -934,18 +943,38 @@
     <div class="modal-body">
       <div id="field-mgr-list"></div>
       <button class="hbtn" style="width:100%;margin-top:6px;padding:10px" onclick="addCustomField()">+ Añadir campo</button>
+      <div style="height:1px;background:var(--border);margin:16px 0"></div>
+      <button class="hbtn" style="width:100%;padding:10px" onclick="openFamilyMgr()">🌸 Gestionar familias olfativas</button>
       <button class="btn-primary" style="width:100%;margin-top:10px" onclick="closeModal('modal-fields');render()">Guardar y cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-families">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <span class="modal-title">🌸 Familias olfativas</span>
+      <button class="modal-close" onclick="closeModal('modal-families')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="family-mgr-list" class="family-mgr-list"></div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <input type="text" id="new-family-input" placeholder="Nueva familia..." style="flex:1" onkeydown="if(event.key==='Enter'){addFamily();}"/>
+        <button class="btn-primary" style="padding:0 18px" onclick="addFamily()">+</button>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:14px" onclick="closeModal('modal-families')">Cerrar</button>
     </div>
   </div>
 </div>
 
 <script>
 // ══ STATE ══════════════════════════════════════════════════════
-const FAMILIES = ["Floral","Oriental","Amaderado","Fresco","Cítrico","Fougère","Chipre","Gourmand","Acuático","Especiado","Cuero","Almizclado","Animálico","Ambarado","Verde","Incensado","Resinoso","Limpio"];
+const DEFAULT_FAMILIES = ["Floral","Oriental","Amaderado","Fresco","Cítrico","Fougère","Chipre","Gourmand","Acuático","Especiado","Cuero","Almizclado","Animálico","Ambarado","Verde","Incensado","Resinoso","Limpio"];
 const CONCENTRATIONS = ["Aceite","Colonia","EDT","EDP","Perfume","Extracto de perfume","Sólido"];
 const GENDERS = ["Masculino","Femenino","Unisex","Andrógino"];
 
 let state = {
+  families: [...DEFAULT_FAMILIES],
   perfumes: [
     {id:1,name:"Santal 33",brand:"Le Labo",concentration:"EDP",capacity:"100ml",launch:"2011",perfumer:"Frank Voelkl",bottleDesigner:"Le Labo Studio",family:"Amaderado",gender:"Unisex",notes:"Cardamomo, Violeta · Iris, Ambrox · Sándalo, Cuero",boughtAt:"Boutique Le Labo Madrid",price:"310€",inCollectionSince:"2023-04-12",rating:5,bottleCount:1,bottleStatus:"Medio",myOpinion:"Un clásico moderno imprescindible.",comments:"Lo reservo para ocasiones especiales.",inCollection:true,tags:["favorito","especial"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-04-12"},
     {id:2,name:"Baccarat Rouge 540",brand:"MFK",concentration:"EDP",capacity:"70ml",launch:"2015",perfumer:"Francis Kurkdjian",bottleDesigner:"Georges Chevalier",family:"Floral",gender:"Unisex",notes:"Azafrán, Jazmín · Ambroxan, Cedro · Musgo",boughtAt:"El Corte Inglés",price:"395€",inCollectionSince:"2023-09-01",rating:5,bottleCount:1,bottleStatus:"Lleno",myOpinion:"Sofisticado y adictivo.",comments:"",inCollection:true,tags:["lujo"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-09-01"},
@@ -1084,6 +1113,7 @@ async function initState() {
   const saved = load('pf_state');
   if (saved) {
     state = saved;
+    if (!Array.isArray(state.families) || !state.families.length) state.families = [...DEFAULT_FAMILIES];
     // Ensure each perfume has photos array placeholder
     state.perfumes = state.perfumes.map(p => ({...p, photos: [null,null,null], coverIndex: 0}));
     // Load all photos from IDB
@@ -1144,8 +1174,49 @@ function renderFieldMgr() {
       <span class="field-mgr-drag-handle">⠿</span>
       <input type="checkbox" ${f.visible?'checked':''} ${f.required?'disabled':''} onchange="toggleField(${i},this.checked)"/>
       <input type="text" value="${f.label}" onchange="renameField(${i},this.value)"/>
-      ${f.required?'<span style="font-size:10px;color:var(--text-light)">requerido</span>':''}
+      ${f.required?'<span style="font-size:10px;color:var(--text-light)">requerido</span>':`<button type="button" class="field-mgr-delete" title="Eliminar campo" onclick="deleteField(${i})">🗑</button>`}
     </div>`).join('');
+}
+
+function deleteField(i) {
+  const f = state.fields[i];
+  if (!f || f.required) return;
+  if (!confirm(`¿Eliminar el campo "${f.label}"? Los datos guardados en este campo para todos los perfumes se perderán.`)) return;
+  state.fields.splice(i,1);
+  save();
+  renderFieldMgr();
+}
+
+// ══ FAMILY MANAGER ══════════════════════════════════════════════
+function openFamilyMgr() {
+  renderFamilyMgr();
+  openModal('modal-families');
+}
+function renderFamilyMgr() {
+  const el = document.getElementById('family-mgr-list');
+  el.innerHTML = state.families.map((fam,i)=>`
+    <div class="family-mgr-row">
+      <span>${fam}</span>
+      <button type="button" class="field-mgr-delete" title="Eliminar familia" onclick="deleteFamily(${i})">🗑</button>
+    </div>`).join('');
+}
+function addFamily() {
+  const input = document.getElementById('new-family-input');
+  const val = input.value.trim();
+  if (!val) return;
+  if (state.families.some(f=>f.toLowerCase()===val.toLowerCase())) { input.value=''; return; }
+  state.families.push(val);
+  save();
+  input.value = '';
+  renderFamilyMgr();
+}
+function deleteFamily(i) {
+  const fam = state.families[i];
+  if (!fam) return;
+  if (!confirm(`¿Eliminar la familia "${fam}"? Los perfumes que la tengan asignada la conservarán en sus datos, pero ya no podrás seleccionarla para nuevos perfumes.`)) return;
+  state.families.splice(i,1);
+  save();
+  renderFamilyMgr();
 }
 
 function fmDragStart(e, idx) {
@@ -1198,7 +1269,11 @@ document.addEventListener('click', function(e) {
   const wrap = document.getElementById('menu-wrap');
   if(wrap && !wrap.contains(e.target)) closeMainMenu();
   const dotsWrap = document.getElementById('home-dots-wrap');
-  if(dotsWrap && !dotsWrap.contains(e.target)) closeHomeMenu();
+  const menuPanel = document.getElementById('home-menu-bar');
+  const insideTrigger = (dotsWrap && dotsWrap.contains(e.target))
+    || (menuPanel && menuPanel.contains(e.target))
+    || e.target.closest('#main-menu-btn');
+  if (!insideTrigger) closeHomeMenu();
   const langWrap = document.getElementById('home-lang-wrap');
   if(langWrap && !langWrap.contains(e.target)) closeLangMenu();
   const panelLangWrap = document.getElementById('panel-lang-wrap');
@@ -1315,7 +1390,7 @@ function openDetail(id) {
       })():''}
       ${(p.tags||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${(p.tags||[]).map(t=>`<span class="tag-chip">#${t}</span>`).join('')}</div>`:''}
       <div class="btn-row" style="margin-top:auto">
-        <button class="btn-primary" onclick="closeModal('modal-detail');openEdit(${p.id})">Editar</button>
+        <button class="btn-primary" onclick="openEdit(${p.id})">Editar</button>
       </div>
     </div>`;
   openModal('modal-detail');
@@ -1388,7 +1463,7 @@ function openEdit(id) {
     else if(f.key==='family') {
       // families stored as array; support legacy string
       const selectedFams = Array.isArray(val) ? val : (val ? [val] : []);
-      inner += `<div class="family-chips" id="ef-family-chips">${FAMILIES.map(fam=>`<button type="button" class="family-chip${selectedFams.includes(fam)?' selected':''}" onclick="toggleFamilyChip(this,'${fam}')">${fam}</button>`).join('')}</div>`;
+      inner += `<div class="family-chips" id="ef-family-chips">${state.families.map(fam=>`<button type="button" class="family-chip${selectedFams.includes(fam)?' selected':''}" onclick="toggleFamilyChip(this,'${fam}')">${fam}</button>`).join('')}</div>`;
     }
     else if(f.key==='gender') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${GENDERS.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}</select>`;
     else if(f.key==='inCollectionSince') inner+=`<input class="field-input" type="date" id="ef-${f.key}" value="${val}"/>`;
@@ -1425,7 +1500,7 @@ function openEdit(id) {
   document.getElementById('tag-input').value='';
   document.getElementById('list-input').value='';
 
-  closeModal('modal-detail');
+  document.getElementById('modal-detail').classList.remove('open');
   openModal('modal-edit');
 }
 
