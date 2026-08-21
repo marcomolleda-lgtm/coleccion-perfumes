@@ -13,7 +13,8 @@
 <link rel="apple-touch-icon" href="./icon-192.png"/>
 <style>
   :root {
-    --bg: #f7f7f7;
+    --bg: #ffffff;
+    --accent-yellow: #ffe184;
     --surface: #ffffff;
     --surface-alt: #f0f0ee;
     --border: #e3e2df;
@@ -100,60 +101,58 @@
 
 
 
-  /* ── MAIN ── */
-  #main { max-width:900px; margin:0 auto; padding:8px 16px 20px; }
-  #list-toolbar {
-    display:flex; align-items:center; gap:22px;
-    margin-bottom:18px; padding:0 2px;
-    font-family:'Jost',sans-serif; font-size:17px; color:var(--text-light);
-  }
-  #count-label { color:var(--text-light); }
-  .sort-link {
-    background:none; border:none; cursor:pointer; padding:0;
-    font-family:'Jost',sans-serif; font-size:17px; color:var(--text-light);
-  }
-  .sort-link.active { color:var(--text); font-weight:500; }
-  .sort-link:active { opacity:.6; }
+  /* ── MAIN (full-screen swipeable cards) ── */
+  #main { padding:0; overflow-y:auto; scroll-snap-type:y mandatory; -webkit-overflow-scrolling:touch;
+    height: calc(100vh - var(--header-h, 78px)); }
 
   /* ── LIST VIEW ── */
-  #list { display:flex; flex-direction:column; gap:22px; }
+  #list { display:flex; flex-direction:column; }
   .row {
-    background:var(--surface); border:none; border-radius:0;
-    padding:0; cursor:pointer; display:flex; flex-direction:column;
-    box-shadow: 5px 6px 0 0 #000;
-    transition:transform .1s;
+    background:#ffffff; width:100%;
+    height: calc(100vh - var(--header-h, 78px));
+    scroll-snap-align:start; scroll-snap-stop:always;
+    display:flex; flex-direction:column; overflow:hidden;
+    flex-shrink:0;
   }
-  .row:active { transform:translate(2px,2px); box-shadow: 3px 4px 0 0 #000; }
-  .row-top { display:flex; align-items:stretch; }
-  .row-thumb {
-    width:42%; flex-shrink:0; aspect-ratio:1/1;
+  .row-photo {
+    position:relative; width:100%; flex-shrink:0;
+    height:35%; min-height:35%; max-height:35%;
     background:linear-gradient(135deg,#f0f0ee,#e3e2df);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow: 0 8px 16px rgba(0,0,0,.22);
-    position:relative; z-index:2;
+    overflow:hidden;
   }
-  .row-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
-  .row-thumb .no-photo { font-size:32px; opacity:.25; }
-  .row-info {
-    flex:1; min-width:0; padding:16px 16px 16px 18px;
-    display:flex; flex-direction:column; justify-content:center; gap:7px; overflow:hidden;
+  .row-photo img { width:100%; height:100%; object-fit:cover; display:block; }
+  .row-photo .no-photo { display:flex; align-items:center; justify-content:center; width:100%; height:100%; font-size:40px; opacity:.25; }
+  .row-photo::after {
+    content:''; position:absolute; left:0; right:0; bottom:0; height:45%;
+    background:linear-gradient(to bottom, rgba(255,255,255,0), #ffffff);
+    pointer-events:none;
   }
-  .row-brand { font-size:19px; color:var(--star); letter-spacing:0; font-family:'Jost',sans-serif; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .row-name { font-size:27px; font-family:'Cormorant Garamond',serif; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
-  .row-perfumer { font-size:19px; font-family:'Jost',sans-serif; font-weight:400; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .row-sub { font-size:19px; font-family:'Jost',sans-serif; font-weight:400; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .row-specs { font-size:17px; color:var(--text); font-family:'Jost',sans-serif; white-space:nowrap; }
-  .row-notes { font-size:17px; color:var(--text); font-family:'Jost',sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row-body {
+    flex:1; min-height:0; padding:14px 20px 18px;
+    display:flex; flex-direction:column;
+  }
+  .row-name { font-size:29px; font-family:'Cormorant Garamond',serif; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:8px; }
+  .row-cols { display:grid; grid-template-columns:1fr 1fr; gap:2px 14px; margin-top:14px; }
+  .row-col { display:flex; flex-direction:column; gap:9px; min-width:0; }
+  .row-brand-badge {
+    display:inline-block; background:var(--accent-yellow); padding:2px 8px;
+    font-size:19px; font-family:'Jost',sans-serif; font-weight:400; color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; align-self:flex-start; max-width:100%;
+  }
+  .row-perfumer, .row-year, .row-family, .row-specs, .row-notes {
+    font-size:17px; font-family:'Jost',sans-serif; font-weight:400; color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
   .row-comments {
-    padding:18px; font-size:16px; font-family:'Jost',sans-serif; color:var(--text);
-    line-height:1.5; flex:1; min-height:60px;
-    white-space:pre-wrap; word-break:break-word;
+    flex:1; min-height:0; margin-top:14px; padding-right:2px;
+    font-size:15px; font-family:'Jost',sans-serif; font-style:italic; color:var(--text-muted);
+    line-height:1.5; overflow:hidden; white-space:pre-wrap; word-break:break-word;
   }
-  .row-bottom {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:0 18px 18px;
+  .row-more-wrap { flex-shrink:0; text-align:center; padding-top:10px; }
+  .row-more-btn {
+    background:none; border:none; cursor:pointer; padding:6px 10px;
+    font-size:17px; font-family:'Jost',sans-serif; color:var(--star);
   }
-  .row-more { font-size:16px; font-family:'Jost',sans-serif; color:var(--star); }
 
   /* Stars */
   .stars { display:flex; gap:3px; }
@@ -767,7 +766,7 @@
 
 <!-- ══ MAIN ══ -->
 <div id="main" class="app-hidden">
-  <div id="list-toolbar">
+  <div id="list-toolbar" style="display:none">
     <span id="count-label"></span>
     <button id="sort-date" class="sort-link" data-i18n="sort_date" onclick="setSort('date')">cronológico</button>
     <button id="sort-name" class="sort-link" data-i18n="sort_name" onclick="setSort('name')">alfabético</button>
@@ -1337,26 +1336,32 @@ function render() {
   document.getElementById('empty').style.display='none';
 
   document.getElementById('list').innerHTML = filtered.map(p=>`
-    <div class="row" onclick="openDetail(${p.id})">
-      <div class="row-top">
-        <div class="row-thumb">
-          ${p.photos&&p.photos[p.coverIndex||0]?`<img src="${p.photos[p.coverIndex||0]}" alt="${p.name}"/>`:`<span class="no-photo">🫙</span>`}
-        </div>
-        <div class="row-info">
-          <div class="row-name">${p.name}</div>
-          <div class="row-brand">${p.brand||''}</div>
-          <div class="row-perfumer">${p.perfumer||''}</div>
-          <div class="row-sub">${p.launch||''}</div>
-          <div class="row-specs">${[p.concentration,p.capacity].filter(Boolean).join('  -  ')}</div>
-          <div class="row-notes">${p.notes||''}</div>
-        </div>
+    <div class="row">
+      <div class="row-photo">
+        ${p.photos&&p.photos[p.coverIndex||0]?`<img src="${p.photos[p.coverIndex||0]}" alt="${p.name}"/>`:`<span class="no-photo">🫙</span>`}
       </div>
-      <div class="row-comments">${p.comments||''}</div>
-      <div class="row-bottom">
+      <div class="row-body">
+        <div class="row-name">${p.name}</div>
         ${starsHTML(p.rating||0)}
-        <span class="row-more">Ver más</span>
+        <div class="row-cols">
+          <div class="row-col">
+            <div class="row-brand-badge">${p.brand||''}</div>
+            <div class="row-year">${p.launch||''}</div>
+            <div class="row-family">${Array.isArray(p.family)?p.family.join(', '):(p.family||'')}</div>
+          </div>
+          <div class="row-col">
+            <div class="row-perfumer">${p.perfumer||''}</div>
+            <div class="row-specs">${[p.concentration,p.capacity].filter(Boolean).join('  -  ')}</div>
+            <div class="row-notes">${p.notes||''}</div>
+          </div>
+        </div>
+        <div class="row-comments">${p.comments||''}</div>
+        <div class="row-more-wrap">
+          <button class="row-more-btn" onclick="openDetail(${p.id})">Ver más</button>
+        </div>
       </div>
     </div>`).join('');
+  _setMainHeight();
 }
 
 // ══ DETAIL ═════════════════════════════════════════════════════
@@ -2298,12 +2303,21 @@ function showHome() {
   history.pushState({view:'home', modal:null}, '');
   _suppressHistory = false;
 }
+function _setMainHeight() {
+  const header = document.getElementById('header');
+  if (header && !header.classList.contains('app-hidden')) {
+    document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+  }
+}
+window.addEventListener('resize', _setMainHeight);
+
 function showPerfumes() {
   _closeAllModals();
   _renderView('perfumes');
   _suppressHistory = true;
   history.pushState({view:'perfumes', modal:null}, '');
   _suppressHistory = false;
+  _setMainHeight();
 }
 window.addEventListener('popstate', function(e) {
   const st = e.state || {view:'home', modal:null};
