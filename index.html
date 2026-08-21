@@ -118,33 +118,42 @@
   /* ── LIST VIEW ── */
   #list { display:flex; flex-direction:column; gap:22px; }
   .row {
-    background:var(--surface); border:none; border-radius:12px;
-    padding:0; cursor:pointer; display:flex; align-items:stretch; gap:0;
-    box-shadow: 2px 3px 0 0 #000;
-    transition:transform .1s; overflow:hidden;
-    height:96px; min-height:96px; max-height:96px;
+    background:var(--surface); border:none; border-radius:0;
+    padding:0; cursor:pointer; display:flex; flex-direction:column;
+    box-shadow: 5px 6px 0 0 #000;
+    transition:transform .1s;
   }
-  .row:active { transform:translate(1px,1px); box-shadow: 1px 2px 0 0 #000; }
+  .row:active { transform:translate(2px,2px); box-shadow: 3px 4px 0 0 #000; }
+  .row-top { display:flex; align-items:stretch; }
   .row-thumb {
-    width:88px; flex-shrink:0;
+    width:42%; flex-shrink:0; aspect-ratio:1/1;
     background:linear-gradient(135deg,#f0f0ee,#e3e2df);
     display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 8px 16px rgba(0,0,0,.22);
+    position:relative; z-index:2;
   }
   .row-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
-  .row-thumb .no-photo { font-size:24px; opacity:.25; }
+  .row-thumb .no-photo { font-size:32px; opacity:.25; }
   .row-info {
-    flex:1; min-width:0; padding:12px 0 12px 16px;
-    display:flex; flex-direction:column; justify-content:center; gap:3px; overflow:hidden;
+    flex:1; min-width:0; padding:16px 16px 16px 18px;
+    display:flex; flex-direction:column; justify-content:center; gap:7px; overflow:hidden;
   }
-  .row-brand { font-size:16px; color:var(--text); letter-spacing:0; font-family:'Jost',sans-serif; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .row-name { font-size:19px; font-family:'Cormorant Garamond',serif; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:1px; }
-  .row-sub { font-size:14px; font-family:'Jost',sans-serif; font-weight:500; color:var(--star); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .row-right {
-    text-align:right; flex-shrink:0; padding:12px 14px 12px 8px;
-    display:flex; flex-direction:column; justify-content:center; align-items:flex-end; gap:6px;
+  .row-brand { font-size:19px; color:var(--star); letter-spacing:0; font-family:'Jost',sans-serif; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row-name { font-size:27px; font-family:'Cormorant Garamond',serif; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+  .row-perfumer { font-size:19px; font-family:'Jost',sans-serif; font-weight:400; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row-sub { font-size:19px; font-family:'Jost',sans-serif; font-weight:400; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row-specs { font-size:17px; color:var(--text); font-family:'Jost',sans-serif; white-space:nowrap; }
+  .row-notes { font-size:17px; color:var(--text); font-family:'Jost',sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row-comments {
+    padding:18px; font-size:16px; font-family:'Jost',sans-serif; color:var(--text);
+    line-height:1.5; flex:1; min-height:60px;
+    white-space:pre-wrap; word-break:break-word;
   }
-  .row-price { font-size:13px; color:var(--accent); font-weight:500; }
-  .row-specs { font-size:12px; color:var(--text); font-family:'Jost',sans-serif; white-space:nowrap; }
+  .row-bottom {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 18px 18px;
+  }
+  .row-more { font-size:16px; font-family:'Jost',sans-serif; color:var(--star); }
 
   /* Stars */
   .stars { display:flex; gap:3px; }
@@ -982,22 +991,22 @@ let state = {
   ],
   fields: [
     {key:"name",label:"Nombre",visible:true,required:true},
-    {key:"brand",label:"Marca",visible:true},
-    {key:"concentration",label:"Concentración",visible:true},
-    {key:"capacity",label:"Capacidad",visible:true},
-    {key:"launch",label:"Lanzamiento",visible:true},
-    {key:"perfumer",label:"Perfumista",visible:true},
+    {key:"brand",label:"Marca",visible:true,required:true},
+    {key:"concentration",label:"Concentración",visible:true,required:true},
+    {key:"capacity",label:"Capacidad",visible:true,required:true},
+    {key:"launch",label:"Lanzamiento",visible:true,required:true},
+    {key:"perfumer",label:"Perfumista",visible:true,required:true},
     {key:"bottleDesigner",label:"Diseñador del frasco",visible:true},
     {key:"family",label:"Familia olfativa",visible:true},
     {key:"gender",label:"Sexo",visible:true},
-    {key:"notes",label:"Notas olfativas",visible:true},
+    {key:"notes",label:"Notas olfativas",visible:true,required:true},
     {key:"boughtAt",label:"Comprado en",visible:true},
     {key:"price",label:"Precio",visible:true},
     {key:"inCollectionSince",label:"En colección desde",visible:true},
-    {key:"rating",label:"Valoración",visible:true},
+    {key:"rating",label:"Valoración",visible:true,required:true},
     {key:"bottleCount",label:"Número de frascos",visible:true},
     {key:"myOpinion",label:"Mi opinión",visible:true},
-    {key:"comments",label:"Comentarios",visible:true},
+    {key:"comments",label:"Comentarios",visible:true,required:true},
     {key:"inCollection",label:"¿Está en colección?",visible:true},
     {key:"barcode",label:"Código de barras",visible:true},
   ],
@@ -1114,6 +1123,10 @@ async function initState() {
   if (saved) {
     state = saved;
     if (!Array.isArray(state.families) || !state.families.length) state.families = [...DEFAULT_FAMILIES];
+    const REQUIRED_CARD_FIELDS = ["name","brand","concentration","capacity","launch","perfumer","notes","comments","rating"];
+    if (Array.isArray(state.fields)) {
+      state.fields.forEach(f => { if (REQUIRED_CARD_FIELDS.includes(f.key)) f.required = true; });
+    }
     // Ensure each perfume has photos array placeholder
     state.perfumes = state.perfumes.map(p => ({...p, photos: [null,null,null], coverIndex: 0}));
     // Load all photos from IDB
@@ -1325,17 +1338,23 @@ function render() {
 
   document.getElementById('list').innerHTML = filtered.map(p=>`
     <div class="row" onclick="openDetail(${p.id})">
-      <div class="row-thumb">
-        ${p.photos&&p.photos[p.coverIndex||0]?`<img src="${p.photos[p.coverIndex||0]}" alt="${p.name}"/>`:`<span class="no-photo">🫙</span>`}
+      <div class="row-top">
+        <div class="row-thumb">
+          ${p.photos&&p.photos[p.coverIndex||0]?`<img src="${p.photos[p.coverIndex||0]}" alt="${p.name}"/>`:`<span class="no-photo">🫙</span>`}
+        </div>
+        <div class="row-info">
+          <div class="row-name">${p.name}</div>
+          <div class="row-brand">${p.brand||''}</div>
+          <div class="row-perfumer">${p.perfumer||''}</div>
+          <div class="row-sub">${p.launch||''}</div>
+          <div class="row-specs">${[p.concentration,p.capacity].filter(Boolean).join('  -  ')}</div>
+          <div class="row-notes">${p.notes||''}</div>
+        </div>
       </div>
-      <div class="row-info">
-        <div class="row-name">${p.name}</div>
-        <div class="row-brand">${p.brand||''}</div>
-        <div class="row-sub">${p.launch || (Array.isArray(p.family)?p.family.join(', '):(p.family||''))}</div>
-      </div>
-      <div class="row-right">
+      <div class="row-comments">${p.comments||''}</div>
+      <div class="row-bottom">
         ${starsHTML(p.rating||0)}
-        <div class="row-specs">${[p.concentration,p.capacity].filter(Boolean).join('  -  ')}</div>
+        <span class="row-more">Ver más</span>
       </div>
     </div>`).join('');
 }
