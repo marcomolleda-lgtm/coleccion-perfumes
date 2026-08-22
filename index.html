@@ -42,7 +42,7 @@
   #header {
     position:sticky; top:0; z-index:100;
     background:var(--bg); border-bottom:none;
-    box-shadow:none; padding:16px 16px 10px;
+    box-shadow:none; padding:26px 16px 22px;
   }
   #header.app-hidden, #main.app-hidden { display:none; }
   #header-top { display:flex; align-items:center; gap:10px; }
@@ -123,8 +123,8 @@
   .row-photo img { width:100%; height:100%; object-fit:cover; display:block; }
   .row-photo .no-photo { display:flex; align-items:center; justify-content:center; width:100%; height:100%; font-size:40px; opacity:.25; }
   .row-photo::after {
-    content:''; position:absolute; left:0; right:0; bottom:0; height:45%;
-    background:linear-gradient(to bottom, rgba(255,255,255,0), #ffffff);
+    content:''; position:absolute; left:0; right:0; bottom:0; height:34%;
+    background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.8));
     pointer-events:none;
   }
   .row-body {
@@ -144,7 +144,8 @@
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .row-comments {
-    flex:1; min-height:0; margin-top:14px; padding-right:2px;
+    flex:1; min-height:0; margin-top:26px; padding-top:14px; padding-right:2px;
+    border-top:1px solid #ededec;
     font-size:15px; font-family:'Jost',sans-serif; font-style:italic; color:var(--text-muted);
     line-height:1.5; overflow:hidden; white-space:pre-wrap; word-break:break-word;
   }
@@ -1355,13 +1356,31 @@ function render() {
             <div class="row-notes">${p.notes||''}</div>
           </div>
         </div>
-        <div class="row-comments">${p.comments||''}</div>
+        <div class="row-comments"></div>
         <div class="row-more-wrap">
           <button class="row-more-btn" onclick="openDetail(${p.id})">Ver más</button>
         </div>
       </div>
     </div>`).join('');
   _setMainHeight();
+  _clampComments(filtered);
+}
+
+function _clampComments(filtered) {
+  const els = document.querySelectorAll('.row-comments');
+  els.forEach((el, i) => {
+    const full = (filtered[i] && filtered[i].comments) || '';
+    el.textContent = full;
+    if (!full) return;
+    if (el.scrollHeight <= el.clientHeight + 1) return;
+    let lo = 0, hi = full.length;
+    while (lo < hi) {
+      const mid = Math.ceil((lo + hi) / 2);
+      el.textContent = full.slice(0, mid).trimEnd() + '…';
+      if (el.scrollHeight <= el.clientHeight + 1) lo = mid; else hi = mid - 1;
+    }
+    el.textContent = lo > 0 ? full.slice(0, lo).trimEnd() + '…' : '…';
+  });
 }
 
 // ══ DETAIL ═════════════════════════════════════════════════════
@@ -2309,7 +2328,10 @@ function _setMainHeight() {
     document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
   }
 }
-window.addEventListener('resize', _setMainHeight);
+window.addEventListener('resize', function(){
+  _setMainHeight();
+  if (!document.getElementById('main').classList.contains('app-hidden')) render();
+});
 
 function showPerfumes() {
   _closeAllModals();
