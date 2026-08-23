@@ -146,8 +146,20 @@
     display:flex; align-items:center; justify-content:center;
     font-size:15px; font-family:'Jost',sans-serif; font-weight:500; color:var(--text);
   }
+  .row-cat-circle.cat-perfumes { background:#cfe8f7; }
+  .row-cat-circle.cat-coleccion { background:#d3ecd0; }
+  .row-cat-circle.cat-deseo { background:#f7d6e0; }
+  .row-cat-circle.cat-otro { background:#f5e6bd; }
   .row-cat-label { font-size:11px; font-family:'Jost',sans-serif; color:var(--text-light); white-space:nowrap; }
   .row-cat-badge:active .row-cat-circle { opacity:.75; }
+  .category-picker-row {
+    display:flex; align-items:center; gap:14px; width:100%;
+    background:none; border:none; cursor:pointer; padding:12px 6px;
+    border-bottom:1px solid var(--border); text-align:left;
+  }
+  .category-picker-row:last-child { border-bottom:none; }
+  .category-picker-row.active { background:var(--surface-alt); border-radius:10px; }
+  .category-picker-label { font-family:'Jost',sans-serif; font-size:17px; color:var(--text); text-transform:capitalize; }
   .row-cols { display:grid; grid-template-columns:1fr 1fr; gap:2px 14px; margin-top:14px; }
   .row-col { display:flex; flex-direction:column; gap:9px; min-width:0; }
   .row-brand-badge {
@@ -795,7 +807,7 @@
   <div id="empty" style="display:none">
     <div class="row-name-row" style="padding:14px 20px 0">
       <span></span>
-      <button class="row-cat-badge" onclick="cycleCategory()" title="Cambiar categoría">
+      <button class="row-cat-badge" onclick="openCategoryPicker()" title="Cambiar categoría">
         <span class="row-cat-circle" id="empty-cat-circle">0</span>
         <span class="row-cat-label" id="empty-cat-label">perfumes</span>
       </button>
@@ -972,6 +984,16 @@
 
 
 <!-- ══ FIELD MANAGER MODAL ══ -->
+<div class="modal-overlay" id="modal-category">
+  <div class="modal" style="max-width:340px">
+    <div class="modal-header">
+      <span class="modal-title">Categoría</span>
+      <button class="modal-close" onclick="closeModal('modal-category')">✕</button>
+    </div>
+    <div class="modal-body" id="category-picker-list"></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-fields">
   <div class="modal" style="max-width:440px">
     <div class="modal-header">
@@ -1361,11 +1383,25 @@ function getFiltered() {
   }).sort((a,b)=>state.sort==='name'?a.name.localeCompare(b.name):new Date(b.added)-new Date(a.added));
 }
 
-function cycleCategory() {
+function openCategoryPicker() {
+  renderCategoryPicker();
+  openModal('modal-category');
+}
+function renderCategoryPicker() {
+  const el = document.getElementById('category-picker-list');
   const cur = state.category || 'perfumes';
-  const idx = CATEGORY_CYCLE.indexOf(cur);
-  state.category = CATEGORY_CYCLE[(idx+1) % CATEGORY_CYCLE.length];
+  el.innerHTML = CATEGORY_CYCLE.map(cat=>{
+    const count = state.perfumes.filter(p=> cat==='perfumes' ? true : (p.status||'coleccion')===cat).length;
+    return `<button class="category-picker-row${cat===cur?' active':''}" onclick="selectCategory('${cat}')">
+      <span class="row-cat-circle cat-${cat}" style="width:38px;height:38px;font-size:13px;flex-shrink:0">${count}</span>
+      <span class="category-picker-label">${CATEGORY_LABELS[cat]}</span>
+    </button>`;
+  }).join('');
+}
+function selectCategory(cat) {
+  state.category = cat;
   save();
+  closeModal('modal-category');
   render();
 }
 
@@ -1380,7 +1416,9 @@ function render() {
   if(filtered.length===0) {
     document.getElementById('empty').style.display='flex';
     document.getElementById('list').innerHTML='';
-    document.getElementById('empty-cat-circle').textContent = '0';
+    const ec = document.getElementById('empty-cat-circle');
+    ec.textContent = '0';
+    ec.className = 'row-cat-circle cat-' + (state.category||'perfumes');
     document.getElementById('empty-cat-label').textContent = CATEGORY_LABELS[state.category||'perfumes'];
     _setMainHeight();
     return;
@@ -1404,8 +1442,8 @@ function render() {
       <div class="row-body">
         <div class="row-name-row">
           <div class="row-name">${p.name}</div>
-          <button class="row-cat-badge" onclick="cycleCategory()" title="Cambiar categoría">
-            <span class="row-cat-circle">${filtered.length}</span>
+          <button class="row-cat-badge" onclick="openCategoryPicker()" title="Cambiar categoría">
+            <span class="row-cat-circle cat-${state.category||'perfumes'}">${filtered.length}</span>
             <span class="row-cat-label">${CATEGORY_LABELS[state.category||'perfumes']}</span>
           </button>
         </div>
@@ -1452,9 +1490,11 @@ function _clampComments(filtered) {
 
 // ══ DETAIL ═════════════════════════════════════════════════════
 var currentDetailPhotos = [];
+var currentDetailId = null;
 function openDetail(id) {
   const p = state.perfumes.find(x=>x.id===id);
   if(!p) return;
+  currentDetailId = id;
   const vf = state.fields.filter(f=>f.visible&&!['name','rating','status','myOpinion','comments','notes'].includes(f.key));
   const rawPhotos = (p.photos||[]).filter(Boolean);
   const ci = p.coverIndex||0;
@@ -2410,6 +2450,9 @@ window.addEventListener('popstate', function(e) {
     if (el.id !== st.modal) el.classList.remove('open');
   });
   if (st.modal) {
+    if (st.modal === 'modal-detail' && currentDetailId != null) {
+      openDetail(currentDetailId);
+    }
     document.getElementById(st.modal).classList.add('open');
   }
   _renderView(st.view);
