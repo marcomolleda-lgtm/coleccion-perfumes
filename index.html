@@ -118,20 +118,36 @@
     position:relative; width:100%; flex-shrink:0;
     height:35%; min-height:35%; max-height:35%;
     background:linear-gradient(135deg,#f0f0ee,#e3e2df);
-    overflow:hidden;
+    box-shadow: 0 6px 10px -4px rgba(0,0,0,.18);
   }
-  .row-photo img { width:100%; height:100%; object-fit:cover; display:block; }
+  .row-photo-carousel {
+    display:flex; overflow-x:auto; scroll-snap-type:x mandatory;
+    height:100%; width:100%; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  }
+  .row-photo-carousel::-webkit-scrollbar { display:none; }
+  .row-photo-slide { flex:0 0 100%; scroll-snap-align:start; height:100%; }
+  .row-photo-slide img { width:100%; height:100%; object-fit:cover; display:block; }
   .row-photo .no-photo { display:flex; align-items:center; justify-content:center; width:100%; height:100%; font-size:40px; opacity:.25; }
-  .row-photo::after {
-    content:''; position:absolute; left:0; right:0; bottom:0; height:34%;
-    background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.8));
-    pointer-events:none;
-  }
+  .row-photo-dots { position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; gap:6px; z-index:5; }
+  .row-photo-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.6); box-shadow:0 0 2px rgba(0,0,0,.3); transition:background .2s,transform .2s; }
+  .row-photo-dot.active { background:var(--accent); transform:scale(1.3); }
   .row-body {
     flex:1; min-height:0; padding:14px 20px 18px;
     display:flex; flex-direction:column;
   }
-  .row-name { font-size:29px; font-family:'Cormorant Garamond',serif; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:8px; }
+  .row-name-row { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+  .row-name { font-size:29px; font-family:'Cormorant Garamond',serif; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0; }
+  .row-cat-badge {
+    background:none; border:none; cursor:pointer; flex-shrink:0;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+  }
+  .row-cat-circle {
+    width:44px; height:44px; border-radius:50%; background:#cfe8f7;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-family:'Jost',sans-serif; font-weight:500; color:var(--text);
+  }
+  .row-cat-label { font-size:11px; font-family:'Jost',sans-serif; color:var(--text-light); white-space:nowrap; }
+  .row-cat-badge:active .row-cat-circle { opacity:.75; }
   .row-cols { display:grid; grid-template-columns:1fr 1fr; gap:2px 14px; margin-top:14px; }
   .row-col { display:flex; flex-direction:column; gap:9px; min-width:0; }
   .row-brand-badge {
@@ -728,7 +744,6 @@
     </div>
     <div class="home-mega-col">
       <button class="home-mega-item" data-i18n="menu_fields" onclick="homeMenuAction(openFieldMgr)">campos</button>
-      <button class="home-mega-item" data-i18n="menu_lists" onclick="homeMenuAction(openWishlist)">listas</button>
       <button class="home-mega-item" data-i18n="menu_notes" onclick="homeMenuAction(openNotesTab)">notas</button>
     </div>
   </div>
@@ -896,13 +911,14 @@
         <div class="stars interactive lg" id="edit-stars"></div>
       </div>
 
-      <!-- In collection toggle -->
-      <div class="switch-row">
-        <span class="switch-label">¿ESTÁ EN COLECCIÓN?</span>
-        <label class="switch">
-          <input type="checkbox" id="f-incollection" checked/>
-          <div class="switch-track"></div>
-        </label>
+      <!-- Category status -->
+      <div class="field-group">
+        <label class="field-label">CATEGORÍA</label>
+        <select class="field-input" id="f-status">
+          <option value="coleccion">En colección</option>
+          <option value="deseo">Deseo</option>
+          <option value="otro">Otro</option>
+        </select>
       </div>
 
       <!-- Tags -->
@@ -1007,7 +1023,7 @@ let state = {
     {key:"bottleCount",label:"Número de frascos",visible:true},
     {key:"myOpinion",label:"Mi opinión",visible:true},
     {key:"comments",label:"Comentarios",visible:true,required:true},
-    {key:"inCollection",label:"¿Está en colección?",visible:true},
+    {key:"status",label:"Categoría",visible:true},
     {key:"barcode",label:"Código de barras",visible:true},
   ],
   nextId: 10,
@@ -1126,7 +1142,13 @@ async function initState() {
     const REQUIRED_CARD_FIELDS = ["name","brand","concentration","capacity","launch","perfumer","notes","comments","rating"];
     if (Array.isArray(state.fields)) {
       state.fields.forEach(f => { if (REQUIRED_CARD_FIELDS.includes(f.key)) f.required = true; });
+      const oldField = state.fields.find(f=>f.key==='inCollection');
+      if (oldField) { oldField.key = 'status'; oldField.label = 'Categoría'; }
     }
+    state.perfumes.forEach(p => {
+      if (!p.status) p.status = (p.inCollection === false) ? 'otro' : 'coleccion';
+    });
+    if (!state.category) state.category = 'perfumes';
     // Ensure each perfume has photos array placeholder
     state.perfumes = state.perfumes.map(p => ({...p, photos: [null,null,null], coverIndex: 0}));
     // Load all photos from IDB
@@ -1312,13 +1334,26 @@ function openNotesTab() {
 }
 
 // ══ RENDER ═════════════════════════════════════════════════════
+const CATEGORY_CYCLE = ['perfumes','coleccion','deseo','otro'];
+const CATEGORY_LABELS = {perfumes:'perfumes', coleccion:'en colección', deseo:'deseos', otro:'otros'};
+
 function getFiltered() {
   const q = document.getElementById('search-bar').value.toLowerCase();
+  const cat = state.category || 'perfumes';
 
   return state.perfumes.filter(p=>{
     const pfam=Array.isArray(p.family)?p.family.join(' '):(p.family||''); if(q && !`${p.name} ${p.brand} ${p.perfumer} ${pfam}`.toLowerCase().includes(q)) return false;
+    if (cat !== 'perfumes' && (p.status||'coleccion') !== cat) return false;
     return true;
   }).sort((a,b)=>state.sort==='name'?a.name.localeCompare(b.name):new Date(b.added)-new Date(a.added));
+}
+
+function cycleCategory() {
+  const cur = state.category || 'perfumes';
+  const idx = CATEGORY_CYCLE.indexOf(cur);
+  state.category = CATEGORY_CYCLE[(idx+1) % CATEGORY_CYCLE.length];
+  save();
+  render();
 }
 
 function starsHTML(n, cls='') {
@@ -1336,13 +1371,28 @@ function render() {
   }
   document.getElementById('empty').style.display='none';
 
-  document.getElementById('list').innerHTML = filtered.map(p=>`
+  document.getElementById('list').innerHTML = filtered.map(p=>{
+    const rawPhotos = (p.photos||[]).filter(Boolean);
+    const heroPhoto = p.photos && p.photos[p.coverIndex||0];
+    const photos = heroPhoto ? [heroPhoto, ...rawPhotos.filter(ph=>ph!==heroPhoto)] : rawPhotos;
+    return `
     <div class="row">
       <div class="row-photo">
-        ${p.photos&&p.photos[p.coverIndex||0]?`<img src="${p.photos[p.coverIndex||0]}" alt="${p.name}"/>`:`<span class="no-photo">🫙</span>`}
+        ${photos.length ? `
+          <div class="row-photo-carousel" onscroll="onRowPhotoScroll(this)">
+            ${photos.map(ph=>`<div class="row-photo-slide"><img src="${ph}" alt="${p.name}"/></div>`).join('')}
+          </div>
+          ${photos.length>1?`<div class="row-photo-dots">${photos.map((_,i)=>`<span class="row-photo-dot${i===0?' active':''}"></span>`).join('')}</div>`:''}
+        ` : `<span class="no-photo">🫙</span>`}
       </div>
       <div class="row-body">
-        <div class="row-name">${p.name}</div>
+        <div class="row-name-row">
+          <div class="row-name">${p.name}</div>
+          <button class="row-cat-badge" onclick="cycleCategory()" title="Cambiar categoría">
+            <span class="row-cat-circle">${filtered.length}</span>
+            <span class="row-cat-label">${CATEGORY_LABELS[state.category||'perfumes']}</span>
+          </button>
+        </div>
         ${starsHTML(p.rating||0)}
         <div class="row-cols">
           <div class="row-col">
@@ -1361,7 +1411,8 @@ function render() {
           <button class="row-more-btn" onclick="openDetail(${p.id})">Ver más</button>
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   _setMainHeight();
   _clampComments(filtered);
 }
@@ -1388,7 +1439,7 @@ var currentDetailPhotos = [];
 function openDetail(id) {
   const p = state.perfumes.find(x=>x.id===id);
   if(!p) return;
-  const vf = state.fields.filter(f=>f.visible&&!['name','rating','inCollection','myOpinion','comments','notes'].includes(f.key));
+  const vf = state.fields.filter(f=>f.visible&&!['name','rating','status','myOpinion','comments','notes'].includes(f.key));
   const rawPhotos = (p.photos||[]).filter(Boolean);
   const ci = p.coverIndex||0;
   const heroPhoto = p.photos&&p.photos[ci] ? p.photos[ci] : null;
@@ -1409,7 +1460,7 @@ function openDetail(id) {
       <div style="font-family:'Cormorant Garamond',serif; font-weight:600;font-size:32px;color:var(--text);margin-bottom:6px">${p.name}</div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px">
         ${starsHTML(p.rating||0,'lg')}
-        ${p.inCollection?'':`<span class="badge-out">✗ No en colección</span>`}
+        ${(p.status && p.status!=='coleccion')?`<span class="badge-out">${p.status==='deseo'?'♡ Deseo':'Otro'}</span>`:''}
       </div>
       <div class="detail-fields">
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
@@ -1445,6 +1496,12 @@ function onHeroScroll(){
   const idx = Math.round(el.scrollLeft / el.clientWidth);
   dots.querySelectorAll('.hero-dot').forEach((d,i)=>d.classList.toggle('active', i===idx));
 }
+function onRowPhotoScroll(el){
+  const dots = el.parentElement.querySelector('.row-photo-dots');
+  if(!dots) return;
+  const idx = Math.round(el.scrollLeft / el.clientWidth);
+  dots.querySelectorAll('.row-photo-dot').forEach((d,i)=>d.classList.toggle('active', i===idx));
+}
 
 // ══ RICH TEXT EDITOR HELPERS ═══════════════════════════════════
 var rteActive = 'rte-notes';
@@ -1479,7 +1536,7 @@ function openEdit(id) {
   for(let i=0;i<3;i++) renderPhotoSlot(i);
 
   // Build dynamic fields
-  const skipKeys = ['name','brand','rating','inCollection','notes','myOpinion','comments','barcode'];
+  const skipKeys = ['name','brand','rating','status','notes','myOpinion','comments','barcode'];
   const dynFields = state.fields.filter(f=>f.visible && !skipKeys.includes(f.key));
   const grid = document.getElementById('fields-grid');
   grid.innerHTML = '';
@@ -1534,7 +1591,7 @@ function openEdit(id) {
   renderEditStars();
 
   // In collection
-  document.getElementById('f-incollection').checked = p ? !!p.inCollection : true;
+  document.getElementById('f-status').value = p ? (p.status||'coleccion') : 'coleccion';
 
   // Tags & Lists
   renderEditTags();
@@ -1634,7 +1691,7 @@ function savePerfume() {
     tags: [...editTags],
     lists: [...editLists],
     barcode: document.getElementById('pf-barcode').value.trim(),
-    inCollection: document.getElementById('f-incollection').checked,
+    status: document.getElementById('f-status').value,
     notes: document.getElementById('f-notes').value,
     myOpinion: document.getElementById('f-opinion').value,
     comments: document.getElementById('f-comments').value,
@@ -1642,7 +1699,7 @@ function savePerfume() {
   };
 
   state.fields.forEach(f=>{
-    if(['rating','inCollection','notes','myOpinion','comments'].includes(f.key)) return;
+    if(['rating','status','notes','myOpinion','comments'].includes(f.key)) return;
     obj[f.key]=getFieldVal(f.key);
   });
 
@@ -1676,7 +1733,7 @@ function exportCSV() {
   const vf=state.fields.filter(f=>f.visible);
   const headers=vf.map(f=>f.label).join(',');
   const rows=state.perfumes.map(p=>vf.map(f=>{
-    let v=f.key==='inCollection'?(p[f.key]?'Sí':'No'):(p[f.key]||'');
+    let v=f.key==='status'?(CATEGORY_LABELS[p.status||'coleccion']||''):(p[f.key]||'');
     return `"${String(v).replace(/"/g,'""')}"`;
   }).join(','));
   const csv=[headers,...rows].join('\n');
@@ -1761,7 +1818,7 @@ function exportCSV() {
   const vf = state.fields.filter(f=>f.visible && !['photos','coverIndex'].includes(f.key));
   const headers = vf.map(f=>f.label).join(',');
   const rows = state.perfumes.map(p=>vf.map(f=>{
-    let v = f.key==='inCollection' ? (p[f.key]?'Sí':'No') : (p[f.key]||'');
+    let v = f.key==='status' ? (CATEGORY_LABELS[p.status||'coleccion']||'') : (p[f.key]||'');
     return '"'+String(v).replace(/"/g,'""')+'"';
   }).join(','));
   const csv = [headers,...rows].join('\n');
@@ -1776,7 +1833,7 @@ function exportXLSX() {
   const vf = state.fields.filter(f=>f.visible && !['photos','coverIndex'].includes(f.key));
   const headers = vf.map(f=>f.label).join('\t');
   const rows = state.perfumes.map(p=>vf.map(f=>{
-    let v = f.key==='inCollection' ? (p[f.key]?'Sí':'No') : (p[f.key]||'');
+    let v = f.key==='status' ? (CATEGORY_LABELS[p.status||'coleccion']||'') : (p[f.key]||'');
     return String(v).replace(/\t/g,' ');
   }).join('\t'));
   const tsv = [headers,...rows].join('\n');
@@ -2093,20 +2150,9 @@ function deleteNote(i) {
 }
 
 function openWishlist() {
-  wlActiveTab = 'lists';
+  wlActiveTab = 'notes';
   renderWishlist();
   openModal('modal-wishlist');
-  // Asegurar que se muestra la pestaña correcta al abrir
-  setTimeout(() => {
-    const lp = document.getElementById('wl-panel-lists');
-    const np = document.getElementById('wl-panel-notes');
-    const bl = document.getElementById('tab-btn-lists');
-    const bn = document.getElementById('tab-btn-notes');
-    if (lp) lp.style.display = 'block';
-    if (np) np.style.display = 'none';
-    if (bl) bl.classList.add('active');
-    if (bn) bn.classList.remove('active');
-  }, 0);
 }
 
 function renderWishlist() {
@@ -2449,18 +2495,12 @@ if('serviceWorker' in navigator) {
   <div class="modal">
     <div class="modal-header">
       <button class="modal-close" onclick="closeModal('modal-wishlist')" style="position:static;background:rgba(255,255,255,.8);border-radius:50%;width:32px;height:32px;padding:0">&#8592;</button>
-      <span class="modal-title">Listas y Notas</span>
+      <span class="modal-title">Notas</span>
       <span style="width:32px"></span>
     </div>
     <div class="modal-body">
-      <!-- Pestañas -->
-      <div class="wl-tab-bar">
-        <button id="tab-btn-lists" class="active" onclick="switchWlTab('lists')">Listas</button>
-        <button id="tab-btn-notes" onclick="switchWlTab('notes')">Notas</button>
-      </div>
-
       <!-- Pestaña Listas -->
-      <div id="wl-panel-lists">
+      <div id="wl-panel-lists" style="display:none">
         <div id="wishlist-items"></div>
         <div style="margin-top:10px">
           <button class="btn-secondary" style="width:100%;margin-bottom:12px" onclick="toggleWishForm()"><span id="wish-form-title">＋ Añadir perfume</span></button>
@@ -2500,7 +2540,7 @@ if('serviceWorker' in navigator) {
       </div>
 
       <!-- Pestaña Notas -->
-      <div id="wl-panel-notes" style="display:none">
+      <div id="wl-panel-notes">
         <div id="notes-list"></div>
         <button class="btn-secondary" style="width:100%;margin-bottom:12px" onclick="toggleNoteForm()">
           <span id="note-form-title">＋ Nueva nota</span>
