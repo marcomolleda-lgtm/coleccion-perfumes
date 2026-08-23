@@ -374,7 +374,11 @@
   .field-mgr-row input[type=text] { flex:1; border:none; background:transparent; font-size:14px; color:var(--text); font-family:'Jost',sans-serif; outline:none; }
 
   /* Empty state */
-  #empty { text-align:center; padding:70px 20px; }
+  #empty {
+    height: calc(100vh - var(--header-h, 78px));
+    display:flex; flex-direction:column;
+  }
+  .empty-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
   #empty .empty-icon { font-size:60px; opacity:.2; margin-bottom:16px; }
   #empty p { font-family:'Jost',sans-serif; font-weight:600; font-size:20px; color:var(--text-muted); }
   #empty small { font-size:13px; color:var(--text-light); }
@@ -789,9 +793,18 @@
   </div>
   <div id="list"></div>
   <div id="empty" style="display:none">
-    <div class="empty-icon">🫙</div>
-    <p data-i18n="empty_state">No hay perfumes</p>
-    <small>Prueba a cambiar los filtros</small>
+    <div class="row-name-row" style="padding:14px 20px 0">
+      <span></span>
+      <button class="row-cat-badge" onclick="cycleCategory()" title="Cambiar categoría">
+        <span class="row-cat-circle" id="empty-cat-circle">0</span>
+        <span class="row-cat-label" id="empty-cat-label">perfumes</span>
+      </button>
+    </div>
+    <div class="empty-body">
+      <div class="empty-icon">🫙</div>
+      <p data-i18n="empty_state">No hay perfumes</p>
+      <small>Prueba a cambiar los filtros</small>
+    </div>
   </div>
 </div>
 
@@ -1365,8 +1378,11 @@ function render() {
   document.getElementById('count-label').textContent = `${filtered.length} perfume${filtered.length!==1?'s':''}`;
 
   if(filtered.length===0) {
-    document.getElementById('empty').style.display='block';
+    document.getElementById('empty').style.display='flex';
     document.getElementById('list').innerHTML='';
+    document.getElementById('empty-cat-circle').textContent = '0';
+    document.getElementById('empty-cat-label').textContent = CATEGORY_LABELS[state.category||'perfumes'];
+    _setMainHeight();
     return;
   }
   document.getElementById('empty').style.display='none';
