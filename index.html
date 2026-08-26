@@ -198,7 +198,7 @@
   #modal-detail { padding:0; }
   #modal-detail .modal { max-width:100%; width:100%; height:100%; max-height:100%; border-radius:0; display:flex; flex-direction:column; overflow:hidden; }
   #modal-detail .modal-body { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
-  #modal-wishlist { padding:0; }
+  #modal-wishlist { padding:0; backdrop-filter:none; }
   #modal-wishlist .modal { max-width:100%; width:100%; height:100%; max-height:100%; border-radius:0; display:flex; flex-direction:column; overflow:hidden; }
   #modal-wishlist .modal-body { flex:1; overflow-y:auto; }
   .modal {
@@ -332,6 +332,7 @@
   .detail-page-overlay {
     display:none; position:fixed; inset:0; z-index:900;
     background:#ffffff; padding:0; align-items:stretch; justify-content:stretch;
+    backdrop-filter:none;
     overflow-y:auto;
   }
   .detail-page-overlay.open { display:block; }
@@ -607,6 +608,7 @@
   /* ── NOTE EDITOR (full page, minimalist) ── */
   .note-editor-overlay {
     display:none; position:fixed; inset:0; z-index:1200; background:#ffffff;
+    backdrop-filter:none;
   }
   .note-editor-overlay.open { display:flex; }
   .note-editor-inner {
@@ -1725,6 +1727,7 @@ function openDetail(id) {
       <button class="detail-edit-btn" onclick="openEdit(${p.id})">Editar</button>
     </div>`;
   openModal('modal-detail');
+  history.replaceState({view:'perfumes', modal:'modal-detail', detailId:id}, '');
 }
 function onHeroScroll(){
   const el = document.getElementById('hero-carousel');
@@ -2631,8 +2634,8 @@ window.addEventListener('popstate', function(e) {
     if (fab) fab.classList.remove('visible');
   }
   if (st.modal) {
-    if (st.modal === 'modal-detail' && currentDetailId != null) {
-      openDetail(currentDetailId);
+    if (st.modal === 'modal-detail' && st.detailId != null) {
+      openDetail(st.detailId);
     }
     if (st.modal === 'modal-note-editor') {
       if (typeof st.noteIndex === 'number') {
@@ -2750,6 +2753,8 @@ function applyLanguage(lang) {
           toggleNoteForm();
         }
       }
+    } else if (st.modal === 'modal-detail' && st.detailId != null) {
+      openDetail(st.detailId);
     } else if (st.modal) {
       document.getElementById(st.modal).classList.add('open');
     }
