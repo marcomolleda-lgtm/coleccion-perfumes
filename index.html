@@ -571,9 +571,16 @@
   }
   .note-editor-overlay.open { display:flex; }
   .note-editor-inner {
+    position:relative;
     display:flex; flex-direction:column; width:100%; height:100%;
     padding:56px 26px 26px; box-sizing:border-box; gap:22px;
   }
+  .note-editor-back {
+    position:absolute; top:18px; left:20px;
+    background:none; border:none; cursor:pointer;
+    font-size:22px; color:var(--text); padding:6px; line-height:1;
+  }
+  .note-editor-back:active { opacity:.6; }
   .note-editor-title {
     border:none; outline:none; background:none;
     font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:700;
@@ -605,7 +612,7 @@
     white-space:pre-wrap; word-break:break-word;
   }
   .note-card-date {
-    font-size:10px; color:var(--text-muted); letter-spacing:1px;
+    font-size:10px; color:var(--star); letter-spacing:1px;
     margin-top:8px;
   }
   .note-card-x {
@@ -2250,6 +2257,7 @@ function toggleNoteForm() {
   document.getElementById('nf-title').value = '';
   document.getElementById('nf-body').value = '';
   openModal('modal-note-editor');
+  history.replaceState({view:'perfumes', modal:'modal-note-editor', noteIndex:null}, '');
   setTimeout(()=>document.getElementById('nf-title').focus(), 60);
 }
 
@@ -2286,6 +2294,7 @@ function editNote(i) {
   document.getElementById('nf-title').value = note.title || '';
   document.getElementById('nf-body').value = note.body || '';
   openModal('modal-note-editor');
+  history.replaceState({view:'perfumes', modal:'modal-note-editor', noteIndex:i}, '');
 }
 
 function deleteNote(i) {
@@ -2551,6 +2560,23 @@ window.addEventListener('popstate', function(e) {
     if (st.modal === 'modal-detail' && currentDetailId != null) {
       openDetail(currentDetailId);
     }
+    if (st.modal === 'modal-note-editor') {
+      if (typeof st.noteIndex === 'number') {
+        const notes = loadNotes();
+        const note = notes[st.noteIndex];
+        document.getElementById('modal-note-editor').dataset.editIndex = st.noteIndex;
+        document.getElementById('nf-title').value = note ? (note.title||'') : '';
+        document.getElementById('nf-body').value = note ? (note.body||'') : '';
+      } else {
+        document.getElementById('modal-note-editor').dataset.editIndex = '';
+        document.getElementById('nf-title').value = '';
+        document.getElementById('nf-body').value = '';
+      }
+    }
+    if (st.modal === 'modal-wishlist' || st.modal === 'modal-note-editor') {
+      switchWlTab('notes');
+      document.getElementById('note-add-fab').classList.add('visible');
+    }
     document.getElementById(st.modal).classList.add('open');
   }
   _renderView(st.view);
@@ -2635,6 +2661,22 @@ function applyLanguage(lang) {
     history.replaceState({view:'home', modal:null}, '');
   } else if (history.state.view === 'perfumes') {
     _renderView('perfumes');
+    const st = history.state;
+    _suppressHistory = true;
+    if (st.modal === 'modal-wishlist' || st.modal === 'modal-note-editor') {
+      openWishlist();
+      if (st.modal === 'modal-note-editor') {
+        if (typeof st.noteIndex === 'number') {
+          editNote(st.noteIndex);
+        } else {
+          toggleNoteForm();
+        }
+      }
+    } else if (st.modal) {
+      document.getElementById(st.modal).classList.add('open');
+    }
+    _suppressHistory = false;
+    history.replaceState(st, '');
   }
   document.querySelectorAll('.app-search').forEach(function(el){
     el.addEventListener('focus', function(){ this.dataset.ph = this.placeholder; this.placeholder = ''; });
@@ -2716,7 +2758,8 @@ if('serviceWorker' in navigator) {
 
 <!-- ══ NOTE EDITOR (full page) ══ -->
 <div class="modal-overlay note-editor-overlay" id="modal-note-editor">
-  <div class="note-editor-inner">
+  <div class="note-editor-inner" onclick="if(event.target===this) document.activeElement.blur()">
+    <button class="note-editor-back" onclick="closeNoteEditor()" title="Volver">&#8592;</button>
     <input id="nf-title" class="note-editor-title" placeholder="Título"/>
     <textarea id="nf-body" class="note-editor-body" placeholder="Escribe tu nota aquí..."></textarea>
     <div class="note-editor-actions">
