@@ -1313,6 +1313,9 @@ async function initState() {
   }
   applyViewSort();
   render();
+  if (currentDetailId != null && document.getElementById('modal-detail').classList.contains('open')) {
+    openDetail(currentDetailId);
+  }
   // Hide splash after app is ready
   setTimeout(function() {
     var s = document.getElementById('splash');
