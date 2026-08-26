@@ -399,24 +399,50 @@
 
   /* Field manager */
   .field-mgr-row {
-    display:flex; align-items:center; gap:10px; margin-bottom:8px;
-    padding:10px 12px; background:var(--surface-alt); border-radius:10px; border:1px solid var(--border);
-    cursor:grab; user-select:none; transition:opacity .2s, box-shadow .2s;
+    display:flex; align-items:center; gap:12px;
+    padding:12px 0; border-bottom:1px solid #ededec;
+    user-select:none;
   }
-  .field-mgr-row.dragging { opacity:.45; cursor:grabbing; }
-  .field-mgr-row.drag-over { box-shadow:0 0 0 2px var(--accent); background:var(--surface); }
+  .field-mgr-row.dragging { opacity:.45; }
+  .field-mgr-row.drag-over { background:var(--surface-alt); }
   .field-mgr-drag-handle { color:var(--text-light); font-size:16px; cursor:grab; flex-shrink:0; line-height:1; }
-  .field-mgr-row input[type=checkbox] { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
   .field-mgr-delete { background:none; border:none; cursor:pointer; font-size:15px; opacity:.55; flex-shrink:0; padding:4px; }
   .field-mgr-delete:active { opacity:.9; }
-  .family-mgr-list { display:flex; flex-direction:column; gap:2px; max-height:50vh; overflow-y:auto; }
+  .family-mgr-list { display:flex; flex-direction:column; }
   .family-mgr-row {
     display:flex; align-items:center; justify-content:space-between;
-    padding:9px 4px; border-bottom:1px solid var(--border);
-    font-size:15px; color:var(--text);
+    padding:12px 0; border-bottom:1px solid #ededec;
+    font-size:16px; font-family:'Jost',sans-serif; color:var(--text);
   }
-  .family-mgr-row:last-child { border-bottom:none; }
-  .field-mgr-row input[type=text] { flex:1; border:none; background:transparent; font-size:14px; color:var(--text); font-family:'Jost',sans-serif; outline:none; }
+  .field-mgr-row input[type=text] { flex:1; border:none; background:transparent; font-size:16px; color:var(--text); font-family:'Jost',sans-serif; outline:none; }
+
+  /* ── Generic full-page screen (fields, families, and future secondary pages) ── */
+  .page-overlay {
+    display:none; position:fixed; inset:0; z-index:1000; background:#ffffff;
+    backdrop-filter:none; overflow-y:auto;
+  }
+  .page-overlay.open { display:block; }
+  .page-inner { position:relative; max-width:640px; margin:0 auto; padding:56px 22px 60px; }
+  .page-back {
+    position:absolute; top:18px; left:16px;
+    background:none; border:none; cursor:pointer;
+    font-size:22px; color:var(--text); padding:6px; line-height:1;
+  }
+  .page-back:active { opacity:.6; }
+  .page-title { font-size:28px; font-family:'Cormorant Garamond',serif; font-weight:700; color:var(--text); margin-bottom:24px; }
+  .page-link {
+    display:block; background:none; border:none; cursor:pointer; padding:6px 0;
+    font-family:'Jost',sans-serif; font-size:15px; font-weight:500; color:var(--star);
+  }
+  .page-link:active { opacity:.6; }
+  .page-divider { height:1px; background:#ededec; margin:20px 0; }
+  .page-text-input {
+    flex:1; border:none; border-bottom:1px solid var(--border); background:none;
+    font-family:'Jost',sans-serif; font-size:16px; color:var(--text);
+    padding:6px 2px; outline:none;
+  }
+  .page-text-input:focus { border-bottom-color:var(--text); }
+  .page-text-input::placeholder { color:var(--text-light); }
 
   /* Empty state */
   #empty {
@@ -1109,35 +1135,25 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-fields">
-  <div class="modal" style="max-width:440px">
-    <div class="modal-header">
-      <span class="modal-title">≡ Gestionar campos</span>
-      <button class="modal-close" onclick="closeModal('modal-fields')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div id="field-mgr-list"></div>
-      <button class="hbtn" style="width:100%;margin-top:6px;padding:10px" onclick="addCustomField()">+ Añadir campo</button>
-      <div style="height:1px;background:var(--border);margin:16px 0"></div>
-      <button class="hbtn" style="width:100%;padding:10px" onclick="openFamilyMgr()">🌸 Gestionar familias olfativas</button>
-      <button class="btn-primary" style="width:100%;margin-top:10px" onclick="closeModal('modal-fields');render()">Guardar y cerrar</button>
-    </div>
+<div class="modal-overlay page-overlay" id="modal-fields">
+  <div class="page-inner">
+    <button class="page-back" onclick="closeModal('modal-fields');render()" title="Volver">&#8592;</button>
+    <div class="page-title">Campos</div>
+    <div id="field-mgr-list"></div>
+    <button class="page-link" onclick="addCustomField()">+ Añadir campo</button>
+    <div class="page-divider"></div>
+    <button class="page-link" onclick="openFamilyMgr()">Gestionar familias olfativas</button>
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-families">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-header">
-      <span class="modal-title">🌸 Familias olfativas</span>
-      <button class="modal-close" onclick="closeModal('modal-families')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div id="family-mgr-list" class="family-mgr-list"></div>
-      <div style="display:flex;gap:8px;margin-top:14px">
-        <input type="text" id="new-family-input" placeholder="Nueva familia..." style="flex:1" onkeydown="if(event.key==='Enter'){addFamily();}"/>
-        <button class="btn-primary" style="padding:0 18px" onclick="addFamily()">+</button>
-      </div>
-      <button class="btn-primary" style="width:100%;margin-top:14px" onclick="closeModal('modal-families')">Cerrar</button>
+<div class="modal-overlay page-overlay" id="modal-families">
+  <div class="page-inner">
+    <button class="page-back" onclick="closeModal('modal-families')" title="Volver">&#8592;</button>
+    <div class="page-title">Familias olfativas</div>
+    <div id="family-mgr-list" class="family-mgr-list"></div>
+    <div style="display:flex;gap:10px;margin-top:18px;align-items:center">
+      <input type="text" id="new-family-input" class="page-text-input" placeholder="Nueva familia..." onkeydown="if(event.key==='Enter'){addFamily();}"/>
+      <button class="page-link" onclick="addFamily()">Añadir</button>
     </div>
   </div>
 </div>
@@ -1360,9 +1376,12 @@ function renderFieldMgr() {
       ondrop="fmDrop(event,${i})"
       ondragend="fmDragEnd(event)">
       <span class="field-mgr-drag-handle">⠿</span>
-      <input type="checkbox" ${f.visible?'checked':''} ${f.required?'disabled':''} onchange="toggleField(${i},this.checked)"/>
+      <label class="switch">
+        <input type="checkbox" ${f.visible?'checked':''} ${f.required?'disabled':''} onchange="toggleField(${i},this.checked)"/>
+        <div class="switch-track"></div>
+      </label>
       <input type="text" value="${f.label}" onchange="renameField(${i},this.value)"/>
-      ${f.required?'<span style="font-size:10px;color:var(--text-light)">requerido</span>':`<button type="button" class="field-mgr-delete" title="Eliminar campo" onclick="deleteField(${i})">🗑</button>`}
+      ${f.required?'<span style="font-size:10px;color:var(--text-light);font-family:\'Jost\',sans-serif">requerido</span>':`<button type="button" class="field-mgr-delete" title="Eliminar campo" onclick="deleteField(${i})">✕</button>`}
     </div>`).join('');
 }
 
@@ -1385,7 +1404,7 @@ function renderFamilyMgr() {
   el.innerHTML = state.families.map((fam,i)=>`
     <div class="family-mgr-row">
       <span>${fam}</span>
-      <button type="button" class="field-mgr-delete" title="Eliminar familia" onclick="deleteFamily(${i})">🗑</button>
+      <button type="button" class="field-mgr-delete" title="Eliminar familia" onclick="deleteFamily(${i})">✕</button>
     </div>`).join('');
 }
 function addFamily() {
