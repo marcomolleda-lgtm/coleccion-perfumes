@@ -96,6 +96,7 @@
   /* ── MAIN (full-screen swipeable cards) ── */
   #main { padding:0; overflow-y:auto; scroll-snap-type:y mandatory; -webkit-overflow-scrolling:touch;
     height: calc(100vh - var(--header-h, 78px));
+    height: calc(100dvh - var(--header-h, 78px));
     display:flex; flex-direction:column; }
   #main.list-mode { scroll-snap-type:none; }
 
@@ -104,6 +105,7 @@
   .row {
     background:#ffffff; width:100%;
     height: calc(100vh - var(--header-h, 78px));
+    height: calc(100dvh - var(--header-h, 78px));
     scroll-snap-align:start; scroll-snap-stop:always;
     display:flex; flex-direction:column; overflow:hidden;
     flex-shrink:0;
@@ -333,6 +335,19 @@
     overflow-y:auto;
   }
   .detail-page-overlay.open { display:block; }
+  #detail-header {
+    position:sticky; top:0; z-index:20; background:var(--bg);
+    display:flex; align-items:center; gap:10px;
+    padding:26px 16px 14px;
+  }
+  #detail-search { flex:1; padding:13px 16px; border-radius:999px; min-height:36px; }
+  #detail-add-btn {
+    padding:0; border-radius:50%; border:none;
+    background:var(--accent-dark); color:#fff; font-weight:700;
+    font-family:'Jost',sans-serif; font-size:20px; cursor:pointer;
+    flex-shrink:0; line-height:1; width:40px; height:40px;
+    display:flex; align-items:center; justify-content:center;
+  }
   .detail-hero {
     height:34vh; overflow:hidden;
     background:linear-gradient(135deg,#f0f0ee,#e3e2df);
@@ -360,19 +375,23 @@
   .detail-block-label { font-size:11px; color:var(--text-light); letter-spacing:1.5px; font-family:'Jost',sans-serif; font-weight:500; margin-bottom:6px; text-transform:uppercase; }
   .detail-block-value { font-size:16px; color:var(--text-muted); font-family:'Jost',sans-serif; font-style:italic; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
   .detail-edit-btn {
-    display:block; margin:32px auto 0; padding:12px 34px; border-radius:999px;
-    background:var(--accent-dark); color:#fff; border:none; cursor:pointer;
-    font-family:'Jost',sans-serif; font-size:15px; letter-spacing:1px;
-    box-shadow: 2px 3px 0 0 #000;
+    position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+    padding:14px 36px; border-radius:999px;
+    background:var(--accent-yellow); color:#1a1a18; border:none; cursor:pointer;
+    font-family:'Jost',sans-serif; font-size:16px; font-weight:500; letter-spacing:.5px;
+    box-shadow:0 6px 16px rgba(0,0,0,.22); z-index:600;
   }
-  .detail-edit-btn:active { transform:translate(1px,1px); box-shadow:1px 2px 0 0 #000; }
+  .detail-edit-btn:active { opacity:.85; }
   .detail-back-btn {
     position:absolute; top:18px; left:16px; z-index:6;
     background:rgba(255,255,255,.85); border:none; border-radius:50%;
     width:34px; height:34px; font-size:18px; color:var(--text); cursor:pointer;
   }
   .badge-in { display:inline-block; padding:3px 12px; border-radius:20px; font-size:12px; background:#e8f4ed; color:#4a8a5a; border:1px solid #c0ddc8; }
-  .badge-out { display:inline-block; padding:3px 12px; border-radius:20px; font-size:12px; background:#fdf0ef; color:#c0392b; border:1px solid #f0c0bb; }
+  .badge-out { display:inline-block; padding:3px 12px; border-radius:20px; font-size:12px; font-family:'Jost',sans-serif; cursor:pointer; }
+  .badge-out.cat-coleccion { background:#eaf6e8; color:#3d7a37; border:1px solid #bde3b5; }
+  .badge-out.cat-deseo { background:#fdeef2; color:#a3406a; border:1px solid #f3c3d3; }
+  .badge-out.cat-otro { background:#fbf3e0; color:#8a6d1f; border:1px solid #ecd99a; }
 
   /* Theme panel */
   .theme-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
@@ -947,6 +966,11 @@
 
 <!-- ══ DETAIL MODAL ══ -->
 <div class="modal-overlay detail-page-overlay" id="modal-detail">
+  <div id="detail-header">
+    <button class="menu-btn" onclick="toggleHomeMenu()" title="Menú">•••</button>
+    <input id="detail-search" class="app-search" type="search" placeholder="Buscar" oninput="detailSearch(this.value)"/>
+    <button id="detail-add-btn" onclick="openEdit(null)" title="Añadir perfume">＋</button>
+  </div>
   <div id="detail-content"></div>
 </div>
 
@@ -1505,6 +1529,31 @@ function selectCategory(cat) {
   render();
 }
 
+var _perfumeCategoryTargetId = null;
+function openPerfumeCategoryPicker(id) {
+  _perfumeCategoryTargetId = id;
+  const p = state.perfumes.find(x=>x.id===id);
+  const cur = p ? (p.status||'coleccion') : 'coleccion';
+  const el = document.getElementById('category-picker-list');
+  el.innerHTML = ['coleccion','deseo','otro'].map(cat=>{
+    const count = state.perfumes.filter(x=>(x.status||'coleccion')===cat).length;
+    return `<button class="category-picker-row${cat===cur?' active':''}" onclick="setPerfumeCategory('${cat}')">
+      <span class="row-cat-circle cat-${cat}" style="width:38px;height:38px;font-size:13px;flex-shrink:0">${count}</span>
+      <span class="category-picker-label">${CATEGORY_LABELS[cat]}</span>
+    </button>`;
+  }).join('');
+  openModal('modal-category');
+}
+function setPerfumeCategory(cat) {
+  const p = state.perfumes.find(x=>x.id===_perfumeCategoryTargetId);
+  if (p) { p.status = cat; save(); }
+  closeModal('modal-category');
+  render();
+  if (document.getElementById('modal-detail').classList.contains('open')) {
+    openDetail(_perfumeCategoryTargetId);
+  }
+}
+
 function starsHTML(n, cls='') {
   return `<div class="stars ${cls}">${[1,2,3,4,5].map(i=>`<span class="star${i<=n?' on':''}">★</span>`).join('')}</div>`;
 }
@@ -1583,7 +1632,10 @@ function render() {
             <span class="row-cat-label">${CATEGORY_LABELS[state.category||'perfumes']}</span>
           </button>
         </div>
-        ${starsHTML(p.rating||0)}
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          ${starsHTML(p.rating||0)}
+          <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${CATEGORY_LABELS[p.status||'coleccion']}</span>
+        </div>
         <div class="row-cols">
           <div class="row-brand-badge">${p.brand||''}</div>
           <div class="row-perfumer">${p.perfumer||''}</div>
@@ -1594,7 +1646,7 @@ function render() {
         </div>
         <div class="row-comments"></div>
         <div class="row-more-wrap">
-          <button class="row-more-btn" onclick="openDetail(${p.id})">Ver más</button>
+          <button class="row-more-btn" onclick="openDetail(${p.id})">Ficha completa</button>
         </div>
       </div>
     </div>`;
@@ -1647,7 +1699,7 @@ function openDetail(id) {
       <div class="detail-name">${p.name}</div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         ${starsHTML(p.rating||0,'lg')}
-        ${(p.status && p.status!=='coleccion')?`<span class="badge-out">${p.status==='deseo'?'♡ Deseo':'Otro'}</span>`:''}
+        <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${CATEGORY_LABELS[p.status||'coleccion']}</span>
       </div>
       <div class="detail-fields">
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
@@ -2553,6 +2605,11 @@ window.addEventListener('resize', function(){
   _setMainHeight();
   if (!document.getElementById('main').classList.contains('app-hidden')) render();
 });
+window.addEventListener('orientationchange', function(){ setTimeout(_setMainHeight, 200); });
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', _setMainHeight);
+}
+window.addEventListener('load', function(){ setTimeout(_setMainHeight, 100); });
 
 function showPerfumes() {
   _closeAllModals();
@@ -2616,6 +2673,10 @@ function homeSearch(v) {
   sb.value = v;
   render();
   setTimeout(function(){ sb.focus(); }, 30);
+}
+function detailSearch(v) {
+  document.getElementById('search-bar').value = v;
+  closeModal('modal-detail');
 }
 
 // ══ LANGUAGE MENU ═══════════════════════════════════════
