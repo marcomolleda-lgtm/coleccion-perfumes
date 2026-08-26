@@ -326,31 +326,51 @@
   .btn-row { display:flex; gap:10px; margin-top:20px; }
 
   /* Detail modal photo */
+  /* ── DETAIL PAGE (full screen, no floating card) ── */
+  .detail-page-overlay {
+    display:none; position:fixed; inset:0; z-index:900;
+    background:#ffffff; padding:0; align-items:stretch; justify-content:stretch;
+    overflow-y:auto;
+  }
+  .detail-page-overlay.open { display:block; }
   .detail-hero {
-    height:38vh; overflow:hidden; border-radius:0;
+    height:34vh; overflow:hidden;
     background:linear-gradient(135deg,#f0f0ee,#e3e2df);
     display:flex; align-items:center; justify-content:center; position:relative;
-    flex:0 0 auto;
+    box-shadow: 0 6px 10px -4px rgba(0,0,0,.18);
   }
   .detail-hero img { width:100%; height:100%; object-fit:cover; }
-  .detail-hero-fade { position:absolute; inset:0; background:linear-gradient(to top,var(--surface),transparent 22%); pointer-events:none; }
   .hero-carousel {
     display:flex; overflow-x:auto; scroll-snap-type:x mandatory; height:100%; width:100%;
     -webkit-overflow-scrolling:touch; scrollbar-width:none;
   }
   .hero-carousel::-webkit-scrollbar { display:none; }
-  .hero-slide { flex:0 0 100%; scroll-snap-align:start; height:100%; }
-  .hero-slide img { width:100%; height:100%; object-fit:cover; display:block; cursor:zoom-in; }
+  .hero-slide { position:relative; flex:1 0 100%; width:100%; scroll-snap-align:start; height:100%; }
+  .hero-slide img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; cursor:zoom-in; }
   .hero-dots { position:absolute; bottom:14px; left:0; right:0; display:flex; justify-content:center; gap:6px; z-index:5; }
-  .hero-dot { width:6px; height:6px; border-radius:50%; background:rgba(0,0,0,.2); transition:background .2s,transform .2s; }
+  .hero-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.6); box-shadow:0 0 2px rgba(0,0,0,.3); transition:background .2s,transform .2s; }
   .hero-dot.active { background:var(--accent); transform:scale(1.3); }
-  .detail-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px 18px; margin-bottom:16px; }
-  .detail-field-label { font-size:13px; color:var(--text-light); letter-spacing:2px; font-family:'Yantramanav',sans-serif; font-weight:500; margin-bottom:2px; }
-  .detail-field-value { font-size:14px; color:var(--text); }
-  .detail-block { background:var(--surface-alt); border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:12px; }
-  .detail-block-value { white-space: pre-wrap; word-break: break-word; }
-  .detail-block-label { font-size:13px; color:var(--text-light); letter-spacing:2px; font-family:'Yantramanav',sans-serif; font-weight:500; margin-bottom:6px; }
-  .detail-block-value { font-size:14px; color:var(--text); line-height:1.6; }
+  .detail-body { padding:26px 22px 60px; max-width:640px; margin:0 auto; }
+  .detail-name { font-size:32px; font-family:'Cormorant Garamond',serif; font-weight:700; color:var(--text); margin-bottom:10px; }
+  .detail-fields { display:grid; grid-template-columns:1fr 1fr; grid-auto-flow:row; column-gap:16px; row-gap:16px; align-items:baseline; margin:22px 0; }
+  .detail-field-label { font-size:11px; color:var(--text-light); letter-spacing:1.5px; font-family:'Jost',sans-serif; font-weight:500; margin-bottom:3px; text-transform:uppercase; }
+  .detail-field-value { font-size:17px; color:var(--text); font-family:'Jost',sans-serif; }
+  .detail-field-value.brand-badge { display:inline-block; background:var(--accent-yellow); padding:2px 8px; }
+  .detail-block { padding-top:16px; margin-top:16px; border-top:1px solid #ededec; }
+  .detail-block-label { font-size:11px; color:var(--text-light); letter-spacing:1.5px; font-family:'Jost',sans-serif; font-weight:500; margin-bottom:6px; text-transform:uppercase; }
+  .detail-block-value { font-size:16px; color:var(--text-muted); font-family:'Jost',sans-serif; font-style:italic; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+  .detail-edit-btn {
+    display:block; margin:32px auto 0; padding:12px 34px; border-radius:999px;
+    background:var(--accent-dark); color:#fff; border:none; cursor:pointer;
+    font-family:'Jost',sans-serif; font-size:15px; letter-spacing:1px;
+    box-shadow: 2px 3px 0 0 #000;
+  }
+  .detail-edit-btn:active { transform:translate(1px,1px); box-shadow:1px 2px 0 0 #000; }
+  .detail-back-btn {
+    position:absolute; top:18px; left:16px; z-index:6;
+    background:rgba(255,255,255,.85); border:none; border-radius:50%;
+    width:34px; height:34px; font-size:18px; color:var(--text); cursor:pointer;
+  }
   .badge-in { display:inline-block; padding:3px 12px; border-radius:20px; font-size:12px; background:#e8f4ed; color:#4a8a5a; border:1px solid #c0ddc8; }
   .badge-out { display:inline-block; padding:3px 12px; border-radius:20px; font-size:12px; background:#fdf0ef; color:#c0392b; border:1px solid #f0c0bb; }
 
@@ -926,8 +946,8 @@
 </div>
 
 <!-- ══ DETAIL MODAL ══ -->
-<div class="modal-overlay" id="modal-detail">
-  <div class="modal" id="detail-content"></div>
+<div class="modal-overlay detail-page-overlay" id="modal-detail">
+  <div id="detail-content"></div>
 </div>
 
 <!-- ══ EDIT MODAL ══ -->
@@ -1621,39 +1641,36 @@ function openDetail(id) {
         </div>
         ${currentDetailPhotos.length>1?`<div class="hero-dots" id="hero-dots">${currentDetailPhotos.map((_,i)=>`<span class="hero-dot${i===0?' active':''}"></span>`).join('')}</div>`:''}
       ` : `<span style="font-size:80px;opacity:.12">🫙</span>`}
-      <div class="detail-hero-fade"></div>
-      <button class="modal-close" onclick="closeModal('modal-detail')" style="position:absolute;top:14px;left:14px;background:rgba(255,255,255,.8);backdrop-filter:blur(4px);border-radius:50%;width:32px;height:32px;padding:0">&#8592;</button>
+      <button class="detail-back-btn" onclick="closeModal('modal-detail')" title="Volver">&#8592;</button>
     </div>
-    <div class="modal-body">
-      <div style="font-family:'Cormorant Garamond',serif; font-weight:600;font-size:32px;color:var(--text);margin-bottom:6px">${p.name}</div>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px">
+    <div class="detail-body">
+      <div class="detail-name">${p.name}</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         ${starsHTML(p.rating||0,'lg')}
         ${(p.status && p.status!=='coleccion')?`<span class="badge-out">${p.status==='deseo'?'♡ Deseo':'Otro'}</span>`:''}
       </div>
       <div class="detail-fields">
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
           <div>
-            <div class="detail-field-label">${f.label.toUpperCase()}</div>
-            <div class="detail-field-value">${f.key==='family'?(Array.isArray(p.family)?p.family.join(' · '):(p.family||'')):p[f.key]}</div>
+            <div class="detail-field-label">${f.label}</div>
+            <div class="detail-field-value${f.key==='brand'?' brand-badge':''}">${f.key==='family'?(Array.isArray(p.family)?p.family.join(' · '):(p.family||'')):p[f.key]}</div>
           </div>`).join('')}
       </div>
-      ${p.notes?`<div class="detail-block"><div class="detail-block-label">NOTAS OLFATIVAS</div><div class="detail-block-value">${p.notes}</div></div>`:''}
-      ${p.myOpinion?`<div class="detail-block" style="background:rgba(138,117,96,.06);border-color:rgba(138,117,96,.2)"><div class="detail-block-label">MI OPINIÓN</div><div class="detail-block-value" style="font-style:italic">${p.myOpinion}</div></div>`:''}
-      ${p.comments?`<div class="detail-block"><div class="detail-block-label">COMENTARIOS</div><div class="detail-block-value">${p.comments}</div></div>`:''}
+      ${p.notes?`<div class="detail-block"><div class="detail-block-label">Notas olfativas</div><div class="detail-block-value">${p.notes}</div></div>`:''}
+      ${p.myOpinion?`<div class="detail-block"><div class="detail-block-label">Mi opinión</div><div class="detail-block-value">${p.myOpinion}</div></div>`:''}
+      ${p.comments?`<div class="detail-block"><div class="detail-block-label">Comentarios</div><div class="detail-block-value">${p.comments}</div></div>`:''}
       ${p.videoUrl?(()=>{
         const vid=getYouTubeId(p.videoUrl);
-        return vid?`<div style="margin-bottom:12px">
-          <div class="video-label">&#127916; VÍDEO</div>
+        return vid?`<div class="detail-block" style="border-top:none;margin-top:20px;padding-top:0">
+          <div class="detail-block-label">Vídeo</div>
           <div class="video-thumb-wrap" onclick="window.open('https://www.youtube.com/watch?v=${vid}','_blank')">
             <img src="https://img.youtube.com/vi/${vid}/hqdefault.jpg" alt="Miniatura del vídeo"/>
             <div class="video-play-btn"><span>&#9654;</span></div>
           </div>
         </div>`:'';
       })():''}
-      ${(p.tags||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${(p.tags||[]).map(t=>`<span class="tag-chip">#${t}</span>`).join('')}</div>`:''}
-      <div class="btn-row" style="margin-top:auto">
-        <button class="btn-primary" onclick="openEdit(${p.id})">Editar</button>
-      </div>
+      ${(p.tags||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:20px">${(p.tags||[]).map(t=>`<span class="tag-chip">#${t}</span>`).join('')}</div>`:''}
+      <button class="detail-edit-btn" onclick="openEdit(${p.id})">Editar</button>
     </div>`;
   openModal('modal-detail');
 }
