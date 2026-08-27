@@ -218,23 +218,23 @@
   .modal-body { padding:20px 22px 24px; }
 
   /* Form */
-  .field-group { margin-bottom:14px; }
-  .field-label { display:block; font-size:13px; color:var(--text); letter-spacing:2px; margin-bottom:5px; font-family:'Yantramanav',sans-serif; font-weight:500; }
+  .field-group { margin-bottom:20px; }
+  .field-label { display:block; font-size:11px; color:var(--text-light); letter-spacing:1.5px; margin-bottom:8px; font-family:'Jost',sans-serif; font-weight:500; text-transform:uppercase; }
   .field-input, .field-select, .field-textarea {
-    width:100%; padding:9px 12px; border-radius:8px;
-    border:1px solid var(--border); background:var(--surface-alt);
-    font-family:var(--font-family,'Jost'),sans-serif; font-size:var(--font-size-base); color:var(--text);
+    width:100%; padding:8px 2px; border-radius:0;
+    border:none; border-bottom:1px solid var(--border); background:none;
+    font-family:'Jost',sans-serif; font-size:16px; color:var(--text);
     outline:none; transition:border-color .2s;
   }
-  .field-input:focus, .field-select:focus, .field-textarea:focus { border-color:var(--accent); }
-  .field-textarea { resize:vertical; min-height:70px; }
-  .field-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .field-input:focus, .field-select:focus, .field-textarea:focus { border-bottom-color:var(--text); }
+  .field-textarea { resize:vertical; min-height:60px; }
+  .field-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; }
 
   /* Photo upload */
-  .photo-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:18px; }
+  .photo-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:26px; }
   .photo-slot {
-    aspect-ratio:1; border-radius:10px; overflow:hidden;
-    border:2px dashed var(--accent); background:var(--surface-alt);
+    aspect-ratio:1; border-radius:4px; overflow:hidden;
+    border:1px solid var(--border); background:none;
     display:flex; align-items:center; justify-content:center;
     cursor:pointer; position:relative;
   }
@@ -242,10 +242,10 @@
     position:absolute; inset:0; width:100%; height:100%;
     opacity:0; cursor:pointer; z-index:2;
   }
-  .photo-slot img { width:100%; height:100%; object-fit:cover; border-radius:8px; }
-  .photo-slot .photo-placeholder { text-align:center; color:var(--accent); pointer-events:none; }
-  .photo-slot .photo-placeholder span { font-size:28px; display:block; }
-  .photo-slot .photo-placeholder small { font-size:10px; letter-spacing:1px; }
+  .photo-slot img { width:100%; height:100%; object-fit:cover; border-radius:0; }
+  .photo-slot .photo-placeholder { text-align:center; color:var(--text-light); pointer-events:none; }
+  .photo-slot .photo-placeholder span { font-size:22px; display:block; opacity:.5; }
+  .photo-slot .photo-placeholder small { font-size:10px; letter-spacing:1px; font-family:'Jost',sans-serif; }
   .photo-del {
     position:absolute; top:4px; right:4px; z-index:3;
     background:rgba(0,0,0,.55); color:#fff; border:none; border-radius:50%;
@@ -298,13 +298,13 @@
   .switch input:checked + .switch-track::after { transform:translateX(20px); }
 
   /* Tags */
-  .tags-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .tags-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
   .tag-chip {
-    font-size:11px; padding:3px 10px;
-    background:rgba(138,117,96,.12); color:var(--accent);
-    border:1px solid rgba(138,117,96,.25); border-radius:20px; cursor:pointer;
+    font-size:13px; padding:4px 12px; font-family:'Jost',sans-serif;
+    background:none; color:var(--text);
+    border:1px solid var(--border); border-radius:20px; cursor:pointer;
   }
-  .tag-add-row { display:flex; gap:8px; }
+  .tag-add-row { display:flex; gap:10px; align-items:center; }
   .tag-add-row input { flex:1; }
 
   /* Action buttons */
@@ -391,6 +391,16 @@
   .badge-out.cat-coleccion { background:#eaf6e8; color:#3d7a37; border:1px solid #bde3b5; }
   .badge-out.cat-deseo { background:#fdeef2; color:#a3406a; border:1px solid #f3c3d3; }
   .badge-out.cat-otro { background:#fbf3e0; color:#8a6d1f; border:1px solid #ecd99a; }
+
+  .cat-toggle-row { display:flex; gap:8px; }
+  .cat-toggle-btn {
+    flex:1; padding:9px 4px; border-radius:20px; cursor:pointer;
+    background:none; border:1px solid var(--border); color:var(--text-light);
+    font-family:'Jost',sans-serif; font-size:13px;
+  }
+  .cat-toggle-btn.active.cat-coleccion { background:#eaf6e8; color:#3d7a37; border-color:#bde3b5; }
+  .cat-toggle-btn.active.cat-deseo { background:#fdeef2; color:#a3406a; border-color:#f3c3d3; }
+  .cat-toggle-btn.active.cat-otro { background:#fbf3e0; color:#8a6d1f; border-color:#ecd99a; }
 
   /* Theme panel */
   .theme-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
@@ -568,17 +578,16 @@
   /* ── NOTAS: tarjetas ── */
   /* ── FAMILY CHIPS ── */
   .family-chips {
-    display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;
+    display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;
   }
   .family-chip {
-    font-size:11px; letter-spacing:1px; padding:5px 12px;
-    border-radius:20px; border:1.5px solid var(--border);
-    background:var(--surface-alt); color:var(--text-muted);
+    font-size:13px; padding:5px 12px; font-family:'Jost',sans-serif;
+    border-radius:20px; border:1px solid var(--border);
+    background:none; color:var(--text);
     cursor:pointer; transition:all .15s; user-select:none;
-    font-family:inherit;
   }
   .family-chip.selected {
-    background:var(--accent); color:#fff; border-color:var(--accent);
+    background:var(--accent-yellow); color:var(--text); border-color:var(--accent-yellow);
   }
 
   /* ── BARCODE SCANNER ── */
@@ -602,16 +611,16 @@
     color:var(--text-muted); margin-bottom:10px; min-height:1.4em;
   }
   .barcode-input-wrap {
-    display:flex; gap:8px; align-items:center;
+    display:flex; gap:12px; align-items:center;
   }
   .barcode-input-wrap .field-input { flex:1; }
   .barcode-scan-btn {
-    background:var(--accent); color:#fff; border:none;
-    border-radius:10px; padding:0 14px; height:42px; font-size:18px;
+    background:none; color:var(--text); border:1px solid var(--border);
+    border-radius:50%; padding:0; width:38px; height:38px; font-size:16px;
     cursor:pointer; flex-shrink:0; display:flex; align-items:center;
     justify-content:center; transition:opacity .2s;
   }
-  .barcode-scan-btn:active { opacity:.8; }
+  .barcode-scan-btn:active { opacity:.6; }
 
   .note-card {
     background:var(--surface); border:1px solid var(--border);
@@ -1001,13 +1010,10 @@
 </div>
 
 <!-- ══ EDIT MODAL ══ -->
-<div class="modal-overlay" id="modal-edit">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title" id="edit-title">Nuevo perfume</span>
-      <button class="modal-close" onclick="closeEdit()">✕</button>
-    </div>
-    <div class="modal-body">
+<div class="modal-overlay page-overlay" id="modal-edit">
+  <div class="page-inner" style="padding-bottom:110px">
+    <button class="page-back" onclick="closeEdit()" title="Volver">&#8592;</button>
+    <div class="page-title" id="edit-title">Nuevo perfume</div>
 
       <!-- Photos -->
       <div class="field-label">FOTOS (hasta 6)</div>
@@ -1080,11 +1086,11 @@
       <!-- Category status -->
       <div class="field-group">
         <label class="field-label">CATEGORÍA</label>
-        <select class="field-input" id="f-status">
-          <option value="coleccion">En colección</option>
-          <option value="deseo">Deseo</option>
-          <option value="otro">Otro</option>
-        </select>
+        <div class="cat-toggle-row" id="f-status-toggle">
+          <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')">Colección</button>
+          <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')">Deseo</button>
+          <button type="button" class="cat-toggle-btn cat-otro" data-val="otro" onclick="setStatusToggle('otro')">Otro</button>
+        </div>
       </div>
 
       <!-- Tags -->
@@ -1101,7 +1107,7 @@
         <div class="tags-row" id="edit-tags"></div>
         <div class="tag-add-row">
           <input class="field-input" id="tag-input" placeholder="Nueva etiqueta..." onkeydown="if(event.key==='Enter'){addTag();event.preventDefault();}"/>
-          <button class="hbtn" onclick="addTag()">+</button>
+          <button class="page-link" onclick="addTag()">+</button>
         </div>
       </div>
 
@@ -1111,18 +1117,14 @@
         <div class="tags-row" id="edit-lists"></div>
         <div class="tag-add-row">
           <input class="field-input" id="list-input" placeholder="Nombre de lista..." onkeydown="if(event.key==='Enter'){addList();event.preventDefault();}"/>
-          <button class="hbtn" onclick="addList()">+</button>
+          <button class="page-link" onclick="addList()">+</button>
         </div>
       </div>
 
-      <div class="btn-row">
-        <button class="btn-primary" onclick="savePerfume()">✦ Guardar</button>
-        <button class="btn-danger" id="btn-delete" onclick="deletePerfume()" style="display:none">🗑</button>
-      </div>
-    </div>
+      <button class="page-link" id="btn-delete" onclick="deletePerfume()" style="display:none;color:var(--danger);margin-top:10px">Eliminar perfume</button>
   </div>
+  <button class="detail-edit-btn" onclick="savePerfume()">Guardar</button>
 </div>
-
 
 <!-- ══ FIELD MANAGER MODAL ══ -->
 <div class="modal-overlay" id="modal-category">
@@ -1852,7 +1854,7 @@ function openEdit(id) {
   renderEditStars();
 
   // In collection
-  document.getElementById('f-status').value = p ? (p.status||'coleccion') : 'coleccion';
+  setStatusToggle(p ? (p.status||'coleccion') : 'coleccion');
 
   // Tags & Lists
   renderEditTags();
@@ -1917,6 +1919,12 @@ function renderEditStars() {
 }
 function setEditRating(n){ editRating=n; renderEditStars(); }
 
+function setStatusToggle(cat) {
+  document.querySelectorAll('#f-status-toggle .cat-toggle-btn').forEach(function(btn){
+    btn.classList.toggle('active', btn.dataset.val === cat);
+  });
+}
+
 function renderEditTags() {
   document.getElementById('edit-tags').innerHTML=editTags.map(t=>`<span class="tag-chip" onclick="removeTag('${t}')">x #${t}</span>`).join('');
 }
@@ -1952,7 +1960,7 @@ function savePerfume() {
     tags: [...editTags],
     lists: [...editLists],
     barcode: document.getElementById('pf-barcode').value.trim(),
-    status: document.getElementById('f-status').value,
+    status: document.querySelector('#f-status-toggle .cat-toggle-btn.active').dataset.val,
     notes: document.getElementById('f-notes').value,
     myOpinion: document.getElementById('f-opinion').value,
     comments: document.getElementById('f-comments').value,
