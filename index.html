@@ -301,9 +301,12 @@
   .tags-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
   .tag-chip {
     font-size:13px; padding:4px 12px; font-family:'Jost',sans-serif;
-    background:none; color:var(--text);
-    border:1px solid var(--border); border-radius:20px; cursor:pointer;
+    background:none; color:var(--text); cursor:default;
+    border:1px solid var(--border); border-radius:20px;
+    display:inline-flex; align-items:center; gap:7px;
   }
+  .tag-chip-x { cursor:pointer; color:var(--text-light); font-size:11px; padding:2px; }
+  .tag-chip-x:active { color:var(--danger); }
   .tag-add-row { display:flex; gap:10px; align-items:center; }
   .tag-add-row input { flex:1; }
 
@@ -1062,7 +1065,7 @@
       <!-- Comments -->
       <div class="field-group" id="fg-comments">
         <label class="field-label">COMENTARIOS</label>
-        <textarea class="field-textarea" id="f-comments" rows="2" placeholder="Añade comentarios..."></textarea>
+        <textarea class="field-textarea" id="f-comments" rows="4" placeholder="Añade comentarios..."></textarea>
       </div>
 
       <!-- Video -->
@@ -1087,7 +1090,7 @@
       <div class="field-group">
         <label class="field-label">CATEGORÍA</label>
         <div class="cat-toggle-row" id="f-status-toggle">
-          <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')">Colección</button>
+          <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')">En colección</button>
           <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')">Deseo</button>
           <button type="button" class="cat-toggle-btn cat-otro" data-val="otro" onclick="setStatusToggle('otro')">Otro</button>
         </div>
@@ -1678,6 +1681,19 @@ function render() {
   }).join('');
   _setMainHeight();
   _clampComments(filtered);
+  _resnapScroll();
+}
+
+function _resnapScroll() {
+  const main = document.getElementById('main');
+  if (main.classList.contains('list-mode')) return;
+  const rowH = main.clientHeight;
+  if (!rowH) return;
+  const idx = Math.round(main.scrollTop / rowH);
+  const target = idx * rowH;
+  if (Math.abs(main.scrollTop - target) > 1) {
+    main.scrollTop = target;
+  }
 }
 
 function _clampComments(filtered) {
@@ -1926,13 +1942,13 @@ function setStatusToggle(cat) {
 }
 
 function renderEditTags() {
-  document.getElementById('edit-tags').innerHTML=editTags.map(t=>`<span class="tag-chip" onclick="removeTag('${t}')">x #${t}</span>`).join('');
+  document.getElementById('edit-tags').innerHTML=editTags.map(t=>`<span class="tag-chip">#${t} <span class="tag-chip-x" onclick="removeTag('${t}')">✕</span></span>`).join('');
 }
 function addTag(){ const v=document.getElementById('tag-input').value.trim(); if(!v||editTags.includes(v)) return; editTags.push(v); document.getElementById('tag-input').value=''; renderEditTags(); }
 function removeTag(t){ editTags=editTags.filter(x=>x!==t); renderEditTags(); }
 
 function renderEditLists() {
-  document.getElementById('edit-lists').innerHTML=editLists.map(l=>`<span class="tag-chip" onclick="removeList('${l}')">x 📁 ${l}</span>`).join('');
+  document.getElementById('edit-lists').innerHTML=editLists.map(l=>`<span class="tag-chip">📁 ${l} <span class="tag-chip-x" onclick="removeList('${l}')">✕</span></span>`).join('');
 }
 function addList(){ const v=document.getElementById('list-input').value.trim(); if(!v||editLists.includes(v)) return; editLists.push(v); document.getElementById('list-input').value=''; renderEditLists(); }
 function removeList(l){ editLists=editLists.filter(x=>x!==l); renderEditLists(); }
@@ -2637,11 +2653,11 @@ window.addEventListener('resize', function(){
   _setMainHeight();
   if (!document.getElementById('main').classList.contains('app-hidden')) render();
 });
-window.addEventListener('orientationchange', function(){ setTimeout(_setMainHeight, 200); });
+window.addEventListener('orientationchange', function(){ setTimeout(function(){ _setMainHeight(); _resnapScroll(); }, 200); });
 if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', _setMainHeight);
+  window.visualViewport.addEventListener('resize', function(){ _setMainHeight(); _resnapScroll(); });
 }
-window.addEventListener('load', function(){ setTimeout(_setMainHeight, 100); });
+window.addEventListener('load', function(){ setTimeout(function(){ _setMainHeight(); _resnapScroll(); }, 100); });
 
 function showPerfumes() {
   _closeAllModals();
