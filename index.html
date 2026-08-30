@@ -593,6 +593,58 @@
     background:var(--accent-yellow); color:var(--text); border-color:var(--accent-yellow);
   }
 
+  /* ── UNIFIED MULTI-VALUE PICKERS: family / notes / tags ── */
+  .multi-picker { position:relative; width:100%; }
+  .multi-picker-input-wrap {
+    display:flex; align-items:center; gap:8px;
+    border-bottom:1px solid var(--border);
+  }
+  .multi-picker-input {
+    flex:1; min-width:0; padding:8px 2px; border:none; background:none;
+    font-family:'Jost',sans-serif; font-size:16px; color:var(--text); outline:none;
+  }
+  .multi-picker-input::placeholder { color:var(--text-light); }
+  .multi-picker-input-wrap:focus-within { border-bottom-color:var(--text); }
+  .multi-picker-add {
+    width:30px; height:30px; flex-shrink:0; padding:0; margin-bottom:2px;
+    border:none; background:none; color:var(--star); font-family:'Jost',sans-serif;
+    font-size:27px; line-height:1; cursor:pointer; display:flex;
+    align-items:center; justify-content:center;
+  }
+  .multi-picker-add:active { opacity:.55; }
+  .multi-picker-suggestions {
+    display:none; position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:50;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,.12); padding:5px; max-height:190px; overflow-y:auto;
+  }
+  .multi-picker-suggestions.open { display:block; }
+  .multi-picker-suggestion {
+    display:block; width:100%; padding:9px 10px; border:none; border-radius:7px;
+    background:none; color:var(--text); text-align:left; font-family:'Jost',sans-serif;
+    font-size:15px; cursor:pointer;
+  }
+  .multi-picker-suggestion:hover, .multi-picker-suggestion:active { background:var(--surface-alt); }
+  .multi-picker-chips {
+    display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;
+  }
+  .multi-picker-chips.collapsed { max-height:112px; overflow:hidden; }
+  .multi-picker-chip {
+    font-size:13px; padding:5px 12px; font-family:'Jost',sans-serif;
+    border-radius:20px; border:1px solid var(--border); background:none; color:var(--text);
+    display:inline-flex; align-items:center; gap:7px; cursor:pointer; user-select:none;
+  }
+  .multi-picker-chip.selected {
+    background:var(--accent-yellow); border-color:var(--accent-yellow); color:var(--text);
+  }
+  .multi-picker-chip-x { color:var(--text-light); font-size:11px; padding:1px; cursor:pointer; }
+  .multi-picker-chip-x:active { color:var(--danger); }
+  .multi-picker-more {
+    display:none; width:100%; margin-top:12px; padding:0; border:none; background:none;
+    color:var(--star); font-family:'Jost',sans-serif; font-size:15px; cursor:pointer; text-align:center;
+  }
+  .multi-picker-more.visible { display:block; }
+  .multi-picker-more:active { opacity:.6; }
+
   /* ── BARCODE SCANNER ── */
   #modal-barcode .modal { max-width:380px; }
   #barcode-video-wrap {
@@ -1053,7 +1105,7 @@
       <!-- Notes -->
       <div class="field-group" id="fg-notes">
         <label class="field-label">NOTAS OLFATIVAS</label>
-        <textarea class="field-textarea" id="f-notes" rows="3" placeholder="Salida: Rosa · Corazón: Jazmín · Fondo: Sándalo"></textarea>
+        <div id="edit-notes-picker"></div>
       </div>
 
       <!-- Opinion -->
@@ -1107,11 +1159,7 @@
 
       <div class="field-group">
         <label class="field-label">ETIQUETAS</label>
-        <div class="tags-row" id="edit-tags"></div>
-        <div class="tag-add-row">
-          <input class="field-input" id="tag-input" placeholder="Nueva etiqueta..." onkeydown="if(event.key==='Enter'){addTag();event.preventDefault();}"/>
-          <button class="page-link" onclick="addTag()">+</button>
-        </div>
+        <div id="edit-tags-picker"></div>
       </div>
 
       <!-- Lists -->
@@ -1172,9 +1220,9 @@ const GENDERS = ["Masculino","Femenino","Unisex","Andrógino"];
 let state = {
   families: [...DEFAULT_FAMILIES],
   perfumes: [
-    {id:1,name:"Santal 33",brand:"Le Labo",concentration:"EDP",capacity:"100ml",launch:"2011",perfumer:"Frank Voelkl",bottleDesigner:"Le Labo Studio",family:"Amaderado",gender:"Unisex",notes:"Cardamomo, Violeta · Iris, Ambrox · Sándalo, Cuero",boughtAt:"Boutique Le Labo Madrid",price:"310€",inCollectionSince:"2023-04-12",rating:5,bottleCount:1,bottleStatus:"Medio",myOpinion:"Un clásico moderno imprescindible.",comments:"Lo reservo para ocasiones especiales.",inCollection:true,tags:["favorito","especial"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-04-12"},
-    {id:2,name:"Baccarat Rouge 540",brand:"MFK",concentration:"EDP",capacity:"70ml",launch:"2015",perfumer:"Francis Kurkdjian",bottleDesigner:"Georges Chevalier",family:"Floral",gender:"Unisex",notes:"Azafrán, Jazmín · Ambroxan, Cedro · Musgo",boughtAt:"El Corte Inglés",price:"395€",inCollectionSince:"2023-09-01",rating:5,bottleCount:1,bottleStatus:"Lleno",myOpinion:"Sofisticado y adictivo.",comments:"",inCollection:true,tags:["lujo"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-09-01"},
-    {id:3,name:"Oud Wood",brand:"Tom Ford",concentration:"EDP",capacity:"50ml",launch:"2007",perfumer:"Richard Herpin",bottleDesigner:"Tom Ford Beauty",family:"Oriental",gender:"Masculino",notes:"Palo de Rosa · Oud, Sándalo · Vainilla, Ámbar",boughtAt:"Tom Ford Online",price:"280€",inCollectionSince:"2024-01-20",rating:4,bottleCount:2,bottleStatus:"Casi vacío",myOpinion:"Cálido y envolvente.",comments:"Perfecto para invierno.",inCollection:true,tags:["invierno","noche"],lists:[],photos:[null,null,null,null,null,null],added:"2024-01-20"},
+    {id:1,name:"Santal 33",brand:"Le Labo",concentration:"EDP",capacity:"100ml",launch:"2011",perfumer:"Frank Voelkl",bottleDesigner:"Le Labo Studio",family:"Amaderado",gender:"Unisex",notes:["Cardamomo","Violeta","Iris","Ambrox","Sándalo","Cuero"],boughtAt:"Boutique Le Labo Madrid",price:"310€",inCollectionSince:"2023-04-12",rating:5,bottleCount:1,bottleStatus:"Medio",myOpinion:"Un clásico moderno imprescindible.",comments:"Lo reservo para ocasiones especiales.",inCollection:true,tags:["favorito","especial"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-04-12"},
+    {id:2,name:"Baccarat Rouge 540",brand:"MFK",concentration:"EDP",capacity:"70ml",launch:"2015",perfumer:"Francis Kurkdjian",bottleDesigner:"Georges Chevalier",family:"Floral",gender:"Unisex",notes:["Azafrán","Jazmín","Ambroxan","Cedro","Musgo"],boughtAt:"El Corte Inglés",price:"395€",inCollectionSince:"2023-09-01",rating:5,bottleCount:1,bottleStatus:"Lleno",myOpinion:"Sofisticado y adictivo.",comments:"",inCollection:true,tags:["lujo"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-09-01"},
+    {id:3,name:"Oud Wood",brand:"Tom Ford",concentration:"EDP",capacity:"50ml",launch:"2007",perfumer:"Richard Herpin",bottleDesigner:"Tom Ford Beauty",family:"Oriental",gender:"Masculino",notes:["Palo de Rosa","Oud","Sándalo","Vainilla","Ámbar"],boughtAt:"Tom Ford Online",price:"280€",inCollectionSince:"2024-01-20",rating:4,bottleCount:2,bottleStatus:"Casi vacío",myOpinion:"Cálido y envolvente.",comments:"Perfecto para invierno.",inCollection:true,tags:["invierno","noche"],lists:[],photos:[null,null,null,null,null,null],added:"2024-01-20"},
   ],
   fields: [
     {key:"name",label:"Nombre",visible:true,required:true},
@@ -1207,8 +1255,31 @@ let editPhotos=[null,null,null,null,null,null];
 var editCoverIndex=0;
 let editRating = 0;
 let editTags = [];
+let editFamilies = [];
+let editNotes = [];
 let editLists = [];
 let editId = null;
+const pickerExpanded = {family:false, notes:false, tags:false};
+
+function normalizePickerValues(value) {
+  if (Array.isArray(value)) return value.map(v=>String(v).trim()).filter(Boolean);
+  if (!value) return [];
+  return String(value).split(/[·,;\n]+/).map(v=>v.trim()).filter(Boolean);
+}
+function uniqueSorted(values) {
+  const seen = new Map();
+  values.forEach(v=>{ const x=String(v||'').trim(); if(x && !seen.has(x.toLowerCase())) seen.set(x.toLowerCase(),x); });
+  return [...seen.values()].sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
+}
+function getExistingNotes() {
+  return uniqueSorted(state.perfumes.flatMap(p=>normalizePickerValues(p.notes)));
+}
+function getExistingTags() {
+  return uniqueSorted(state.perfumes.flatMap(p=>Array.isArray(p.tags)?p.tags:normalizePickerValues(p.tags)));
+}
+function escapeHtml(v) {
+  return String(v??'').replace(/[&<>\"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+}
 
 // ══ INDEXEDDB FOR PHOTOS ══════════════════════════════════════════
 let _idb = null;
@@ -1318,7 +1389,11 @@ async function initState() {
     }
     state.perfumes.forEach(p => {
       if (!p.status) p.status = (p.inCollection === false) ? 'otro' : 'coleccion';
+      p.family = Array.isArray(p.family) ? p.family : (p.family ? [p.family] : []);
+      p.notes = normalizePickerValues(p.notes);
+      p.tags = Array.isArray(p.tags) ? p.tags.map(v=>String(v).trim()).filter(Boolean) : normalizePickerValues(p.tags);
     });
+    state.families = uniqueSorted(state.families);
     if (!state.category) state.category = 'perfumes';
     // Ensure each perfume has photos array placeholder
     state.perfumes = state.perfumes.map(p => ({...p, photos: [null,null,null], coverIndex: 0}));
@@ -1406,10 +1481,11 @@ function openFamilyMgr() {
 }
 function renderFamilyMgr() {
   const el = document.getElementById('family-mgr-list');
-  el.innerHTML = state.families.map((fam,i)=>`
+  const families = uniqueSorted(state.families);
+  el.innerHTML = families.map((fam,i)=>`
     <div class="family-mgr-row">
       <span>${fam}</span>
-      <button type="button" class="field-mgr-delete" title="Eliminar familia" onclick="deleteFamily(${i})">✕</button>
+      <button type="button" class="field-mgr-delete" title="Eliminar familia" onclick="deleteFamilyByName('${escapeHtml(fam)}')">✕</button>
     </div>`).join('');
 }
 function addFamily() {
@@ -1418,9 +1494,14 @@ function addFamily() {
   if (!val) return;
   if (state.families.some(f=>f.toLowerCase()===val.toLowerCase())) { input.value=''; return; }
   state.families.push(val);
+  state.families = uniqueSorted(state.families);
   save();
   input.value = '';
   renderFamilyMgr();
+}
+function deleteFamilyByName(name) {
+  const i = state.families.findIndex(f=>f.toLowerCase()===String(name).toLowerCase());
+  if(i>=0) deleteFamily(i);
 }
 function deleteFamily(i) {
   const fam = state.families[i];
@@ -1528,8 +1609,9 @@ function getFiltered() {
 
   return state.perfumes.filter(p=>{
     const pfam=Array.isArray(p.family)?p.family.join(' '):(p.family||'');
+    const pnotes=Array.isArray(p.notes)?p.notes.join(' '):p.notes||'';
     const ptags=Array.isArray(p.tags)?p.tags.join(' '):(p.tags||'');
-    if(q && !_stripAccents(`${p.name} ${p.brand} ${p.perfumer} ${pfam} ${ptags}`.toLowerCase()).includes(q)) return false;
+    if(q && !_stripAccents(`${p.name} ${p.brand} ${p.perfumer} ${pfam} ${pnotes} ${ptags}`.toLowerCase()).includes(q)) return false;
     if (cat !== 'perfumes' && (p.status||'coleccion') !== cat) return false;
     return true;
   }).sort((a,b)=>state.sort==='name'?a.name.localeCompare(b.name):new Date(b.added)-new Date(a.added));
@@ -1670,7 +1752,7 @@ function render() {
           <div class="row-year">${p.launch||''}</div>
           <div class="row-specs">${[p.concentration,p.capacity].filter(Boolean).join('  -  ')}</div>
           <div class="row-family">${Array.isArray(p.family)?p.family.join(', '):(p.family||'')}</div>
-          <div class="row-notes">${p.notes||''}</div>
+          <div class="row-notes">${Array.isArray(p.notes)?p.notes.join(', '):(p.notes||'')}</div>
         </div>
         <div class="row-comments"></div>
         <div class="row-more-wrap">
@@ -1749,7 +1831,7 @@ function openDetail(id) {
             <div class="detail-field-value${f.key==='brand'?' brand-badge':''}">${f.key==='family'?(Array.isArray(p.family)?p.family.join(' · '):(p.family||'')):p[f.key]}</div>
           </div>`).join('')}
       </div>
-      ${p.notes?`<div class="detail-block"><div class="detail-block-label">Notas olfativas</div><div class="detail-block-value">${p.notes}</div></div>`:''}
+      ${(Array.isArray(p.notes)?p.notes.length:p.notes)?`<div class="detail-block"><div class="detail-block-label">Notas olfativas</div><div class="detail-block-value">${Array.isArray(p.notes)?p.notes.join(', '):p.notes}</div></div>`:''}
       ${p.myOpinion?`<div class="detail-block"><div class="detail-block-label">Mi opinión</div><div class="detail-block-value">${p.myOpinion}</div></div>`:''}
       ${p.comments?`<div class="detail-block"><div class="detail-block-label">Comentarios</div><div class="detail-block-value">${p.comments}</div></div>`:''}
       ${p.videoUrl?(()=>{
@@ -1840,9 +1922,8 @@ function openEdit(id) {
     const val = p?p[f.key]||'':'';
     if(f.key==='concentration') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${CONCENTRATIONS.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}</select>`;
     else if(f.key==='family') {
-      // families stored as array; support legacy string
-      const selectedFams = Array.isArray(val) ? val : (val ? [val] : []);
-      inner += `<div class="family-chips" id="ef-family-chips">${state.families.map(fam=>`<button type="button" class="family-chip${selectedFams.includes(fam)?' selected':''}" onclick="toggleFamilyChip(this,'${fam}')">${fam}</button>`).join('')}</div>`;
+      editFamilies = normalizePickerValues(val);
+      inner += `<div id="ef-family-picker"></div>`;
     }
     else if(f.key==='gender') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${GENDERS.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}</select>`;
     else if(f.key==='inCollectionSince') inner+=`<input class="field-input" type="date" id="ef-${f.key}" value="${val}"/>`;
@@ -1852,8 +1933,14 @@ function openEdit(id) {
     grid.appendChild(div);
   });
 
-  // Text areas (RTE)
-  document.getElementById('f-notes').value = p ? p.notes || '' : '';
+  // Unified multi-value pickers
+  editNotes = p ? normalizePickerValues(p.notes) : [];
+  pickerExpanded.family = pickerExpanded.notes = pickerExpanded.tags = false;
+  renderMultiPicker('family', 'ef-family-picker', editFamilies, state.families, 'Añadir - buscar');
+  renderMultiPicker('notes', 'edit-notes-picker', editNotes, getExistingNotes(), 'Añadir - buscar');
+  renderMultiPicker('tags', 'edit-tags-picker', editTags, getExistingTags(), 'Añadir - buscar');
+
+  // Text areas (other free text)
   document.getElementById('f-opinion').value = p ? p.myOpinion || '' : '';
   document.getElementById('f-comments').value = p ? p.comments || '' : '';
   document.getElementById('f-video').value = p?p.videoUrl||'':'';
@@ -1872,11 +1959,8 @@ function openEdit(id) {
   // In collection
   setStatusToggle(p ? (p.status||'coleccion') : 'coleccion');
 
-  // Tags & Lists
-  renderEditTags();
+  // Lists
   renderEditLists();
-
-  document.getElementById('tag-input').value='';
   document.getElementById('list-input').value='';
 
   document.getElementById('modal-detail').classList.remove('open');
@@ -1941,11 +2025,70 @@ function setStatusToggle(cat) {
   });
 }
 
-function renderEditTags() {
-  document.getElementById('edit-tags').innerHTML=editTags.map(t=>`<span class="tag-chip">#${t} <span class="tag-chip-x" onclick="removeTag('${t}')">✕</span></span>`).join('');
+function getPickerData(type) {
+  if(type==='family') return {selected:editFamilies, options:state.families, inputId:'family-picker-input'};
+  if(type==='notes') return {selected:editNotes, options:getExistingNotes(), inputId:'notes-picker-input'};
+  return {selected:editTags, options:getExistingTags(), inputId:'tags-picker-input'};
 }
-function addTag(){ const v=document.getElementById('tag-input').value.trim(); if(!v||editTags.includes(v)) return; editTags.push(v); document.getElementById('tag-input').value=''; renderEditTags(); }
-function removeTag(t){ editTags=editTags.filter(x=>x!==t); renderEditTags(); }
+function pickerMatches(type, q) {
+  const data=getPickerData(type);
+  const needle=_stripAccents(String(q||'').toLowerCase());
+  return data.options.filter(v=>!data.selected.some(s=>s.toLowerCase()===v.toLowerCase()) && (!needle || _stripAccents(v.toLowerCase()).includes(needle))).slice(0,12);
+}
+function renderMultiPicker(type, mountId, selected, options, placeholder) {
+  const mount=document.getElementById(mountId); if(!mount) return;
+  const sorted=uniqueSorted(options);
+  const expanded=pickerExpanded[type];
+  const visible=expanded?sorted:sorted.slice(0, 12);
+  const needsMore=sorted.length>12;
+  mount.innerHTML=`
+    <div class="multi-picker" id="${type}-picker">
+      <div class="multi-picker-input-wrap">
+        <input class="multi-picker-input" id="${type}-picker-input" placeholder="${escapeHtml(placeholder)}" autocomplete="off"
+          oninput="onPickerInput('${type}',this.value)" onfocus="onPickerInput('${type}',this.value)"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();addPickerValue('${type}',this.value);}"/>
+        <button type="button" class="multi-picker-add" onclick="addPickerValue('${type}',document.getElementById('${type}-picker-input').value)" aria-label="Añadir">＋</button>
+      </div>
+      <div class="multi-picker-suggestions" id="${type}-picker-suggestions"></div>
+      <div class="multi-picker-chips${expanded?'':' collapsed'}" id="${type}-picker-chips">
+        ${visible.map(v=>`<button type="button" class="multi-picker-chip${selected.some(s=>s.toLowerCase()===v.toLowerCase())?' selected':''}" onclick="togglePickerValue('${type}','${escapeHtml(v)}')">${escapeHtml(v)}</button>`).join('')}
+      </div>
+      ${needsMore?`<button type="button" class="multi-picker-more visible" onclick="togglePickerExpanded('${type}')">${expanded?'ver menos':'ver todas'}</button>`:''}
+    </div>`;
+}
+function refreshPicker(type) {
+  const map={family:'ef-family-picker',notes:'edit-notes-picker',tags:'edit-tags-picker'};
+  const data=getPickerData(type);
+  renderMultiPicker(type,map[type],data.selected,data.options,'Añadir - buscar');
+}
+function onPickerInput(type,value) {
+  const box=document.getElementById(type+'-picker-suggestions'); if(!box) return;
+  const matches=pickerMatches(type,value);
+  const exact=getPickerData(type).options.some(v=>v.toLowerCase()===String(value||'').trim().toLowerCase());
+  box.innerHTML=matches.map(v=>`<button type="button" class="multi-picker-suggestion" onclick="selectPickerSuggestion('${type}','${escapeHtml(v)}')">${escapeHtml(v)}</button>`).join('');
+  if(value.trim() && !exact) box.innerHTML += `<button type="button" class="multi-picker-suggestion" onclick="addPickerValue('${type}',document.getElementById('${type}-picker-input').value)">＋ Crear «${escapeHtml(value.trim())}»</button>`;
+  box.classList.toggle('open', !!value.trim() && box.innerHTML.length>0);
+}
+function closePickerSuggestions() { document.querySelectorAll('.multi-picker-suggestions.open').forEach(el=>el.classList.remove('open')); }
+function addPickerValue(type,value) {
+  const v=String(value||'').trim(); if(!v) return;
+  const data=getPickerData(type);
+  const existing=data.options.find(x=>x.toLowerCase()===v.toLowerCase());
+  const val=existing||v;
+  if(!data.selected.some(x=>x.toLowerCase()===val.toLowerCase())) data.selected.push(val);
+  const input=document.getElementById(type+'-picker-input'); if(input) input.value='';
+  closePickerSuggestions(); refreshPicker(type);
+}
+function selectPickerSuggestion(type,value) { addPickerValue(type,value); }
+function togglePickerValue(type,value) {
+  const data=getPickerData(type);
+  const idx=data.selected.findIndex(x=>x.toLowerCase()===String(value).toLowerCase());
+  if(idx>=0) data.selected.splice(idx,1); else data.selected.push(value);
+  refreshPicker(type);
+}
+function removePickerValue(type,value) { togglePickerValue(type,value); }
+function togglePickerExpanded(type) { pickerExpanded[type]=!pickerExpanded[type]; refreshPicker(type); }
+function toggleFamilyChip(btn, fam) { togglePickerValue('family',fam); }
 
 function renderEditLists() {
   document.getElementById('edit-lists').innerHTML=editLists.map(l=>`<span class="tag-chip">📁 ${l} <span class="tag-chip-x" onclick="removeList('${l}')">✕</span></span>`).join('');
@@ -1954,10 +2097,7 @@ function addList(){ const v=document.getElementById('list-input').value.trim(); 
 function removeList(l){ editLists=editLists.filter(x=>x!==l); renderEditLists(); }
 
 function getFieldVal(key) {
-  if(key==='family'){
-    const chips=document.querySelectorAll('#ef-family-chips .family-chip.selected');
-    return chips.length ? [...chips].map(c=>c.textContent) : [];
-  }
+  if(key==='family') return [...editFamilies];
   const el=document.getElementById('ef-'+key);
   return el?el.value:'';
 }
@@ -1977,7 +2117,7 @@ function savePerfume() {
     lists: [...editLists],
     barcode: document.getElementById('pf-barcode').value.trim(),
     status: document.querySelector('#f-status-toggle .cat-toggle-btn.active').dataset.val,
-    notes: document.getElementById('f-notes').value,
+    notes: [...editNotes],
     myOpinion: document.getElementById('f-opinion').value,
     comments: document.getElementById('f-comments').value,
     videoUrl: document.getElementById('f-video').value.trim(),
@@ -2658,6 +2798,9 @@ if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', function(){ _setMainHeight(); _resnapScroll(); });
 }
 window.addEventListener('load', function(){ setTimeout(function(){ _setMainHeight(); _resnapScroll(); }, 100); });
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.multi-picker')) closePickerSuggestions();
+});
 
 function showPerfumes() {
   _closeAllModals();
