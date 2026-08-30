@@ -150,13 +150,15 @@
     content:"+";
     display:block;
     font-size:42px;
-    line-height:.75;
+    line-height:1;
     font-weight:300;
     letter-spacing:0;
-    margin-bottom:12px;
+    margin-bottom:8px;
   }
   .row-photo .no-photo-add:hover { opacity:1; background:transparent; }
   .row-photo .no-photo-add:active { transform:none; }
+  .row-photo { cursor:default; }
+  .row-photo .no-photo-add { pointer-events:auto; }
 
   .row-photo-dots { position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; gap:6px; z-index:5; }
   .row-photo-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.6); box-shadow:0 0 2px rgba(0,0,0,.3); transition:background .2s,transform .2s; }
@@ -180,7 +182,7 @@
   .row-cat-circle.cat-perfumes { background:#cfe8f7; }
   .row-cat-circle.cat-coleccion { background:#d3ecd0; }
   .row-cat-circle.cat-deseo { background:#f7d6e0; }
-  .row-cat-circle.cat-otro { background:#f5e6bd; }
+  .row-cat-circle.cat-probados { background:#f5e6bd; }
   .row-cat-label { font-size:11px; font-family:'Jost',sans-serif; color:var(--text-light); white-space:nowrap; }
   .row-cat-badge:active .row-cat-circle { opacity:.75; }
   .category-picker-row {
@@ -427,7 +429,7 @@
   .badge-out { display:inline-block; padding:3px 12px; border-radius:20px; font-size:12px; font-family:'Jost',sans-serif; cursor:pointer; }
   .badge-out.cat-coleccion { background:#eaf6e8; color:#3d7a37; border:1px solid #bde3b5; }
   .badge-out.cat-deseo { background:#fdeef2; color:#a3406a; border:1px solid #f3c3d3; }
-  .badge-out.cat-otro { background:#fbf3e0; color:#8a6d1f; border:1px solid #ecd99a; }
+  .badge-out.cat-probados { background:#fbf3e0; color:#8a6d1f; border:1px solid #ecd99a; }
 
   .cat-toggle-row { display:flex; gap:8px; }
   .cat-toggle-btn {
@@ -437,7 +439,7 @@
   }
   .cat-toggle-btn.active.cat-coleccion { background:#eaf6e8; color:#3d7a37; border-color:#bde3b5; }
   .cat-toggle-btn.active.cat-deseo { background:#fdeef2; color:#a3406a; border-color:#f3c3d3; }
-  .cat-toggle-btn.active.cat-otro { background:#fbf3e0; color:#8a6d1f; border-color:#ecd99a; }
+  .cat-toggle-btn.active.cat-probados { background:#fbf3e0; color:#8a6d1f; border-color:#ecd99a; }
 
   /* Theme panel */
   .theme-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
@@ -1172,7 +1174,7 @@
         <div class="cat-toggle-row" id="f-status-toggle">
           <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')">en colección</button>
           <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')">deseo</button>
-          <button type="button" class="cat-toggle-btn cat-otro" data-val="otro" onclick="setStatusToggle('otro')">otro</button>
+          <button type="button" class="cat-toggle-btn cat-probados" data-val="probados" onclick="setStatusToggle('probados')">probados</button>
         </div>
       </div>
 
@@ -1416,12 +1418,14 @@ async function initState() {
       state.fields = state.fields.filter(f=>f.key!=='myOpinion');
     }
     state.perfumes.forEach(p => {
-      if (!p.status) p.status = (p.inCollection === false) ? 'otro' : 'coleccion';
+      if (p.status === 'otro') p.status = 'probados';
+      if (!p.status) p.status = (p.inCollection === false) ? 'probados' : 'coleccion';
       p.family = Array.isArray(p.family) ? p.family : (p.family ? [p.family] : []);
       p.notes = normalizePickerValues(p.notes);
       p.tags = Array.isArray(p.tags) ? p.tags.map(v=>String(v).trim()).filter(Boolean) : normalizePickerValues(p.tags);
     });
     state.families = uniqueSorted(state.families);
+    if (state.category === 'otro') state.category = 'probados';
     if (!state.category) state.category = 'perfumes';
     // Ensure each perfume has photos array placeholder
     state.perfumes = state.perfumes.map(p => ({...p, photos: [null,null,null], coverIndex: 0}));
@@ -1627,8 +1631,8 @@ function openNotesTab() {
 }
 
 // ══ RENDER ═════════════════════════════════════════════════════
-const CATEGORY_CYCLE = ['perfumes','coleccion','deseo','otro'];
-const CATEGORY_LABELS = {perfumes:'perfumes', coleccion:'en colección', deseo:'deseos', otro:'otros'};
+const CATEGORY_CYCLE = ['perfumes','coleccion','deseo','probados'];
+const CATEGORY_LABELS = {perfumes:'perfumes', coleccion:'en colección', deseo:'deseos', probados:'probados'};
 
 function _stripAccents(s) {
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -1641,7 +1645,9 @@ function getFiltered() {
     const pfam=Array.isArray(p.family)?p.family.join(' '):(p.family||'');
     const pnotes=Array.isArray(p.notes)?p.notes.join(' '):p.notes||'';
     const ptags=Array.isArray(p.tags)?p.tags.join(' '):(p.tags||'');
-    if(q && !_stripAccents(`${p.name} ${p.brand} ${p.perfumer} ${pfam} ${pnotes} ${ptags}`.toLowerCase()).includes(q)) return false;
+    const searchable = _stripAccents(`${p.name} ${p.brand} ${p.perfumer} ${pfam} ${pnotes} ${ptags}`.toLowerCase());
+    const terms = q.split(/\s+/).map(x=>x.trim()).filter(Boolean);
+    if(terms.length && !terms.every(term=>searchable.includes(term))) return false;
     if (cat !== 'perfumes' && (p.status||'coleccion') !== cat) return false;
     return true;
   }).sort((a,b)=>state.sort==='name'?a.name.localeCompare(b.name):new Date(b.added)-new Date(a.added));
@@ -1675,7 +1681,7 @@ function openPerfumeCategoryPicker(id) {
   const p = state.perfumes.find(x=>x.id===id);
   const cur = p ? (p.status||'coleccion') : 'coleccion';
   const el = document.getElementById('category-picker-list');
-  el.innerHTML = ['coleccion','deseo','otro'].map(cat=>{
+  el.innerHTML = ['coleccion','deseo','probados'].map(cat=>{
     const count = state.perfumes.filter(x=>(x.status||'coleccion')===cat).length;
     return `<button class="category-picker-row${cat===cur?' active':''}" onclick="setPerfumeCategory('${cat}')">
       <span class="row-cat-circle cat-${cat}" style="width:38px;height:38px;font-size:13px;flex-shrink:0">${count}</span>
@@ -2942,29 +2948,12 @@ function applyLanguage(lang) {
 (function init() {
   initState();
   applyLanguage(localStorage.getItem('scentic-lang') || 'es');
-  if (!history.state) {
-    history.replaceState({view:'home', modal:null}, '');
-  } else if (history.state.view === 'perfumes') {
-    _renderView('perfumes');
-    const st = history.state;
-    _suppressHistory = true;
-    if (st.modal === 'modal-wishlist' || st.modal === 'modal-note-editor') {
-      openWishlist();
-      if (st.modal === 'modal-note-editor') {
-        if (typeof st.noteIndex === 'number') {
-          editNote(st.noteIndex);
-        } else {
-          toggleNoteForm();
-        }
-      }
-    } else if (st.modal === 'modal-detail' && st.detailId != null) {
-      openDetail(st.detailId);
-    } else if (st.modal) {
-      document.getElementById(st.modal).classList.add('open');
-    }
-    _suppressHistory = false;
-    history.replaceState(st, '');
-  }
+  // Every fresh app launch starts on Home, regardless of the previous view.
+  _suppressHistory = true;
+  _closeAllModals();
+  _renderView('home');
+  history.replaceState({view:'home', modal:null}, '');
+  _suppressHistory = false;
   document.querySelectorAll('.app-search').forEach(function(el){
     el.addEventListener('focus', function(){ this.dataset.ph = this.placeholder; this.placeholder = ''; });
     el.addEventListener('blur', function(){ if(this.dataset.ph) this.placeholder = this.dataset.ph; });
