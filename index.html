@@ -124,6 +124,12 @@
   .row-photo-slide { position:relative; flex:1 0 100%; width:100%; scroll-snap-align:start; height:100%; }
   .row-photo-slide img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
   .row-photo .no-photo { display:flex; align-items:center; justify-content:center; width:100%; height:100%; font-size:40px; opacity:.25; }
+  .row-photo .no-photo-add {
+    appearance:none; border:0; background:transparent; color:#fff; font:inherit;
+    font-size:14px; font-weight:500; letter-spacing:.01em; cursor:pointer;
+    padding:10px 14px; opacity:.95;
+  }
+  .row-photo .no-photo-add:hover { opacity:1; text-decoration:underline; }
   .row-photo-dots { position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; gap:6px; z-index:5; }
   .row-photo-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.6); box-shadow:0 0 2px rgba(0,0,0,.3); transition:background .2s,transform .2s; }
   .row-photo-dot.active { background:var(--accent); transform:scale(1.3); }
@@ -1108,12 +1114,6 @@
         <div id="edit-notes-picker"></div>
       </div>
 
-      <!-- Opinion -->
-      <div class="field-group" id="fg-opinion">
-        <label class="field-label">MI OPINIÓN</label>
-        <textarea class="field-textarea" id="f-opinion" rows="3" placeholder="Escribe tu opinión..."></textarea>
-      </div>
-
       <!-- Comments -->
       <div class="field-group" id="fg-comments">
         <label class="field-label">COMENTARIOS</label>
@@ -1142,9 +1142,9 @@
       <div class="field-group">
         <label class="field-label">CATEGORÍA</label>
         <div class="cat-toggle-row" id="f-status-toggle">
-          <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')">En colección</button>
-          <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')">Deseo</button>
-          <button type="button" class="cat-toggle-btn cat-otro" data-val="otro" onclick="setStatusToggle('otro')">Otro</button>
+          <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')">en colección</button>
+          <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')">deseo</button>
+          <button type="button" class="cat-toggle-btn cat-otro" data-val="otro" onclick="setStatusToggle('otro')">otro</button>
         </div>
       </div>
 
@@ -1203,7 +1203,7 @@
 
 <script>
 // ══ STATE ══════════════════════════════════════════════════════
-const DEFAULT_FAMILIES = ["Floral","Oriental","Amaderado","Fresco","Cítrico","Fougère","Chipre","Gourmand","Acuático","Especiado","Cuero","Almizclado","Animálico","Ambarado","Verde","Incensado","Resinoso","Limpio"];
+const DEFAULT_FAMILIES = ["floral","oriental","amaderado","fresco","cítrico","fougère","chipre","gourmand","acuático","especiado","cuero","almizclado","animálico","ambarado","verde","incensado","resinoso","limpio"];
 const CONCENTRATIONS = ["Aceite","Colonia","EDT","EDP","Perfume","Extracto de perfume","Sólido"];
 const GENDERS = ["Masculino","Femenino","Unisex","Andrógino"];
 
@@ -1230,7 +1230,6 @@ let state = {
     {key:"inCollectionSince",label:"En colección desde",visible:true},
     {key:"rating",label:"Valoración",visible:true,required:true},
     {key:"bottleCount",label:"Número de frascos",visible:true},
-    {key:"myOpinion",label:"Mi opinión",visible:true},
     {key:"comments",label:"Comentarios",visible:true,required:true},
     {key:"status",label:"Categoría",visible:true},
     {key:"barcode",label:"Código de barras",visible:true},
@@ -1259,6 +1258,17 @@ function uniqueSorted(values) {
   const seen = new Map();
   values.forEach(v=>{ const x=String(v||'').trim(); if(x && !seen.has(x.toLowerCase())) seen.set(x.toLowerCase(),x); });
   return [...seen.values()].sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
+}
+function normalizePickerText(value) {
+  return String(value||'').trim().toLocaleLowerCase('es');
+}
+function normalizePickerCollections() {
+  state.families = uniqueSorted((state.families||[]).map(normalizePickerText));
+  (state.perfumes||[]).forEach(p=>{
+    p.family = normalizePickerValues(p.family).map(normalizePickerText);
+    p.notes = normalizePickerValues(p.notes).map(normalizePickerText);
+    p.tags = normalizePickerValues(p.tags).map(normalizePickerText);
+  });
 }
 function getExistingNotes() {
   return uniqueSorted(state.perfumes.flatMap(p=>normalizePickerValues(p.notes)));
@@ -1375,6 +1385,7 @@ async function initState() {
       state.fields.forEach(f => { if (REQUIRED_CARD_FIELDS.includes(f.key)) f.required = true; });
       const oldField = state.fields.find(f=>f.key==='inCollection');
       if (oldField) { oldField.key = 'status'; oldField.label = 'Categoría'; }
+      state.fields = state.fields.filter(f=>f.key!=='myOpinion');
     }
     state.perfumes.forEach(p => {
       if (!p.status) p.status = (p.inCollection === false) ? 'otro' : 'coleccion';
@@ -1396,6 +1407,8 @@ async function initState() {
       }
     });
   }
+  normalizePickerCollections();
+  save();
   applyViewSort();
   render();
   if (currentDetailId != null && document.getElementById('modal-detail').classList.contains('open')) {
@@ -1721,7 +1734,7 @@ function render() {
             ${photos.map(ph=>`<div class="row-photo-slide"><img src="${ph}" alt="${p.name}"/></div>`).join('')}
           </div>
           ${photos.length>1?`<div class="row-photo-dots">${photos.map((_,i)=>`<span class="row-photo-dot${i===0?' active':''}"></span>`).join('')}</div>`:''}
-        ` : `<span class="no-photo">🫙</span>`}
+        ` : `<button type="button" class="no-photo-add" onclick="event.stopPropagation();openEdit(${p.id})" aria-label="Añadir imágenes">añadir imágenes</button>`}
       </div>
       <div class="row-body">
         <div class="row-name-row">
@@ -1821,7 +1834,6 @@ function openDetail(id) {
           </div>`).join('')}
       </div>
       ${(Array.isArray(p.notes)?p.notes.length:p.notes)?`<div class="detail-block"><div class="detail-block-label">Notas olfativas</div><div class="detail-block-value">${Array.isArray(p.notes)?p.notes.join(', '):p.notes}</div></div>`:''}
-      ${p.myOpinion?`<div class="detail-block"><div class="detail-block-label">Mi opinión</div><div class="detail-block-value">${p.myOpinion}</div></div>`:''}
       ${p.comments?`<div class="detail-block"><div class="detail-block-label">Comentarios</div><div class="detail-block-value">${p.comments}</div></div>`:''}
       ${p.videoUrl?(()=>{
         const vid=getYouTubeId(p.videoUrl);
@@ -1929,14 +1941,13 @@ function openEdit(id) {
   renderMultiPicker('tags', 'edit-tags-picker', editTags, getExistingTags(), 'Añadir - buscar');
 
   // Text areas (other free text)
-  document.getElementById('f-opinion').value = p ? p.myOpinion || '' : '';
   document.getElementById('f-comments').value = p ? p.comments || '' : '';
   document.getElementById('f-video').value = p?p.videoUrl||'':'';
   previewVideo(p?p.videoUrl||'':'');
 
-  // Notes/opinion/comments visibility
-  ['notes','myOpinion','comments'].forEach(k=>{
-    const fgId = k==='myOpinion'?'fg-opinion':k==='comments'?'fg-comments':'fg-notes';
+  // Notes/comments visibility
+  ['notes','comments'].forEach(k=>{
+    const fgId = k==='comments'?'fg-comments':'fg-notes';
     const f = state.fields.find(x=>x.key===k);
     document.getElementById(fgId).style.display = (f&&f.visible)?'block':'none';
   });
@@ -2055,7 +2066,7 @@ function onPickerInput(type,value) {
 }
 function closePickerSuggestions() { document.querySelectorAll('.multi-picker-suggestions.open').forEach(el=>el.classList.remove('open')); }
 function addPickerValue(type,value) {
-  const v=String(value||'').trim(); if(!v) return;
+  const v=normalizePickerText(value); if(!v) return;
   const data=getPickerData(type);
   const existing=data.options.find(x=>x.toLowerCase()===v.toLowerCase());
   const val=existing||v;
@@ -2067,7 +2078,7 @@ function selectPickerSuggestion(type,value) { addPickerValue(type,value); }
 function togglePickerValue(type,value) {
   const data=getPickerData(type);
   const idx=data.selected.findIndex(x=>x.toLowerCase()===String(value).toLowerCase());
-  if(idx>=0) data.selected.splice(idx,1); else data.selected.push(value);
+  if(idx>=0) data.selected.splice(idx,1); else data.selected.push(normalizePickerText(value));
   refreshPicker(type);
 }
 function removePickerValue(type,value) { togglePickerValue(type,value); }
@@ -2096,13 +2107,12 @@ function savePerfume() {
     barcode: document.getElementById('pf-barcode').value.trim(),
     status: document.querySelector('#f-status-toggle .cat-toggle-btn.active').dataset.val,
     notes: [...editNotes],
-    myOpinion: document.getElementById('f-opinion').value,
     comments: document.getElementById('f-comments').value,
     videoUrl: document.getElementById('f-video').value.trim(),
   };
 
   state.fields.forEach(f=>{
-    if(['rating','status','notes','myOpinion','comments'].includes(f.key)) return;
+    if(['rating','status','notes','comments'].includes(f.key)) return;
     obj[f.key]=getFieldVal(f.key);
   });
 
