@@ -613,7 +613,7 @@
   }
   .multi-picker-add:active { opacity:.55; }
   .multi-picker-suggestions {
-    display:none; position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:50;
+    display:none; position:absolute; left:0; right:0; bottom:calc(100% + 6px); top:auto; z-index:50;
     background:var(--surface); border:1px solid var(--border); border-radius:10px;
     box-shadow:0 8px 24px rgba(0,0,0,.12); padding:5px; max-height:190px; overflow-y:auto;
   }
@@ -1162,16 +1162,6 @@
         <div id="edit-tags-picker"></div>
       </div>
 
-      <!-- Lists -->
-      <div class="field-group">
-        <label class="field-label">LISTAS / COLECCIONES</label>
-        <div class="tags-row" id="edit-lists"></div>
-        <div class="tag-add-row">
-          <input class="field-input" id="list-input" placeholder="Nombre de lista..." onkeydown="if(event.key==='Enter'){addList();event.preventDefault();}"/>
-          <button class="page-link" onclick="addList()">+</button>
-        </div>
-      </div>
-
       <button class="page-link" id="btn-delete" onclick="deletePerfume()" style="display:none;color:var(--danger);margin-top:10px">Eliminar perfume</button>
   </div>
   <button class="detail-edit-btn" onclick="savePerfume()">Guardar</button>
@@ -1257,7 +1247,6 @@ let editRating = 0;
 let editTags = [];
 let editFamilies = [];
 let editNotes = [];
-let editLists = [];
 let editId = null;
 const pickerExpanded = {family:false, notes:false, tags:false};
 
@@ -1887,7 +1876,6 @@ function openEdit(id) {
   editCoverIndex = p ? (p.coverIndex||0) : 0;
   editRating = p ? (p.rating||0) : 0;
   editTags = p ? [...(p.tags||[])] : [];
-  editLists = p ? [...(p.lists||[])] : [];
   document.getElementById('pf-barcode').value = p ? (p.barcode||'') : '';
 
   document.getElementById('edit-title').textContent = p ? 'Editar perfume' : 'Nuevo perfume';
@@ -1959,10 +1947,6 @@ function openEdit(id) {
   // In collection
   setStatusToggle(p ? (p.status||'coleccion') : 'coleccion');
 
-  // Lists
-  renderEditLists();
-  document.getElementById('list-input').value='';
-
   document.getElementById('modal-detail').classList.remove('open');
   openModal('modal-edit');
 }
@@ -2026,9 +2010,9 @@ function setStatusToggle(cat) {
 }
 
 function getPickerData(type) {
-  if(type==='family') return {selected:editFamilies, options:state.families, inputId:'family-picker-input'};
-  if(type==='notes') return {selected:editNotes, options:getExistingNotes(), inputId:'notes-picker-input'};
-  return {selected:editTags, options:getExistingTags(), inputId:'tags-picker-input'};
+  if(type==='family') return {selected:editFamilies, options:uniqueSorted([...(state.families||[]), ...editFamilies]), inputId:'family-picker-input'};
+  if(type==='notes') return {selected:editNotes, options:uniqueSorted([...getExistingNotes(), ...editNotes]), inputId:'notes-picker-input'};
+  return {selected:editTags, options:uniqueSorted([...getExistingTags(), ...editTags]), inputId:'tags-picker-input'};
 }
 function pickerMatches(type, q) {
   const data=getPickerData(type);
@@ -2090,12 +2074,6 @@ function removePickerValue(type,value) { togglePickerValue(type,value); }
 function togglePickerExpanded(type) { pickerExpanded[type]=!pickerExpanded[type]; refreshPicker(type); }
 function toggleFamilyChip(btn, fam) { togglePickerValue('family',fam); }
 
-function renderEditLists() {
-  document.getElementById('edit-lists').innerHTML=editLists.map(l=>`<span class="tag-chip">📁 ${l} <span class="tag-chip-x" onclick="removeList('${l}')">✕</span></span>`).join('');
-}
-function addList(){ const v=document.getElementById('list-input').value.trim(); if(!v||editLists.includes(v)) return; editLists.push(v); document.getElementById('list-input').value=''; renderEditLists(); }
-function removeList(l){ editLists=editLists.filter(x=>x!==l); renderEditLists(); }
-
 function getFieldVal(key) {
   if(key==='family') return [...editFamilies];
   const el=document.getElementById('ef-'+key);
@@ -2114,7 +2092,7 @@ function savePerfume() {
     coverIndex: editCoverIndex,
     rating: editRating,
     tags: [...editTags],
-    lists: [...editLists],
+    lists: editId ? [...((state.perfumes.find(p=>p.id===editId)||{}).lists||[])] : [],
     barcode: document.getElementById('pf-barcode').value.trim(),
     status: document.querySelector('#f-status-toggle .cat-toggle-btn.active').dataset.val,
     notes: [...editNotes],
