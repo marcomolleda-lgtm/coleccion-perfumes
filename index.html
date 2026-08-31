@@ -383,6 +383,14 @@
     display:flex; align-items:center; justify-content:center; position:relative;
   }
   .detail-hero img { width:100%; height:100%; object-fit:cover; }
+  .detail-hero .no-photo-add {
+    appearance:none; border:0; border-radius:0; background:transparent;
+    color:#fff; font-family:inherit; font-size:18px; line-height:1.25;
+    font-weight:600; letter-spacing:.04em; text-align:center; cursor:pointer;
+    padding:8px 12px; opacity:.96;
+  }
+  .detail-hero .no-photo-add:hover { opacity:1; }
+  .detail-hero .no-photo-add:active { opacity:.8; }
   .hero-carousel {
     display:flex; overflow-x:auto; scroll-snap-type:x mandatory; height:100%; width:100%;
     -webkit-overflow-scrolling:touch; scrollbar-width:none;
@@ -468,27 +476,25 @@
   /* Classification: unified search+add field for family/notes/tags (mirrors the perfume editor picker) */
   .class-section .multi-picker { margin-bottom:12px; }
   .class-chip-row { display:flex; flex-wrap:wrap; gap:10px; }
-  .class-chip-row.collapsed { max-height:142px; overflow:hidden; }
+  .class-chip-row.collapsed { max-height:120px; overflow:hidden; }
   .class-chip {
-    display:inline-flex; align-items:center; gap:2px;
-    border:1px solid var(--border); border-radius:22px; background:#fff;
-    padding:3px 4px 3px 18px; box-sizing:border-box;
+    display:inline-flex; align-items:center; gap:0;
+    border:1px solid var(--border); border-radius:20px; background:#fff;
+    padding:1px 4px 1px 14px; box-sizing:border-box;
   }
-  .class-chip.assigned { background:var(--accent-yellow); border-color:var(--accent-yellow); }
   .class-chip-name {
-    border:none; background:none; padding:8px 2px; margin:0;
-    font-family:'Jost',sans-serif; font-size:15px; color:var(--text); cursor:pointer;
-    display:flex; align-items:center; gap:7px; white-space:nowrap;
+    border:none; background:none; padding:5px 2px; margin:0;
+    font-family:'Jost',sans-serif; font-size:13px; color:var(--text); cursor:pointer;
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
   }
   .class-chip-name:active { opacity:.6; }
   .class-chip-count { font-size:11px; color:var(--text-light); background:rgba(0,0,0,.06); border-radius:10px; padding:1px 7px; flex-shrink:0; }
-  .class-chip.assigned .class-chip-count { background:rgba(255,255,255,.55); }
   .class-chip-icon {
-    border:none; background:none; padding:6px; color:var(--text-light); font-size:13px;
+    border:none; background:none; padding:5px; color:var(--text-light); font-size:12px;
     cursor:pointer; line-height:1; display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
   .class-chip-icon:active { opacity:.5; }
-  .class-chip-row-wrap { margin-top:2px; }
+  .class-chip-row-wrap { margin-top:2px; margin-bottom:10px; }
 
   /* ── Generic full-page screen (fields, families, and future secondary pages) ── */
   .page-overlay {
@@ -667,9 +673,9 @@
   .multi-picker-input::placeholder { color:var(--text-light); }
   .multi-picker-input-wrap:focus-within { border-bottom-color:var(--text); }
   .multi-picker-add {
-    width:30px; height:30px; flex-shrink:0; padding:0; margin-bottom:2px;
+    width:22px; height:22px; flex-shrink:0; padding:0; margin-bottom:2px;
     border:none; background:none; color:var(--star); font-family:'Jost',sans-serif;
-    font-size:27px; line-height:1; cursor:pointer; display:flex;
+    font-size:16px; line-height:1; cursor:pointer; display:flex;
     align-items:center; justify-content:center;
   }
   .multi-picker-add:active { opacity:.55; }
@@ -1649,7 +1655,7 @@ function deleteFamily(i) {
 }
 
 // ══ CLASSIFICATION MANAGER ══════════════════════════════════════
-const CLASS_CATEGORIES = ['coleccion','deseo','probados'];
+const CLASS_CATEGORIES = ['perfumes','coleccion','deseo','probados'];
 let classSearch = {family:'', notes:'', tags:''};
 
 function classFieldOf(type, p) {
@@ -1657,7 +1663,7 @@ function classFieldOf(type, p) {
 }
 function classUsageCount(type, value) {
   const v = String(value).toLowerCase();
-  if (type === 'category') return state.perfumes.filter(p => (p.status||'coleccion') === value).length;
+  if (type === 'category') return value === 'perfumes' ? state.perfumes.length : state.perfumes.filter(p => (p.status||'coleccion') === value).length;
   return state.perfumes.filter(p => {
     const arr = classFieldOf(type, p);
     return Array.isArray(arr) && arr.some(x => String(x).toLowerCase() === v);
@@ -1703,7 +1709,7 @@ function renameCategoryLabel(cat) {
   render();
 }
 
-const CLASS_CHIPS_COLLAPSED_H = 142;
+const CLASS_CHIPS_COLLAPSED_H = 120;
 let classExpanded = {family:false, notes:false, tags:false};
 
 function renderClassSection(type) {
@@ -1715,7 +1721,7 @@ function renderClassSection(type) {
   el.innerHTML = items.length ? items.map(name => {
     const count = classUsageCount(type, name);
     const assigned = count > 0;
-    return `<div class="class-chip${assigned?' assigned':''}">
+    return `<div class="class-chip">
       <button type="button" class="class-chip-name" onclick="openClassMiniList('${type}','${escapeHtml(name)}')">${escapeHtml(name)}${assigned?`<span class="class-chip-count">${count}</span>`:''}</button>
       <button type="button" class="class-chip-icon" title="Renombrar" onclick="event.stopPropagation();renameClassItem('${type}','${escapeHtml(name)}')">✎</button>
       <button type="button" class="class-chip-icon" title="Eliminar" onclick="event.stopPropagation();deleteClassItem('${type}','${escapeHtml(name)}')">✕</button>
@@ -1834,7 +1840,7 @@ function openClassMiniList(type, value) {
   const label = type === 'category' ? catLabel(value) : value;
   document.getElementById('class-mini-title').textContent = label;
   const list = state.perfumes.filter(p => {
-    if (type === 'category') return (p.status||'coleccion') === value;
+    if (type === 'category') return value === 'perfumes' ? true : (p.status||'coleccion') === value;
     const arr = classFieldOf(type, p);
     return Array.isArray(arr) && arr.some(x=>String(x).toLowerCase()===String(value).toLowerCase());
   }).sort((a,b)=>a.name.localeCompare(b.name,'es'));
@@ -2162,7 +2168,7 @@ function openDetail(id) {
           ${currentDetailPhotos.map((ph,i)=>`<div class="hero-slide" onclick="openLightbox(currentDetailPhotos,${i})"><img src="${ph}" alt="${p.name}"/></div>`).join('')}
         </div>
         ${currentDetailPhotos.length>1?`<div class="hero-dots" id="hero-dots">${currentDetailPhotos.map((_,i)=>`<span class="hero-dot${i===0?' active':''}"></span>`).join('')}</div>`:''}
-      ` : `<span style="font-size:80px;opacity:.12">🫙</span>`}
+      ` : `<button type="button" class="no-photo-add" onclick="openEdit(${p.id})" aria-label="Añadir imagen">AÑADIR<br>IMAGEN</button>`}
       <button class="detail-back-btn" onclick="closeModal('modal-detail')" title="Volver">&#8592;</button>
     </div>
     <div class="detail-body">
