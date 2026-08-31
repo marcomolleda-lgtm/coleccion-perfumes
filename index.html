@@ -126,11 +126,10 @@
   .row-photo .no-photo { display:flex; align-items:center; justify-content:center; width:100%; height:100%; font-size:40px; opacity:.25; }
   .row-photo .no-photo-add {
     appearance:none;
-    width:100%;
-    height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
     box-sizing:border-box;
     border:0;
     border-radius:0;
@@ -143,20 +142,11 @@
     letter-spacing:.04em;
     text-align:center;
     cursor:pointer;
-    padding:18px;
+    padding:8px 12px;
     opacity:.96;
   }
-  .row-photo .no-photo-add::before {
-    content:"+";
-    display:block;
-    font-size:42px;
-    line-height:1;
-    font-weight:300;
-    letter-spacing:0;
-    margin-bottom:8px;
-  }
   .row-photo .no-photo-add:hover { opacity:1; background:transparent; }
-  .row-photo .no-photo-add:active { transform:none; }
+  .row-photo .no-photo-add:active { transform:translate(-50%,-50%); }
   .row-photo { cursor:default; }
   .row-photo .no-photo-add { pointer-events:auto; }
 
@@ -469,13 +459,36 @@
   .class-section { margin-bottom:30px; }
   .class-section-title { font-size:13px; font-family:'Jost',sans-serif; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--text-light); margin-bottom:8px; }
   .class-row { display:flex; align-items:center; gap:6px; padding:11px 0; border-bottom:1px solid #ededec; }
-  .class-row-label { flex:1; min-width:0; display:block; text-align:left; background:none; border:none; cursor:pointer; padding:2px 0; font-family:'Jost',sans-serif; font-size:16px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .class-row-label { flex:1; min-width:0; display:flex; align-items:center; gap:10px; text-align:left; background:none; border:none; cursor:pointer; padding:2px 0; font-family:'Jost',sans-serif; font-size:16px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .class-row-label:active { opacity:.6; }
   .class-row-count { font-size:12px; color:var(--text-light); margin-left:6px; }
-  .class-search-input { width:100%; box-sizing:border-box; border:none; border-bottom:1px solid var(--border); background:none; font-family:'Jost',sans-serif; font-size:14px; color:var(--text); padding:8px 2px; outline:none; margin-bottom:4px; }
-  .class-search-input::placeholder { color:var(--text-light); }
   .class-empty { padding:14px 0; font-size:13px; color:var(--text-light); font-family:'Jost',sans-serif; }
   #class-mini-list { display:flex; flex-direction:column; gap:10px; }
+
+  /* Classification: unified search+add field for family/notes/tags (mirrors the perfume editor picker) */
+  .class-section .multi-picker { margin-bottom:12px; }
+  .class-chip-row { display:flex; flex-wrap:wrap; gap:10px; }
+  .class-chip-row.collapsed { max-height:142px; overflow:hidden; }
+  .class-chip {
+    display:inline-flex; align-items:center; gap:2px;
+    border:1px solid var(--border); border-radius:22px; background:#fff;
+    padding:3px 4px 3px 18px; box-sizing:border-box;
+  }
+  .class-chip.assigned { background:var(--accent-yellow); border-color:var(--accent-yellow); }
+  .class-chip-name {
+    border:none; background:none; padding:8px 2px; margin:0;
+    font-family:'Jost',sans-serif; font-size:15px; color:var(--text); cursor:pointer;
+    display:flex; align-items:center; gap:7px; white-space:nowrap;
+  }
+  .class-chip-name:active { opacity:.6; }
+  .class-chip-count { font-size:11px; color:var(--text-light); background:rgba(0,0,0,.06); border-radius:10px; padding:1px 7px; flex-shrink:0; }
+  .class-chip.assigned .class-chip-count { background:rgba(255,255,255,.55); }
+  .class-chip-icon {
+    border:none; background:none; padding:6px; color:var(--text-light); font-size:13px;
+    cursor:pointer; line-height:1; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .class-chip-icon:active { opacity:.5; }
+  .class-chip-row-wrap { margin-top:2px; }
 
   /* ── Generic full-page screen (fields, families, and future secondary pages) ── */
   .page-overlay {
@@ -1186,7 +1199,7 @@
         <label class="field-label">CATEGORÍA</label>
         <div class="cat-toggle-row" id="f-status-toggle">
           <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')">en colección</button>
-          <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')">deseo</button>
+          <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')">deseos</button>
           <button type="button" class="cat-toggle-btn cat-probados" data-val="probados" onclick="setStatusToggle('probados')">probados</button>
         </div>
       </div>
@@ -1256,31 +1269,52 @@
 
     <div class="class-section">
       <div class="class-section-title">Familia olfativa</div>
-      <input type="text" class="class-search-input" placeholder="Buscar..." oninput="onClassSearchInput('family',this.value)"/>
-      <div id="class-family-list"></div>
-      <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
-        <input type="text" id="class-family-input" class="page-text-input" placeholder="Nueva familia..." onkeydown="if(event.key==='Enter'){addClassItem('family');}"/>
-        <button class="page-link" onclick="addClassItem('family')">Añadir</button>
+      <div class="multi-picker" id="class-family-picker">
+        <div class="multi-picker-input-wrap">
+          <input class="multi-picker-input" id="class-family-search" placeholder="Buscar y añadir" autocomplete="off"
+            oninput="onClassPickerInput('family',this.value)" onfocus="onClassPickerInput('family',this.value)"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();classPickerEnter('family',this.value);}"/>
+          <button type="button" class="multi-picker-add" onclick="classPickerEnter('family',document.getElementById('class-family-search').value)" aria-label="Añadir">＋</button>
+        </div>
+        <div class="multi-picker-suggestions" id="class-family-suggestions"></div>
+      </div>
+      <div class="class-chip-row-wrap">
+        <div class="class-chip-row" id="class-family-chips"></div>
+        <button type="button" class="multi-picker-more" id="class-family-more" onclick="toggleClassExpanded('family')">ver todas</button>
       </div>
     </div>
 
     <div class="class-section">
       <div class="class-section-title">Notas olfativas</div>
-      <input type="text" class="class-search-input" placeholder="Buscar..." oninput="onClassSearchInput('notes',this.value)"/>
-      <div id="class-notes-list"></div>
-      <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
-        <input type="text" id="class-notes-input" class="page-text-input" placeholder="Nueva nota..." onkeydown="if(event.key==='Enter'){addClassItem('notes');}"/>
-        <button class="page-link" onclick="addClassItem('notes')">Añadir</button>
+      <div class="multi-picker" id="class-notes-picker">
+        <div class="multi-picker-input-wrap">
+          <input class="multi-picker-input" id="class-notes-search" placeholder="Buscar y añadir" autocomplete="off"
+            oninput="onClassPickerInput('notes',this.value)" onfocus="onClassPickerInput('notes',this.value)"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();classPickerEnter('notes',this.value);}"/>
+          <button type="button" class="multi-picker-add" onclick="classPickerEnter('notes',document.getElementById('class-notes-search').value)" aria-label="Añadir">＋</button>
+        </div>
+        <div class="multi-picker-suggestions" id="class-notes-suggestions"></div>
+      </div>
+      <div class="class-chip-row-wrap">
+        <div class="class-chip-row" id="class-notes-chips"></div>
+        <button type="button" class="multi-picker-more" id="class-notes-more" onclick="toggleClassExpanded('notes')">ver todas</button>
       </div>
     </div>
 
     <div class="class-section">
       <div class="class-section-title">Etiquetas</div>
-      <input type="text" class="class-search-input" placeholder="Buscar..." oninput="onClassSearchInput('tags',this.value)"/>
-      <div id="class-tags-list"></div>
-      <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
-        <input type="text" id="class-tags-input" class="page-text-input" placeholder="Nueva etiqueta..." onkeydown="if(event.key==='Enter'){addClassItem('tags');}"/>
-        <button class="page-link" onclick="addClassItem('tags')">Añadir</button>
+      <div class="multi-picker" id="class-tags-picker">
+        <div class="multi-picker-input-wrap">
+          <input class="multi-picker-input" id="class-tags-search" placeholder="Buscar y añadir" autocomplete="off"
+            oninput="onClassPickerInput('tags',this.value)" onfocus="onClassPickerInput('tags',this.value)"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();classPickerEnter('tags',this.value);}"/>
+          <button type="button" class="multi-picker-add" onclick="classPickerEnter('tags',document.getElementById('class-tags-search').value)" aria-label="Añadir">＋</button>
+        </div>
+        <div class="multi-picker-suggestions" id="class-tags-suggestions"></div>
+      </div>
+      <div class="class-chip-row-wrap">
+        <div class="class-chip-row" id="class-tags-chips"></div>
+        <button type="button" class="multi-picker-more" id="class-tags-more" onclick="toggleClassExpanded('tags')">ver todas</button>
       </div>
     </div>
   </div>
@@ -1632,6 +1666,7 @@ function classUsageCount(type, value) {
 
 function openClassification() {
   classSearch = {family:'', notes:'', tags:''};
+  classExpanded = {family:false, notes:false, tags:false};
   renderClassification();
   openModal('modal-classification');
 }
@@ -1644,11 +1679,17 @@ function renderClassification() {
 
 function renderClassCategories() {
   const el = document.getElementById('class-categories-list');
-  el.innerHTML = CLASS_CATEGORIES.map(cat => `
+  el.innerHTML = CLASS_CATEGORIES.map(cat => {
+    const count = classUsageCount('category',cat);
+    return `
     <div class="class-row">
-      <button type="button" class="class-row-label" onclick="openClassMiniList('category','${cat}')">${escapeHtml(catLabel(cat))}<span class="class-row-count">${classUsageCount('category',cat)}</span></button>
+      <button type="button" class="class-row-label" onclick="openClassMiniList('category','${cat}')">
+        <span class="row-cat-circle cat-${cat}" style="width:32px;height:32px;font-size:12px;flex-shrink:0">${count}</span>
+        <span>${escapeHtml(catLabel(cat))}</span>
+      </button>
       <button type="button" class="field-mgr-delete" title="Renombrar" onclick="event.stopPropagation();renameCategoryLabel('${cat}')">✎</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function renameCategoryLabel(cat) {
   const val = prompt('Nuevo nombre para esta categoría:', catLabel(cat));
@@ -1662,34 +1703,80 @@ function renameCategoryLabel(cat) {
   render();
 }
 
+const CLASS_CHIPS_COLLAPSED_H = 142;
+let classExpanded = {family:false, notes:false, tags:false};
+
 function renderClassSection(type) {
-  const el = document.getElementById('class-' + type + '-list');
+  const el = document.getElementById('class-' + type + '-chips');
   if (!el) return;
   let items = uniqueSorted(state[type] || []);
   const q = _stripAccents((classSearch[type]||'').toLowerCase().trim());
   if (q) items = items.filter(i => _stripAccents(i.toLowerCase()).includes(q));
-  el.innerHTML = items.length ? items.map(name => `
-    <div class="class-row">
-      <button type="button" class="class-row-label" onclick="openClassMiniList('${type}','${escapeHtml(name)}')">${escapeHtml(name)}<span class="class-row-count">${classUsageCount(type,name)}</span></button>
-      <button type="button" class="field-mgr-delete" title="Renombrar" onclick="event.stopPropagation();renameClassItem('${type}','${escapeHtml(name)}')">✎</button>
-      <button type="button" class="field-mgr-delete" title="Eliminar" onclick="event.stopPropagation();deleteClassItem('${type}','${escapeHtml(name)}')">✕</button>
-    </div>`).join('') : `<div class="class-empty">Sin elementos</div>`;
+  el.innerHTML = items.length ? items.map(name => {
+    const count = classUsageCount(type, name);
+    const assigned = count > 0;
+    return `<div class="class-chip${assigned?' assigned':''}">
+      <button type="button" class="class-chip-name" onclick="openClassMiniList('${type}','${escapeHtml(name)}')">${escapeHtml(name)}${assigned?`<span class="class-chip-count">${count}</span>`:''}</button>
+      <button type="button" class="class-chip-icon" title="Renombrar" onclick="event.stopPropagation();renameClassItem('${type}','${escapeHtml(name)}')">✎</button>
+      <button type="button" class="class-chip-icon" title="Eliminar" onclick="event.stopPropagation();deleteClassItem('${type}','${escapeHtml(name)}')">✕</button>
+    </div>`;
+  }).join('') : `<div class="class-empty">Sin elementos</div>`;
+
+  const expanded = !!classExpanded[type];
+  el.classList.toggle('collapsed', !expanded);
+  const moreBtn = document.getElementById('class-' + type + '-more');
+  if (moreBtn) {
+    const overflowing = el.scrollHeight > CLASS_CHIPS_COLLAPSED_H + 4;
+    moreBtn.classList.toggle('visible', overflowing);
+    moreBtn.textContent = expanded ? 'ver menos' : 'ver todas';
+  }
 }
-function onClassSearchInput(type, val) {
-  classSearch[type] = val;
+function toggleClassExpanded(type) {
+  classExpanded[type] = !classExpanded[type];
   renderClassSection(type);
 }
-function addClassItem(type) {
-  const input = document.getElementById('class-' + type + '-input');
-  const val = input.value.trim();
+function classPickerMatches(type, q) {
+  const items = uniqueSorted(state[type] || []);
+  const needle = _stripAccents(String(q||'').toLowerCase().trim());
+  if (!needle) return [];
+  return items.filter(v => _stripAccents(v.toLowerCase()).includes(needle)).slice(0,12);
+}
+function onClassPickerInput(type, value) {
+  classSearch[type] = value;
+  renderClassSection(type);
+  const box = document.getElementById('class-' + type + '-suggestions'); if (!box) return;
+  const matches = classPickerMatches(type, value);
+  const exact = (state[type]||[]).some(v => v.toLowerCase() === String(value||'').trim().toLowerCase());
+  box.innerHTML = matches.map(v => `<button type="button" class="multi-picker-suggestion" onclick="classSelectSuggestion('${type}','${escapeHtml(v)}')">${escapeHtml(v)}</button>`).join('');
+  if (value.trim() && !exact) box.innerHTML += `<button type="button" class="multi-picker-suggestion" onclick="classCreateItem('${type}',document.getElementById('class-${type}-search').value)">＋ Crear «${escapeHtml(value.trim())}»</button>`;
+  box.classList.toggle('open', !!value.trim() && box.innerHTML.length > 0);
+}
+function classSelectSuggestion(type, value) {
+  const box = document.getElementById('class-' + type + '-suggestions'); if (box) box.classList.remove('open');
+  const input = document.getElementById('class-' + type + '-search'); if (input) input.value = '';
+  classSearch[type] = '';
+  renderClassSection(type);
+  openClassMiniList(type, value);
+}
+function classCreateItem(type, value) {
+  const val = normalizePickerText(String(value||'').trim());
   if (!val) return;
   if (!Array.isArray(state[type])) state[type] = [];
-  if (state[type].some(x=>x.toLowerCase()===val.toLowerCase())) { input.value=''; return; }
-  state[type].push(normalizePickerText(val));
-  state[type] = uniqueSorted(state[type]);
-  save();
-  input.value = '';
+  if (!state[type].some(x => x.toLowerCase() === val.toLowerCase())) {
+    state[type].push(val);
+    state[type] = uniqueSorted(state[type]);
+    save();
+  }
+  const box = document.getElementById('class-' + type + '-suggestions'); if (box) box.classList.remove('open');
+  const input = document.getElementById('class-' + type + '-search'); if (input) input.value = '';
+  classSearch[type] = '';
   renderClassSection(type);
+}
+function classPickerEnter(type, value) {
+  const val = String(value||'').trim();
+  if (!val) return;
+  const exact = (state[type]||[]).find(x => x.toLowerCase() === val.toLowerCase());
+  if (exact) classSelectSuggestion(type, exact); else classCreateItem(type, val);
 }
 function reassignClassValue(type, oldName, newName) {
   const oldLower = oldName.toLowerCase();
@@ -2275,6 +2362,7 @@ function setEditRating(n){ editRating=n; renderEditStars(); }
 function setStatusToggle(cat) {
   document.querySelectorAll('#f-status-toggle .cat-toggle-btn').forEach(function(btn){
     btn.classList.toggle('active', btn.dataset.val === cat);
+    btn.textContent = catLabel(btn.dataset.val);
   });
 }
 
