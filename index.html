@@ -465,6 +465,18 @@
   }
   .field-mgr-row input[type=text] { flex:1; border:none; background:transparent; font-size:16px; color:var(--text); font-family:'Jost',sans-serif; outline:none; }
 
+  /* Classification manager */
+  .class-section { margin-bottom:30px; }
+  .class-section-title { font-size:13px; font-family:'Jost',sans-serif; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--text-light); margin-bottom:8px; }
+  .class-row { display:flex; align-items:center; gap:6px; padding:11px 0; border-bottom:1px solid #ededec; }
+  .class-row-label { flex:1; min-width:0; display:block; text-align:left; background:none; border:none; cursor:pointer; padding:2px 0; font-family:'Jost',sans-serif; font-size:16px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .class-row-label:active { opacity:.6; }
+  .class-row-count { font-size:12px; color:var(--text-light); margin-left:6px; }
+  .class-search-input { width:100%; box-sizing:border-box; border:none; border-bottom:1px solid var(--border); background:none; font-family:'Jost',sans-serif; font-size:14px; color:var(--text); padding:8px 2px; outline:none; margin-bottom:4px; }
+  .class-search-input::placeholder { color:var(--text-light); }
+  .class-empty { padding:14px 0; font-size:13px; color:var(--text-light); font-family:'Jost',sans-serif; }
+  #class-mini-list { display:flex; flex-direction:column; gap:10px; }
+
   /* ── Generic full-page screen (fields, families, and future secondary pages) ── */
   .page-overlay {
     display:none; position:fixed; inset:0; z-index:1000; background:#ffffff;
@@ -997,6 +1009,7 @@
     <div class="home-mega-col">
       <button class="home-mega-item" data-i18n="menu_fields" onclick="homeMenuAction(openFieldMgr)">campos</button>
       <button class="home-mega-item" data-i18n="menu_notes" onclick="homeMenuAction(openNotesTab)">notas</button>
+      <button class="home-mega-item" data-i18n="menu_classification" onclick="homeMenuAction(openClassification)">clasificación</button>
     </div>
   </div>
 </div>
@@ -1215,7 +1228,7 @@
     <div id="field-mgr-list"></div>
     <button class="page-link" onclick="addCustomField()">+ Añadir campo</button>
     <div class="page-divider"></div>
-    <button class="page-link" onclick="openFamilyMgr()">Gestionar familias olfativas</button>
+    <button class="page-link" onclick="openClassification()">Gestionar clasificación</button>
   </div>
 </div>
 
@@ -1228,6 +1241,56 @@
       <input type="text" id="new-family-input" class="page-text-input" placeholder="Nueva familia..." onkeydown="if(event.key==='Enter'){addFamily();}"/>
       <button class="page-link" onclick="addFamily()">Añadir</button>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay page-overlay" id="modal-classification">
+  <div class="page-inner">
+    <button class="page-back" onclick="closeModal('modal-classification')" title="Volver">&#8592;</button>
+    <div class="page-title">Clasificación</div>
+
+    <div class="class-section">
+      <div class="class-section-title">Categorías</div>
+      <div id="class-categories-list"></div>
+    </div>
+
+    <div class="class-section">
+      <div class="class-section-title">Familia olfativa</div>
+      <input type="text" class="class-search-input" placeholder="Buscar..." oninput="onClassSearchInput('family',this.value)"/>
+      <div id="class-family-list"></div>
+      <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+        <input type="text" id="class-family-input" class="page-text-input" placeholder="Nueva familia..." onkeydown="if(event.key==='Enter'){addClassItem('family');}"/>
+        <button class="page-link" onclick="addClassItem('family')">Añadir</button>
+      </div>
+    </div>
+
+    <div class="class-section">
+      <div class="class-section-title">Notas olfativas</div>
+      <input type="text" class="class-search-input" placeholder="Buscar..." oninput="onClassSearchInput('notes',this.value)"/>
+      <div id="class-notes-list"></div>
+      <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+        <input type="text" id="class-notes-input" class="page-text-input" placeholder="Nueva nota..." onkeydown="if(event.key==='Enter'){addClassItem('notes');}"/>
+        <button class="page-link" onclick="addClassItem('notes')">Añadir</button>
+      </div>
+    </div>
+
+    <div class="class-section">
+      <div class="class-section-title">Etiquetas</div>
+      <input type="text" class="class-search-input" placeholder="Buscar..." oninput="onClassSearchInput('tags',this.value)"/>
+      <div id="class-tags-list"></div>
+      <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+        <input type="text" id="class-tags-input" class="page-text-input" placeholder="Nueva etiqueta..." onkeydown="if(event.key==='Enter'){addClassItem('tags');}"/>
+        <button class="page-link" onclick="addClassItem('tags')">Añadir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay page-overlay" id="modal-classification-detail">
+  <div class="page-inner">
+    <button class="page-back" onclick="closeModal('modal-classification-detail')" title="Volver">&#8592;</button>
+    <div class="page-title" id="class-mini-title"></div>
+    <div id="class-mini-list"></div>
   </div>
 </div>
 
@@ -1301,10 +1364,10 @@ function normalizePickerCollections() {
   });
 }
 function getExistingNotes() {
-  return uniqueSorted(state.perfumes.flatMap(p=>normalizePickerValues(p.notes)));
+  return uniqueSorted([...(state.notes||[]), ...state.perfumes.flatMap(p=>normalizePickerValues(p.notes))]);
 }
 function getExistingTags() {
-  return uniqueSorted(state.perfumes.flatMap(p=>Array.isArray(p.tags)?p.tags:normalizePickerValues(p.tags)));
+  return uniqueSorted([...(state.tags||[]), ...state.perfumes.flatMap(p=>Array.isArray(p.tags)?p.tags:normalizePickerValues(p.tags))]);
 }
 function escapeHtml(v) {
   return String(v??'').replace(/[&<>\"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
@@ -1440,6 +1503,11 @@ async function initState() {
     });
   }
   normalizePickerCollections();
+  if (!Array.isArray(state.notes)) state.notes = [];
+  if (!Array.isArray(state.tags)) state.tags = [];
+  state.notes = uniqueSorted([...state.notes.map(normalizePickerText), ...getExistingNotes()]);
+  state.tags = uniqueSorted([...state.tags.map(normalizePickerText), ...getExistingTags()]);
+  if (!state.categoryLabels) state.categoryLabels = {...CATEGORY_LABELS};
   save();
   applyViewSort();
   render();
@@ -1546,6 +1614,159 @@ function deleteFamily(i) {
   renderFamilyMgr();
 }
 
+// ══ CLASSIFICATION MANAGER ══════════════════════════════════════
+const CLASS_CATEGORIES = ['coleccion','deseo','probados'];
+let classSearch = {family:'', notes:'', tags:''};
+
+function classFieldOf(type, p) {
+  return type === 'family' ? p.family : (type === 'notes' ? p.notes : p.tags);
+}
+function classUsageCount(type, value) {
+  const v = String(value).toLowerCase();
+  if (type === 'category') return state.perfumes.filter(p => (p.status||'coleccion') === value).length;
+  return state.perfumes.filter(p => {
+    const arr = classFieldOf(type, p);
+    return Array.isArray(arr) && arr.some(x => String(x).toLowerCase() === v);
+  }).length;
+}
+
+function openClassification() {
+  classSearch = {family:'', notes:'', tags:''};
+  renderClassification();
+  openModal('modal-classification');
+}
+function renderClassification() {
+  renderClassCategories();
+  renderClassSection('family');
+  renderClassSection('notes');
+  renderClassSection('tags');
+}
+
+function renderClassCategories() {
+  const el = document.getElementById('class-categories-list');
+  el.innerHTML = CLASS_CATEGORIES.map(cat => `
+    <div class="class-row">
+      <button type="button" class="class-row-label" onclick="openClassMiniList('category','${cat}')">${escapeHtml(catLabel(cat))}<span class="class-row-count">${classUsageCount('category',cat)}</span></button>
+      <button type="button" class="field-mgr-delete" title="Renombrar" onclick="event.stopPropagation();renameCategoryLabel('${cat}')">✎</button>
+    </div>`).join('');
+}
+function renameCategoryLabel(cat) {
+  const val = prompt('Nuevo nombre para esta categoría:', catLabel(cat));
+  if (val === null) return;
+  const trimmed = val.trim();
+  if (!trimmed) return;
+  if (!state.categoryLabels) state.categoryLabels = {...CATEGORY_LABELS};
+  state.categoryLabels[cat] = trimmed;
+  save();
+  renderClassCategories();
+  render();
+}
+
+function renderClassSection(type) {
+  const el = document.getElementById('class-' + type + '-list');
+  if (!el) return;
+  let items = uniqueSorted(state[type] || []);
+  const q = _stripAccents((classSearch[type]||'').toLowerCase().trim());
+  if (q) items = items.filter(i => _stripAccents(i.toLowerCase()).includes(q));
+  el.innerHTML = items.length ? items.map(name => `
+    <div class="class-row">
+      <button type="button" class="class-row-label" onclick="openClassMiniList('${type}','${escapeHtml(name)}')">${escapeHtml(name)}<span class="class-row-count">${classUsageCount(type,name)}</span></button>
+      <button type="button" class="field-mgr-delete" title="Renombrar" onclick="event.stopPropagation();renameClassItem('${type}','${escapeHtml(name)}')">✎</button>
+      <button type="button" class="field-mgr-delete" title="Eliminar" onclick="event.stopPropagation();deleteClassItem('${type}','${escapeHtml(name)}')">✕</button>
+    </div>`).join('') : `<div class="class-empty">Sin elementos</div>`;
+}
+function onClassSearchInput(type, val) {
+  classSearch[type] = val;
+  renderClassSection(type);
+}
+function addClassItem(type) {
+  const input = document.getElementById('class-' + type + '-input');
+  const val = input.value.trim();
+  if (!val) return;
+  if (!Array.isArray(state[type])) state[type] = [];
+  if (state[type].some(x=>x.toLowerCase()===val.toLowerCase())) { input.value=''; return; }
+  state[type].push(normalizePickerText(val));
+  state[type] = uniqueSorted(state[type]);
+  save();
+  input.value = '';
+  renderClassSection(type);
+}
+function reassignClassValue(type, oldName, newName) {
+  const oldLower = oldName.toLowerCase();
+  state.perfumes.forEach(p => {
+    const arr = classFieldOf(type, p);
+    if (!Array.isArray(arr)) return;
+    const idx = arr.findIndex(x=>String(x).toLowerCase()===oldLower);
+    if (idx < 0) return;
+    if (arr.some((x,i)=>i!==idx && String(x).toLowerCase()===newName.toLowerCase())) arr.splice(idx,1);
+    else arr[idx] = newName;
+  });
+}
+function renameClassItem(type, oldName) {
+  const val = prompt('Nuevo nombre:', oldName);
+  if (val === null) return;
+  const trimmed = normalizePickerText(val.trim());
+  if (!trimmed || trimmed.toLowerCase() === oldName.toLowerCase()) return;
+  const list = state[type] || [];
+  const existingIdx = list.findIndex(x=>x.toLowerCase()===trimmed.toLowerCase());
+  const oldIdx = list.findIndex(x=>x.toLowerCase()===oldName.toLowerCase());
+  if (existingIdx >= 0) {
+    if (!confirm(`Ya existe "${list[existingIdx]}". ¿Fusionar "${oldName}" con "${list[existingIdx]}"?`)) return;
+    reassignClassValue(type, oldName, list[existingIdx]);
+    if (oldIdx >= 0) list.splice(oldIdx,1);
+  } else {
+    if (oldIdx >= 0) list[oldIdx] = trimmed;
+    reassignClassValue(type, oldName, trimmed);
+  }
+  state[type] = uniqueSorted(list);
+  save();
+  renderClassSection(type);
+}
+function deleteClassItem(type, name) {
+  const count = classUsageCount(type, name);
+  const msg = count > 0 ? `¿Eliminar "${name}"? Se quitará de ${count} perfume${count!==1?'s':''}.` : `¿Eliminar "${name}"?`;
+  if (!confirm(msg)) return;
+  const lower = name.toLowerCase();
+  state[type] = (state[type]||[]).filter(x=>x.toLowerCase()!==lower);
+  state.perfumes.forEach(p => {
+    const arr = classFieldOf(type, p);
+    if (!Array.isArray(arr)) return;
+    const idx = arr.findIndex(x=>String(x).toLowerCase()===lower);
+    if (idx>=0) arr.splice(idx,1);
+  });
+  save();
+  renderClassSection(type);
+}
+
+function classGoToDetail(id) {
+  document.getElementById('modal-classification-detail').classList.remove('open');
+  document.getElementById('modal-classification').classList.remove('open');
+  openDetail(id);
+}
+function openClassMiniList(type, value) {
+  const label = type === 'category' ? catLabel(value) : value;
+  document.getElementById('class-mini-title').textContent = label;
+  const list = state.perfumes.filter(p => {
+    if (type === 'category') return (p.status||'coleccion') === value;
+    const arr = classFieldOf(type, p);
+    return Array.isArray(arr) && arr.some(x=>String(x).toLowerCase()===String(value).toLowerCase());
+  }).sort((a,b)=>a.name.localeCompare(b.name,'es'));
+  const el = document.getElementById('class-mini-list');
+  el.innerHTML = list.length ? list.map(p=>{
+    const photo = p.photos && p.photos[p.coverIndex||0];
+    return `
+    <div class="row-small" onclick="classGoToDetail(${p.id})">
+      <div class="row-small-thumb">${photo?`<img src="${photo}" alt="${escapeHtml(p.name)}"/>`:`<span class="no-photo">🫙</span>`}</div>
+      <div class="row-small-info">
+        <div class="row-small-name">${escapeHtml(p.name)}</div>
+        <div class="row-small-brand">${escapeHtml(p.brand||'')}</div>
+        ${starsHTML(p.rating||0)}
+      </div>
+    </div>`;
+  }).join('') : `<div class="class-empty">No hay perfumes con este criterio.</div>`;
+  openModal('modal-classification-detail');
+}
+
 function fmDragStart(e, idx) {
   fmDragSrc = idx;
   e.currentTarget.classList.add('dragging');
@@ -1633,6 +1854,9 @@ function openNotesTab() {
 // ══ RENDER ═════════════════════════════════════════════════════
 const CATEGORY_CYCLE = ['perfumes','coleccion','deseo','probados'];
 const CATEGORY_LABELS = {perfumes:'perfumes', coleccion:'en colección', deseo:'deseos', probados:'probados'};
+function catLabel(cat) {
+  return (state.categoryLabels && state.categoryLabels[cat]) || CATEGORY_LABELS[cat] || cat;
+}
 
 function _stripAccents(s) {
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -1664,7 +1888,7 @@ function renderCategoryPicker() {
     const count = state.perfumes.filter(p=> cat==='perfumes' ? true : (p.status||'coleccion')===cat).length;
     return `<button class="category-picker-row${cat===cur?' active':''}" onclick="selectCategory('${cat}')">
       <span class="row-cat-circle cat-${cat}" style="width:38px;height:38px;font-size:13px;flex-shrink:0">${count}</span>
-      <span class="category-picker-label">${CATEGORY_LABELS[cat]}</span>
+      <span class="category-picker-label">${catLabel(cat)}</span>
     </button>`;
   }).join('');
 }
@@ -1685,7 +1909,7 @@ function openPerfumeCategoryPicker(id) {
     const count = state.perfumes.filter(x=>(x.status||'coleccion')===cat).length;
     return `<button class="category-picker-row${cat===cur?' active':''}" onclick="setPerfumeCategory('${cat}')">
       <span class="row-cat-circle cat-${cat}" style="width:38px;height:38px;font-size:13px;flex-shrink:0">${count}</span>
-      <span class="category-picker-label">${CATEGORY_LABELS[cat]}</span>
+      <span class="category-picker-label">${catLabel(cat)}</span>
     </button>`;
   }).join('');
   openModal('modal-category');
@@ -1717,7 +1941,7 @@ function render() {
   if (showHeader) {
     document.getElementById('results-cat-circle').className = 'row-cat-circle cat-' + (state.category||'perfumes');
     document.getElementById('results-cat-circle').textContent = String(filtered.length);
-    document.getElementById('results-cat-label').textContent = CATEGORY_LABELS[state.category||'perfumes'];
+    document.getElementById('results-cat-label').textContent = catLabel(state.category||'perfumes');
     qBadge.style.display = searchQ ? 'inline-block' : 'none';
     if (searchQ) qBadge.textContent = `${searchQ} (${filtered.length})`;
   }
@@ -1775,12 +1999,12 @@ function render() {
           <div class="row-name">${p.name}</div>
           <button class="row-cat-badge" onclick="openCategoryPicker()" title="Cambiar categoría">
             <span class="row-cat-circle cat-${state.category||'perfumes'}">${filtered.length}</span>
-            <span class="row-cat-label">${CATEGORY_LABELS[state.category||'perfumes']}</span>
+            <span class="row-cat-label">${catLabel(state.category||'perfumes')}</span>
           </button>
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           ${starsHTML(p.rating||0)}
-          <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${CATEGORY_LABELS[p.status||'coleccion']}</span>
+          <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
         </div>
         <div class="row-cols">
           <div class="row-brand-badge">${p.brand||''}</div>
@@ -1858,7 +2082,7 @@ function openDetail(id) {
       <div class="detail-name">${p.name}</div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         ${starsHTML(p.rating||0,'lg')}
-        <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${CATEGORY_LABELS[p.status||'coleccion']}</span>
+        <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
       </div>
       <div class="detail-fields">
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
@@ -2180,7 +2404,7 @@ function exportCSV() {
   const vf=state.fields.filter(f=>f.visible);
   const headers=vf.map(f=>f.label).join(',');
   const rows=state.perfumes.map(p=>vf.map(f=>{
-    let v=f.key==='status'?(CATEGORY_LABELS[p.status||'coleccion']||''):(p[f.key]||'');
+    let v=f.key==='status'?(catLabel(p.status||'coleccion')||''):(p[f.key]||'');
     return `"${String(v).replace(/"/g,'""')}"`;
   }).join(','));
   const csv=[headers,...rows].join('\n');
@@ -2265,7 +2489,7 @@ function exportCSV() {
   const vf = state.fields.filter(f=>f.visible && !['photos','coverIndex'].includes(f.key));
   const headers = vf.map(f=>f.label).join(',');
   const rows = state.perfumes.map(p=>vf.map(f=>{
-    let v = f.key==='status' ? (CATEGORY_LABELS[p.status||'coleccion']||'') : (p[f.key]||'');
+    let v = f.key==='status' ? (catLabel(p.status||'coleccion')||'') : (p[f.key]||'');
     return '"'+String(v).replace(/"/g,'""')+'"';
   }).join(','));
   const csv = [headers,...rows].join('\n');
@@ -2280,7 +2504,7 @@ function exportXLSX() {
   const vf = state.fields.filter(f=>f.visible && !['photos','coverIndex'].includes(f.key));
   const headers = vf.map(f=>f.label).join('\t');
   const rows = state.perfumes.map(p=>vf.map(f=>{
-    let v = f.key==='status' ? (CATEGORY_LABELS[p.status||'coleccion']||'') : (p[f.key]||'');
+    let v = f.key==='status' ? (catLabel(p.status||'coleccion')||'') : (p[f.key]||'');
     return String(v).replace(/\t/g,' ');
   }).join('\t'));
   const tsv = [headers,...rows].join('\n');
@@ -2913,7 +3137,7 @@ const I18N = {
     empty_state: "No hay perfumes todavía",
     sort_label: "ORDENAR FICHAS POR", sort_date: "cronológico", sort_name: "alfabético",
     manage_fields: "Gestionar campos", wishlist: "Lista de deseos", notes: "Notas",
-    menu_perfumes: "Perfumes", menu_fields: "Campos", menu_lists: "Listas", menu_notes: "Notas",
+    menu_perfumes: "Perfumes", menu_fields: "Campos", menu_lists: "Listas", menu_notes: "Notas", menu_classification: "Clasificación",
   },
   en: {
     menu_export: "Export", menu_import: "Import",
@@ -2922,7 +3146,7 @@ const I18N = {
     empty_state: "No perfumes yet",
     sort_label: "SORT CARDS BY", sort_date: "chronological", sort_name: "alphabetical",
     manage_fields: "Manage fields", wishlist: "Wishlist", notes: "Notes",
-    menu_perfumes: "Perfumes", menu_fields: "Fields", menu_lists: "Lists", menu_notes: "Notes",
+    menu_perfumes: "Perfumes", menu_fields: "Fields", menu_lists: "Lists", menu_notes: "Notes", menu_classification: "Classification",
   }
 };
 function setLanguage(lang) {
