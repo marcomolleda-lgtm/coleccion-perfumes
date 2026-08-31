@@ -3051,6 +3051,8 @@ document.addEventListener('click', function(e){
 function showPerfumes() {
   _closeAllModals();
   document.getElementById('search-bar').value = '';
+  state.category = 'perfumes';
+  save();
   _renderView('perfumes');
   _suppressHistory = true;
   history.pushState({view:'perfumes', modal:null}, '');
