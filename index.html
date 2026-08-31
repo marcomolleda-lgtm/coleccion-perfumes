@@ -465,7 +465,7 @@
 
   /* Classification manager */
   .class-section { margin-bottom:30px; }
-  .class-section-title { font-size:13px; font-family:'Jost',sans-serif; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--text-light); margin-bottom:8px; }
+  .class-section-title { font-size:13px; font-family:'Jost',sans-serif; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--star); margin-bottom:8px; }
   .class-row { display:flex; align-items:center; gap:6px; padding:11px 0; border-bottom:1px solid #ededec; }
   .class-row-label { flex:1; min-width:0; display:flex; align-items:center; gap:10px; text-align:left; background:none; border:none; cursor:pointer; padding:2px 0; font-family:'Jost',sans-serif; font-size:16px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .class-row-label:active { opacity:.6; }
@@ -510,6 +510,7 @@
   }
   .page-back:active { opacity:.6; }
   .page-title { font-size:28px; font-family:'Cormorant Garamond',serif; font-weight:700; color:var(--text); margin-bottom:24px; }
+  .page-subtitle { font-size:13px; font-family:'Jost',sans-serif; color:var(--text-light); margin-top:-16px; margin-bottom:24px; }
   .page-link {
     display:block; background:none; border:none; cursor:pointer; padding:6px 0;
     font-family:'Jost',sans-serif; font-size:15px; font-weight:500; color:var(--star);
@@ -947,10 +948,10 @@
   /* ── HOME MEGA PANEL (3 columns, full width, soft bottom shadow) ── */
   #home-menu-bar.home-mega-panel {
     display: none; position: fixed; top: 14px;
-    left: 16px; right: 16px; width: auto;
+    left: 0; right: 0; width: auto;
     background: #ffffff; border: none;
     box-shadow: 0 6px 16px rgba(0,0,0,.10);
-    padding: 0; border-radius: 0;
+    padding: 0 16px 24px; border-radius: 0;
     grid-template-columns: repeat(3, 1fr);
     gap: 18px;
     z-index: 950;
@@ -1267,6 +1268,7 @@
   <div class="page-inner">
     <button class="page-back" onclick="closeModal('modal-classification')" title="Volver">&#8592;</button>
     <div class="page-title">Clasificación</div>
+    <div class="page-subtitle">Añadir, renombrar y eliminar valores</div>
 
     <div class="class-section">
       <div class="class-section-title">Categorías</div>
