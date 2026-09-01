@@ -1132,9 +1132,9 @@
 <!-- ══ DETAIL MODAL ══ -->
 <div class="modal-overlay detail-page-overlay" id="modal-detail">
   <div id="detail-header">
-    <button class="menu-btn" id="detail-menu-btn" onclick="toggleHomeMenu()" title="Menú">•••</button>
-    <input id="detail-search" class="app-search" type="search" placeholder="Buscar" oninput="detailSearch(this.value)"/>
-    <button id="detail-add-btn" onclick="openEdit(null)" title="Añadir perfume">＋</button>
+    <button class="menu-btn" id="detail-menu-btn" onclick="toggleHomeMenu()" title="Menú" data-i18n-title="title_menu">•••</button>
+    <input id="detail-search" class="app-search" type="search" placeholder="Buscar" data-i18n-placeholder="search_placeholder" oninput="detailSearch(this.value)"/>
+    <button id="detail-add-btn" onclick="openEdit(null)" title="Añadir perfume" data-i18n-title="title_add_perfume">＋</button>
   </div>
   <div id="detail-content"></div>
 </div>
@@ -1142,11 +1142,11 @@
 <!-- ══ EDIT MODAL ══ -->
 <div class="modal-overlay page-overlay" id="modal-edit">
   <div class="page-inner" style="padding-bottom:110px">
-    <button class="page-back" onclick="closeEdit()" title="Volver">&#8592;</button>
+    <button class="page-back" onclick="closeEdit()" title="Volver" data-i18n-title="title_back">&#8592;</button>
     <div class="page-title" id="edit-title">Nuevo perfume</div>
 
       <!-- Photos -->
-      <div class="field-label">FOTOS (hasta 6)</div>
+      <div class="field-label" data-i18n="label_photos">FOTOS (hasta 6)</div>
       <div class="photo-grid">
         <label class="photo-slot" id="slot-0">
           <input type="file" accept="image/*" onchange="handlePhoto(0,this)"/>
@@ -1179,37 +1179,37 @@
 
       <!-- Notes -->
       <div class="field-group" id="fg-notes">
-        <label class="field-label">NOTAS OLFATIVAS</label>
+        <label class="field-label" data-i18n="field_notes">NOTAS OLFATIVAS</label>
         <div id="edit-notes-picker"></div>
       </div>
 
       <!-- Comments -->
       <div class="field-group" id="fg-comments">
-        <label class="field-label">COMENTARIOS</label>
-        <textarea class="field-textarea" id="f-comments" rows="4" placeholder="Añade comentarios..."></textarea>
+        <label class="field-label" data-i18n="field_comments">COMENTARIOS</label>
+        <textarea class="field-textarea" id="f-comments" rows="4" placeholder="Añade comentarios..." data-i18n-placeholder="comments_placeholder"></textarea>
       </div>
 
       <!-- Video -->
       <div class="field-group">
-        <label class="field-label">VÍDEO DE YOUTUBE</label>
-        <input class="field-input" id="f-video" placeholder="Pega aquí el enlace de YouTube..." oninput="previewVideo(this.value)"/>
+        <label class="field-label" data-i18n="field_video">VÍDEO DE YOUTUBE</label>
+        <input class="field-input" id="f-video" placeholder="Pega aquí el enlace de YouTube..." data-i18n-placeholder="video_url_placeholder" oninput="previewVideo(this.value)"/>
         <div id="video-preview" style="margin-top:10px;display:none">
           <div class="video-input-preview">
             <img id="video-preview-thumb" src="" alt=""/>
-            <span id="video-preview-title">Vídeo encontrado ✓</span>
+            <span id="video-preview-title" data-i18n="video_found">Vídeo encontrado ✓</span>
           </div>
         </div>
       </div>
 
       <!-- Rating -->
       <div class="field-group">
-        <label class="field-label">VALORACIÓN</label>
+        <label class="field-label" data-i18n="field_rating">VALORACIÓN</label>
         <div class="stars interactive lg" id="edit-stars"></div>
       </div>
 
       <!-- Category status -->
       <div class="field-group">
-        <label class="field-label">CATEGORÍA</label>
+        <label class="field-label" data-i18n="field_category">CATEGORÍA</label>
         <div class="cat-toggle-row" id="f-status-toggle">
           <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')">en colección</button>
           <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')">deseos</button>
@@ -1219,21 +1219,21 @@
 
       <!-- Tags -->
       <div class="field-group" id="fg-barcode">
-        <label class="field-label">CÓDIGO DE BARRAS</label>
+        <label class="field-label" data-i18n="field_barcode">CÓDIGO DE BARRAS</label>
         <div class="barcode-input-wrap">
           <input class="field-input" id="pf-barcode" placeholder="EAN / UPC" inputmode="numeric"/>
-          <button class="barcode-scan-btn" onclick="openBarcodeScanner()" title="Escanear con cámara">📷</button>
+          <button class="barcode-scan-btn" onclick="openBarcodeScanner()" title="Escanear con cámara" data-i18n-title="title_scan_barcode">📷</button>
         </div>
       </div>
 
       <div class="field-group">
-        <label class="field-label">ETIQUETAS</label>
+        <label class="field-label" data-i18n="field_tags">ETIQUETAS</label>
         <div id="edit-tags-picker"></div>
       </div>
 
-      <button class="page-link" id="btn-delete" onclick="deletePerfume()" style="display:none;color:var(--danger);margin-top:10px">Eliminar perfume</button>
+      <button class="page-link" id="btn-delete" onclick="deletePerfume()" style="display:none;color:var(--danger);margin-top:10px" data-i18n="btn_delete_perfume">Eliminar perfume</button>
   </div>
-  <button class="detail-edit-btn" onclick="savePerfume()">Guardar</button>
+  <button class="detail-edit-btn" onclick="savePerfume()" data-i18n="btn_save">Guardar</button>
 </div>
 
 <!-- ══ FIELD MANAGER MODAL ══ -->
@@ -1555,7 +1555,7 @@ async function initState() {
   if (!Array.isArray(state.tags)) state.tags = [];
   state.notes = uniqueSorted([...state.notes.map(normalizePickerText), ...getExistingNotes()]);
   state.tags = uniqueSorted([...state.tags.map(normalizePickerText), ...getExistingTags()]);
-  if (!state.categoryLabels) state.categoryLabels = {...CATEGORY_LABELS};
+  if (!state.categoryLabels) state.categoryLabels = {};
   save();
   applyViewSort();
   render();
@@ -1710,7 +1710,7 @@ function renameCategoryLabel(cat) {
   if (val === null) return;
   const trimmed = val.trim();
   if (!trimmed) return;
-  if (!state.categoryLabels) state.categoryLabels = {...CATEGORY_LABELS};
+  if (!state.categoryLabels) state.categoryLabels = {};
   state.categoryLabels[cat] = trimmed;
   save();
   renderClassCategories();
@@ -1954,9 +1954,10 @@ function openNotesTab() {
 
 // ══ RENDER ═════════════════════════════════════════════════════
 const CATEGORY_CYCLE = ['perfumes','coleccion','deseo','probados'];
-const CATEGORY_LABELS = {perfumes:'perfumes', coleccion:'en colección', deseo:'deseos', probados:'probados'};
 function catLabel(cat) {
-  return (state.categoryLabels && state.categoryLabels[cat]) || CATEGORY_LABELS[cat] || cat;
+  if (state.categoryLabels && state.categoryLabels[cat]) return state.categoryLabels[cat];
+  const key = 'cat_' + cat;
+  return t(key) !== key ? t(key) : cat;
 }
 
 function _stripAccents(s) {
@@ -2093,12 +2094,12 @@ function render() {
             ${photos.map(ph=>`<div class="row-photo-slide"><img src="${ph}" alt="${p.name}"/></div>`).join('')}
           </div>
           ${photos.length>1?`<div class="row-photo-dots">${photos.map((_,i)=>`<span class="row-photo-dot${i===0?' active':''}"></span>`).join('')}</div>`:''}
-        ` : `<button type="button" class="no-photo-add" onclick="event.stopPropagation();openEdit(${p.id})" aria-label="Añadir imagen">AÑADIR<br>IMAGEN</button>`}
+        ` : `<button type="button" class="no-photo-add" onclick="event.stopPropagation();openEdit(${p.id})" aria-label="${t('add_image_alt')}">${t('add_photo_line1')}<br>${t('add_photo_line2')}</button>`}
       </div>
       <div class="row-body">
         <div class="row-name-row">
           <div class="row-name">${p.name}</div>
-          <button class="row-cat-badge" onclick="openCategoryPicker()" title="Cambiar categoría">
+          <button class="row-cat-badge" onclick="openCategoryPicker()" title="${t('title_change_category')}">
             <span class="row-cat-circle cat-${state.category||'perfumes'}">${filtered.length}</span>
             <span class="row-cat-label">${catLabel(state.category||'perfumes')}</span>
           </button>
@@ -2111,13 +2112,13 @@ function render() {
           <div class="row-brand-badge">${p.brand||''}</div>
           <div class="row-perfumer">${p.perfumer||''}</div>
           <div class="row-year">${p.launch||''}</div>
-          <div class="row-specs">${[p.concentration,p.capacity].filter(Boolean).join('  -  ')}</div>
+          <div class="row-specs">${[p.concentration?concentrationLabel(p.concentration):'',p.capacity].filter(Boolean).join('  -  ')}</div>
           <div class="row-family">${Array.isArray(p.family)?p.family.join(', '):(p.family||'')}</div>
           <div class="row-notes">${Array.isArray(p.notes)?p.notes.join(', '):(p.notes||'')}</div>
         </div>
         <div class="row-comments"></div>
         <div class="row-more-wrap">
-          <button class="row-more-btn" onclick="openDetail(${p.id})">Ficha completa</button>
+          <button class="row-more-btn" onclick="openDetail(${p.id})">${t('card_full_profile')}</button>
         </div>
       </div>
     </div>`;
@@ -2176,8 +2177,8 @@ function openDetail(id) {
           ${currentDetailPhotos.map((ph,i)=>`<div class="hero-slide" onclick="openLightbox(currentDetailPhotos,${i})"><img src="${ph}" alt="${p.name}"/></div>`).join('')}
         </div>
         ${currentDetailPhotos.length>1?`<div class="hero-dots" id="hero-dots">${currentDetailPhotos.map((_,i)=>`<span class="hero-dot${i===0?' active':''}"></span>`).join('')}</div>`:''}
-      ` : `<button type="button" class="no-photo-add" onclick="openEdit(${p.id})" aria-label="Añadir imagen">AÑADIR<br>IMAGEN</button>`}
-      <button class="detail-back-btn" onclick="closeModal('modal-detail')" title="Volver">&#8592;</button>
+      ` : `<button type="button" class="no-photo-add" onclick="openEdit(${p.id})" aria-label="${t('add_image_alt')}">${t('add_photo_line1')}<br>${t('add_photo_line2')}</button>`}
+      <button class="detail-back-btn" onclick="closeModal('modal-detail')" title="${t('title_back')}">&#8592;</button>
     </div>
     <div class="detail-body">
       <div class="detail-name">${p.name}</div>
@@ -2188,24 +2189,24 @@ function openDetail(id) {
       <div class="detail-fields">
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
           <div>
-            <div class="detail-field-label">${f.label}</div>
-            <div class="detail-field-value${f.key==='brand'?' brand-badge':''}">${f.key==='family'?(Array.isArray(p.family)?p.family.join(' · '):(p.family||'')):p[f.key]}</div>
+            <div class="detail-field-label">${fieldLabel(f)}</div>
+            <div class="detail-field-value${f.key==='brand'?' brand-badge':''}">${f.key==='family'?(Array.isArray(p.family)?p.family.join(' · '):(p.family||'')):f.key==='concentration'?concentrationLabel(p[f.key]):f.key==='gender'?genderLabel(p[f.key]):p[f.key]}</div>
           </div>`).join('')}
       </div>
-      ${(Array.isArray(p.notes)?p.notes.length:p.notes)?`<div class="detail-block"><div class="detail-block-label">Notas olfativas</div><div class="detail-block-value">${Array.isArray(p.notes)?p.notes.join(', '):p.notes}</div></div>`:''}
-      ${p.comments?`<div class="detail-block"><div class="detail-block-label">Comentarios</div><div class="detail-block-value">${p.comments}</div></div>`:''}
+      ${(Array.isArray(p.notes)?p.notes.length:p.notes)?`<div class="detail-block"><div class="detail-block-label">${t('field_notes')}</div><div class="detail-block-value">${Array.isArray(p.notes)?p.notes.join(', '):p.notes}</div></div>`:''}
+      ${p.comments?`<div class="detail-block"><div class="detail-block-label">${t('field_comments')}</div><div class="detail-block-value">${p.comments}</div></div>`:''}
       ${p.videoUrl?(()=>{
         const vid=getYouTubeId(p.videoUrl);
         return vid?`<div class="detail-block" style="border-top:none;margin-top:20px;padding-top:0">
-          <div class="detail-block-label">Vídeo</div>
+          <div class="detail-block-label">${t('video_label_short')}</div>
           <div class="video-thumb-wrap" onclick="window.open('https://www.youtube.com/watch?v=${vid}','_blank')">
-            <img src="https://img.youtube.com/vi/${vid}/hqdefault.jpg" alt="Miniatura del vídeo"/>
+            <img src="https://img.youtube.com/vi/${vid}/hqdefault.jpg" alt="${t('video_thumbnail_alt')}"/>
             <div class="video-play-btn"><span>&#9654;</span></div>
           </div>
         </div>`:'';
       })():''}
-      ${(p.tags||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:20px">${(p.tags||[]).map(t=>`<span class="tag-chip">#${t}</span>`).join('')}</div>`:''}
-      <button class="detail-edit-btn" onclick="openEdit(${p.id})">Editar</button>
+      ${(p.tags||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:20px">${(p.tags||[]).map(tg=>`<span class="tag-chip">#${tg}</span>`).join('')}</div>`:''}
+      <button class="detail-edit-btn" onclick="openEdit(${p.id})">${t('btn_edit')}</button>
     </div>`;
   openModal('modal-detail');
   history.replaceState({view:'perfumes', modal:'modal-detail', detailId:id}, '');
@@ -2249,7 +2250,7 @@ function openEdit(id) {
   editTags = p ? [...(p.tags||[])] : [];
   document.getElementById('pf-barcode').value = p ? (p.barcode||'') : '';
 
-  document.getElementById('edit-title').textContent = p ? 'Editar perfume' : 'Nuevo perfume';
+  document.getElementById('edit-title').textContent = p ? t('edit_title_edit') : t('edit_title_new');
   document.getElementById('btn-delete').style.display = p ? 'block' : 'none';
 
   // Render photo slots
@@ -2268,7 +2269,7 @@ function openEdit(id) {
     const div = document.createElement('div');
     div.className='field-group';
     div.style.gridColumn='1 / -1';
-    div.innerHTML=`<label class="field-label">${f.label.toUpperCase()}${f.required?' *':''}</label>
+    div.innerHTML=`<label class="field-label">${fieldLabel(f).toUpperCase()}${f.required?' *':''}</label>
       <input class="field-input" id="ef-${k}" value="${p?p[k]||'':''}"/>`;
     grid.appendChild(div);
   });
@@ -2277,14 +2278,14 @@ function openEdit(id) {
     const div=document.createElement('div');
     div.className='field-group';
     if(f.key==='family') div.style.gridColumn='1 / -1';
-    let inner=`<label class="field-label">${f.label.toUpperCase()}</label>`;
+    let inner=`<label class="field-label">${fieldLabel(f).toUpperCase()}</label>`;
     const val = p?p[f.key]||'':'';
-    if(f.key==='concentration') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${CONCENTRATIONS.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}</select>`;
+    if(f.key==='concentration') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${CONCENTRATIONS.map(o=>`<option value="${o}"${val===o?' selected':''}>${concentrationLabel(o)}</option>`).join('')}</select>`;
     else if(f.key==='family') {
       editFamilies = normalizePickerValues(val);
       inner += `<div id="ef-family-picker"></div>`;
     }
-    else if(f.key==='gender') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${GENDERS.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}</select>`;
+    else if(f.key==='gender') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${GENDERS.map(o=>`<option value="${o}"${val===o?' selected':''}>${genderLabel(o)}</option>`).join('')}</select>`;
     else if(f.key==='inCollectionSince') inner+=`<input class="field-input" type="date" id="ef-${f.key}" value="${val}"/>`;
     else if(f.key==='bottleCount') inner+=`<input class="field-input" type="number" min="0" id="ef-${f.key}" value="${val}"/>`;
     else inner+=`<input class="field-input" id="ef-${f.key}" value="${val}"/>`;
@@ -2295,9 +2296,9 @@ function openEdit(id) {
   // Unified multi-value pickers
   editNotes = p ? normalizePickerValues(p.notes) : [];
   pickerExpanded.family = pickerExpanded.notes = pickerExpanded.tags = false;
-  renderMultiPicker('family', 'ef-family-picker', editFamilies, state.families, 'Añadir - buscar');
-  renderMultiPicker('notes', 'edit-notes-picker', editNotes, getExistingNotes(), 'Añadir - buscar');
-  renderMultiPicker('tags', 'edit-tags-picker', editTags, getExistingTags(), 'Añadir - buscar');
+  renderMultiPicker('family', 'ef-family-picker', editFamilies, state.families, t('picker_placeholder'));
+  renderMultiPicker('notes', 'edit-notes-picker', editNotes, getExistingNotes(), t('picker_placeholder'));
+  renderMultiPicker('tags', 'edit-tags-picker', editTags, getExistingTags(), t('picker_placeholder'));
 
   // Text areas (other free text)
   document.getElementById('f-comments').value = p ? p.comments || '' : '';
@@ -2340,12 +2341,12 @@ function renderPhotoSlot(i) {
     (function(n){delB.onclick=function(e){e.preventDefault();e.stopPropagation();removePhoto(n);};})(i); slot.appendChild(delB);
     var zmB=document.createElement('button'); zmB.className='photo-zoom-btn'; zmB.innerHTML='&#128269;';
     (function(n){zmB.onclick=function(e){e.preventDefault();e.stopPropagation();openLightbox(editPhotos,n);};})(i); slot.appendChild(zmB);
-    var cvB=document.createElement('button'); cvB.className='photo-cover-btn'+(editCoverIndex===i?' is-cover':''); cvB.textContent=editCoverIndex===i?'★ Portada':'Portada';
+    var cvB=document.createElement('button'); cvB.className='photo-cover-btn'+(editCoverIndex===i?' is-cover':''); cvB.textContent=editCoverIndex===i?'★ '+t('cover_word'):t('cover_word');
     (function(n){cvB.onclick=function(e){e.preventDefault();e.stopPropagation();setCover(n);};})(i); slot.appendChild(cvB);
   } else {
     const ph=document.createElement('div');
     ph.className='photo-placeholder';
-    ph.innerHTML=`<span>📷</span><small>FOTO ${i+1}</small>`;
+    ph.innerHTML=`<span>📷</span><small>${t('photo_word')} ${i+1}</small>`;
     slot.appendChild(ph);
   }
 }
@@ -2402,26 +2403,26 @@ function renderMultiPicker(type, mountId, selected, options, placeholder) {
         <input class="multi-picker-input" id="${type}-picker-input" placeholder="${escapeHtml(placeholder)}" autocomplete="off"
           oninput="onPickerInput('${type}',this.value)" onfocus="onPickerInput('${type}',this.value)"
           onkeydown="if(event.key==='Enter'){event.preventDefault();addPickerValue('${type}',this.value);}"/>
-        <button type="button" class="multi-picker-add" onclick="addPickerValue('${type}',document.getElementById('${type}-picker-input').value)" aria-label="Añadir">＋</button>
+        <button type="button" class="multi-picker-add" onclick="addPickerValue('${type}',document.getElementById('${type}-picker-input').value)" aria-label="${t('picker_add_aria')}">＋</button>
       </div>
       <div class="multi-picker-suggestions" id="${type}-picker-suggestions"></div>
       <div class="multi-picker-chips${expanded?'':' collapsed'}" id="${type}-picker-chips">
         ${visible.map(v=>`<button type="button" class="multi-picker-chip${selected.some(s=>s.toLowerCase()===v.toLowerCase())?' selected':''}" onclick="togglePickerValue('${type}','${escapeHtml(v)}')">${escapeHtml(v)}</button>`).join('')}
       </div>
-      ${needsMore?`<button type="button" class="multi-picker-more visible" onclick="togglePickerExpanded('${type}')">${expanded?'ver menos':'ver todas'}</button>`:''}
+      ${needsMore?`<button type="button" class="multi-picker-more visible" onclick="togglePickerExpanded('${type}')">${expanded?t('picker_view_less'):t('picker_view_all')}</button>`:''}
     </div>`;
 }
 function refreshPicker(type) {
   const map={family:'ef-family-picker',notes:'edit-notes-picker',tags:'edit-tags-picker'};
   const data=getPickerData(type);
-  renderMultiPicker(type,map[type],data.selected,data.options,'Añadir - buscar');
+  renderMultiPicker(type,map[type],data.selected,data.options,t('picker_placeholder'));
 }
 function onPickerInput(type,value) {
   const box=document.getElementById(type+'-picker-suggestions'); if(!box) return;
   const matches=pickerMatches(type,value);
   const exact=getPickerData(type).options.some(v=>v.toLowerCase()===String(value||'').trim().toLowerCase());
   box.innerHTML=matches.map(v=>`<button type="button" class="multi-picker-suggestion" onclick="selectPickerSuggestion('${type}','${escapeHtml(v)}')">${escapeHtml(v)}</button>`).join('');
-  if(value.trim() && !exact) box.innerHTML += `<button type="button" class="multi-picker-suggestion" onclick="addPickerValue('${type}',document.getElementById('${type}-picker-input').value)">＋ Crear «${escapeHtml(value.trim())}»</button>`;
+  if(value.trim() && !exact) box.innerHTML += `<button type="button" class="multi-picker-suggestion" onclick="addPickerValue('${type}',document.getElementById('${type}-picker-input').value)">${t('picker_create_prefix')} «${escapeHtml(value.trim())}»</button>`;
   box.classList.toggle('open', !!value.trim() && box.innerHTML.length>0);
 }
 function closePickerSuggestions() { document.querySelectorAll('.multi-picker-suggestions.open').forEach(el=>el.classList.remove('open')); }
@@ -2453,7 +2454,7 @@ function getFieldVal(key) {
 
 function savePerfume() {
   const name = getFieldVal('name');
-  if(!name.trim()){ alert('El nombre es obligatorio'); return; }
+  if(!name.trim()){ alert(t('alert_name_required')); return; }
 
   const perfId = editId || state.nextId++;
   const obj = {
@@ -2488,7 +2489,7 @@ function savePerfume() {
 }
 
 function deletePerfume() {
-  if(!editId||!confirm('¿Eliminar este perfume?')) return;
+  if(!editId||!confirm(t('confirm_delete_perfume'))) return;
   deletePerfumeById(editId);
   closeEdit();
 }
@@ -3245,6 +3246,26 @@ const I18N = {
     title_home: "Inicio", title_language: "Idioma", title_menu: "Menú",
     title_go_to_perfumes: "Ir a mis perfumes", title_add_perfume: "Añadir perfume",
     title_change_category: "Cambiar categoría", empty_hint: "Prueba a cambiar los filtros",
+    // ── Part 2: cards, detail, edit ──
+    card_full_profile: "Ficha completa",
+    add_photo_line1: "AÑADIR", add_photo_line2: "IMAGEN", add_image_alt: "Añadir imagen",
+    title_back: "Volver",
+    video_thumbnail_alt: "Miniatura del vídeo",
+    field_notes: "Notas olfativas", field_comments: "Comentarios", video_label_short: "Vídeo",
+    btn_edit: "Editar",
+    edit_title_new: "Nuevo perfume", edit_title_edit: "Editar perfume",
+    label_photos: "FOTOS (hasta 6)", photo_word: "FOTO",
+    comments_placeholder: "Añade comentarios...",
+    field_video: "VÍDEO DE YOUTUBE", video_url_placeholder: "Pega aquí el enlace de YouTube...", video_found: "Vídeo encontrado ✓",
+    field_rating: "VALORACIÓN", field_category: "CATEGORÍA",
+    field_barcode: "CÓDIGO DE BARRAS", title_scan_barcode: "Escanear con cámara",
+    field_tags: "ETIQUETAS",
+    btn_delete_perfume: "Eliminar perfume", btn_save: "Guardar",
+    picker_placeholder: "Añadir - buscar", picker_add_aria: "Añadir",
+    picker_create_prefix: "＋ Crear", picker_view_all: "ver todas", picker_view_less: "ver menos",
+    cover_word: "Portada",
+    alert_name_required: "El nombre es obligatorio", confirm_delete_perfume: "¿Eliminar este perfume?",
+    cat_perfumes: "perfumes", cat_coleccion: "en colección", cat_deseo: "deseos", cat_probados: "probados",
   },
   en: {
     menu_export: "Export", menu_import: "Import",
@@ -3257,14 +3278,59 @@ const I18N = {
     title_home: "Home", title_language: "Language", title_menu: "Menu",
     title_go_to_perfumes: "Go to my perfumes", title_add_perfume: "Add perfume",
     title_change_category: "Change category", empty_hint: "Try changing the filters",
+    // ── Part 2: cards, detail, edit ──
+    card_full_profile: "Full profile",
+    add_photo_line1: "ADD", add_photo_line2: "PHOTO", add_image_alt: "Add image",
+    title_back: "Back",
+    video_thumbnail_alt: "Video thumbnail",
+    field_notes: "Olfactory notes", field_comments: "Comments", video_label_short: "Video",
+    btn_edit: "Edit",
+    edit_title_new: "New perfume", edit_title_edit: "Edit perfume",
+    label_photos: "PHOTOS (up to 6)", photo_word: "PHOTO",
+    comments_placeholder: "Add comments...",
+    field_video: "YOUTUBE VIDEO", video_url_placeholder: "Paste the YouTube link here...", video_found: "Video found ✓",
+    field_rating: "RATING", field_category: "CATEGORY",
+    field_barcode: "BARCODE", title_scan_barcode: "Scan with camera",
+    field_tags: "TAGS",
+    btn_delete_perfume: "Delete perfume", btn_save: "Save",
+    picker_placeholder: "Add - search", picker_add_aria: "Add",
+    picker_create_prefix: "＋ Create", picker_view_all: "view all", picker_view_less: "view less",
+    cover_word: "Cover",
+    alert_name_required: "Name is required", confirm_delete_perfume: "Delete this perfume?",
+    cat_perfumes: "perfumes", cat_coleccion: "in collection", cat_deseo: "wishlist", cat_probados: "tried",
   }
 };
+let currentLang = localStorage.getItem('scentic-lang') || 'es';
+function t(key) { return (I18N[currentLang] || I18N.es)[key] || key; }
+
+// Default (unmodified) labels for built-in fields/options, used to translate
+// display only when the user hasn't renamed/customized them.
+const DEFAULT_FIELD_LABELS = {
+  es: {name:"Nombre",brand:"Marca",concentration:"Concentración",capacity:"Capacidad",launch:"Lanzamiento",perfumer:"Perfumista",bottleDesigner:"Diseñador del frasco",family:"Familia olfativa",gender:"Sexo",notes:"Notas olfativas",boughtAt:"Comprado en",price:"Precio",inCollectionSince:"En colección desde",rating:"Valoración",bottleCount:"Número de frascos",comments:"Comentarios",status:"Categoría",barcode:"Código de barras"},
+  en: {name:"Name",brand:"Brand",concentration:"Concentration",capacity:"Size",launch:"Release year",perfumer:"Perfumer",bottleDesigner:"Bottle designer",family:"Olfactory family",gender:"Gender",notes:"Olfactory notes",boughtAt:"Purchased at",price:"Price",inCollectionSince:"In collection since",rating:"Rating",bottleCount:"Number of bottles",comments:"Comments",status:"Category",barcode:"Barcode"}
+};
+function fieldLabel(f) {
+  const esDefault = DEFAULT_FIELD_LABELS.es[f.key];
+  if (esDefault && f.label === esDefault) return (DEFAULT_FIELD_LABELS[currentLang]||DEFAULT_FIELD_LABELS.es)[f.key] || f.label;
+  return f.label;
+}
+const CONCENTRATION_LABELS = {
+  es: {"Aceite":"Aceite","Colonia":"Colonia","EDT":"EDT","EDP":"EDP","Perfume":"Perfume","Extracto de perfume":"Extracto de perfume","Sólido":"Sólido"},
+  en: {"Aceite":"Oil","Colonia":"Cologne","EDT":"EDT","EDP":"EDP","Perfume":"Perfume","Extracto de perfume":"Pure perfume","Sólido":"Solid"}
+};
+const GENDER_LABELS = {
+  es: {"Masculino":"Masculino","Femenino":"Femenino","Unisex":"Unisex","Andrógino":"Andrógino"},
+  en: {"Masculino":"Masculine","Femenino":"Feminine","Unisex":"Unisex","Andrógino":"Androgynous"}
+};
+function concentrationLabel(v) { return (CONCENTRATION_LABELS[currentLang]||CONCENTRATION_LABELS.es)[v] || v; }
+function genderLabel(v) { return (GENDER_LABELS[currentLang]||GENDER_LABELS.es)[v] || v; }
 function setLanguage(lang) {
   localStorage.setItem('scentic-lang', lang);
   applyLanguage(lang);
   closeLangMenu();
 }
 function applyLanguage(lang) {
+  currentLang = lang;
   const dict = I18N[lang] || I18N.es;
   document.querySelectorAll('[data-i18n]').forEach(function(el) {
     const key = el.getAttribute('data-i18n');
