@@ -223,9 +223,9 @@
   #modal-detail { padding:0; }
   #modal-detail .modal { max-width:100%; width:100%; height:100%; max-height:100%; border-radius:0; display:flex; flex-direction:column; overflow:hidden; }
   #modal-detail .modal-body { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
-  #modal-wishlist { padding:0; backdrop-filter:none; }
-  #modal-wishlist .modal { max-width:100%; width:100%; height:100%; max-height:100%; border-radius:0; display:flex; flex-direction:column; overflow:hidden; }
-  #modal-wishlist .modal-body { flex:1; overflow-y:auto; }
+  #modal-notes { padding:0; backdrop-filter:none; }
+  #modal-notes .modal { max-width:100%; width:100%; height:100%; max-height:100%; border-radius:0; display:flex; flex-direction:column; overflow:hidden; }
+  #modal-notes .modal-body { flex:1; overflow-y:auto; }
   .modal {
     background:var(--surface); border-radius:20px; width:100%; max-width:560px;
     box-shadow:0 30px 80px rgba(0,0,0,.2); max-height:92vh; overflow-y:auto;
@@ -832,44 +832,6 @@
   }
   .note-add-form textarea:focus { border-color:var(--accent); }
 
-  #modal-wishlist .wish-item {
-    display:flex; align-items:stretch; gap:0;
-    background:var(--surface-alt); border:1px solid var(--border);
-    border-radius:12px; margin-bottom:10px;
-    position:relative; overflow:hidden;
-  }
-  #modal-wishlist .wish-photo {
-    width:72px; flex-shrink:0; object-fit:cover; display:block;
-    background:var(--border); border:none; border-radius:0;
-    align-self:stretch; min-height:72px;
-  }
-  #modal-wishlist .wish-photo-placeholder {
-    width:72px; flex-shrink:0;
-    background:var(--border); display:flex; align-items:center;
-    justify-content:center; font-size:28px; opacity:.4; border-radius:0;
-  }
-  #modal-wishlist .wish-info { flex:1; min-width:0; padding:12px 36px 12px 12px; }
-  #modal-wishlist .wish-brand { font-size:10px; color:var(--text-muted); letter-spacing:2px; font-weight:600; }
-  #modal-wishlist .wish-name { font-size:16px; font-weight:700; color:var(--text); margin:2px 0 4px; line-height:1.2; }
-  #modal-wishlist .wish-price { font-size:14px; color:var(--accent); font-weight:600; }
-  #modal-wishlist .wish-link {
-    display:inline-block; margin-top:6px; font-size:11px;
-    color:var(--accent); text-decoration:none; letter-spacing:1px;
-    font-weight:600; border-bottom:1px solid var(--accent-light);
-  }
-  #modal-wishlist .wish-del {
-    position:absolute; top:10px; right:10px;
-    background:none; border:none; color:var(--text-light);
-    font-size:16px; cursor:pointer; padding:2px 6px;
-    border-radius:6px; transition:color .15s;
-  }
-  #modal-wishlist .wish-del:hover { color:var(--danger); }
-  .wish-add-form {
-    background:var(--surface); border:1px solid var(--border);
-    border-radius:14px; padding:16px; margin-top:4px;
-  }
-  .wish-add-form .field-grid { margin-bottom:0; }
-
 
   /* ── SPLASH SCREEN ── */
   #splash {
@@ -1106,22 +1068,22 @@
 <div class="modal-overlay" id="modal-export">
   <div class="modal" style="max-width:360px">
     <div class="modal-header">
-      <span class="modal-title">💾 Exportar colección</span>
+      <span class="modal-title" data-i18n="title_export_collection">💾 Exportar colección</span>
       <button class="modal-close" onclick="closeModal('modal-export')">✕</button>
     </div>
     <div class="modal-body">
-      <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.6">
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.6" data-i18n-html="export_intro">
         Elige el formato. El <strong>JSON</strong> guarda todo incluyendo fotos y es el mejor para hacer copias de seguridad. El <strong>Excel/CSV</strong> es para ver los datos en una hoja de cálculo.
       </p>
       <div style="display:flex;flex-direction:column;gap:10px">
         <button class="btn-primary" onclick="exportJSON();closeModal('modal-export')">
-          📦 JSON — Copia de seguridad completa<br>
-          <span style="font-size:11px;font-weight:400;opacity:.85">(incluye fotos · recomendado)</span>
+          <span data-i18n="btn_export_json_title">📦 JSON — Copia de seguridad completa</span><br>
+          <span style="font-size:11px;font-weight:400;opacity:.85" data-i18n="btn_export_json_sub">(incluye fotos · recomendado)</span>
         </button>
-        <button class="btn-secondary" style="text-align:center" onclick="exportXLSX();closeModal('modal-export')">
+        <button class="btn-secondary" style="text-align:center" onclick="exportXLSX();closeModal('modal-export')" data-i18n="btn_export_xlsx">
           📊 Excel (.xls) — Para hoja de cálculo
         </button>
-        <button class="btn-secondary" style="text-align:center" onclick="exportCSV();closeModal('modal-export')">
+        <button class="btn-secondary" style="text-align:center" onclick="exportCSV();closeModal('modal-export')" data-i18n="btn_export_csv">
           📄 CSV — Compatible con cualquier programa
         </button>
       </div>
@@ -1610,7 +1572,7 @@ function renderFieldMgr() {
         <input type="checkbox" ${f.visible?'checked':''} ${f.required?'disabled':''} onchange="toggleField(${i},this.checked)"/>
         <div class="switch-track"></div>
       </label>
-      <input type="text" value="${f.label}" onchange="renameField(${i},this.value)"/>
+      <input type="text" value="${fieldLabel(f)}" onchange="renameField(${i},this.value)"/>
       ${f.required?`<span style="font-size:10px;color:var(--text-light);font-family:'Jost',sans-serif">${t('required_word')}</span>`:`<button type="button" class="field-mgr-delete" title="${t('title_delete_field')}" onclick="deleteField(${i})">✕</button>`}
     </div>`).join('');
 }
@@ -1944,12 +1906,9 @@ function setSort(s) {
   }, 800);
 }
 function openNotesTab() {
-  openWishlist();
-  setTimeout(() => {
-    switchWlTab('notes');
-    closeModal('modal-note-editor');
-    renderNotes();
-  }, 0);
+  closeModal('modal-note-editor');
+  renderNotes();
+  openModal('modal-notes');
 }
 
 // ══ RENDER ═════════════════════════════════════════════════════
@@ -2583,14 +2542,14 @@ async function exportJSON() {
   const data = JSON.stringify(perfumesWithPhotos, null, 2);
   const a = document.createElement('a');
   a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(data);
-  a.download = 'mi_coleccion_perfumes.json';
+  a.download = t('export_filename_base') + '.json';
   a.click();
 }
 
 function exportCSV() {
   // Export as CSV without photos (compatible with Excel)
   const vf = state.fields.filter(f=>f.visible && !['photos','coverIndex'].includes(f.key));
-  const headers = vf.map(f=>f.label).join(',');
+  const headers = vf.map(f=>fieldLabel(f)).join(',');
   const rows = state.perfumes.map(p=>vf.map(f=>{
     let v = f.key==='status' ? (catLabel(p.status||'coleccion')||'') : (p[f.key]||'');
     return '"'+String(v).replace(/"/g,'""')+'"';
@@ -2598,14 +2557,14 @@ function exportCSV() {
   const csv = [headers,...rows].join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
-  a.download = 'mi_coleccion_perfumes.csv';
+  a.download = t('export_filename_base') + '.csv';
   a.click();
 }
 
 function exportXLSX() {
   // Export as tab-separated (opens in Excel perfectly)
   const vf = state.fields.filter(f=>f.visible && !['photos','coverIndex'].includes(f.key));
-  const headers = vf.map(f=>f.label).join('\t');
+  const headers = vf.map(f=>fieldLabel(f)).join('\t');
   const rows = state.perfumes.map(p=>vf.map(f=>{
     let v = f.key==='status' ? (catLabel(p.status||'coleccion')||'') : (p[f.key]||'');
     return String(v).replace(/\t/g,' ');
@@ -2613,7 +2572,7 @@ function exportXLSX() {
   const tsv = [headers,...rows].join('\n');
   const a = document.createElement('a');
   a.href = 'data:application/vnd.ms-excel;charset=utf-8,\uFEFF' + encodeURIComponent(tsv);
-  a.download = 'mi_coleccion_perfumes.xls';
+  a.download = t('export_filename_base') + '.xls';
   a.click();
 }
 
@@ -2629,12 +2588,8 @@ function handleImport(input) {
   reader.onload = async function(e) {
     try {
       const imported = JSON.parse(e.target.result);
-      if(!Array.isArray(imported)) { alert('Archivo no válido.'); return; }
-      const choice = confirm(
-        'Se han encontrado ' + imported.length + ' perfumes.\n\n' +
-        '✓ Aceptar = AÑADIR a tu colección actual\n' +
-        '✗ Cancelar = REEMPLAZAR toda la colección'
-      );
+      if(!Array.isArray(imported)) { alert(t('alert_invalid_file')); return; }
+      const choice = confirm(t('confirm_import_pre') + imported.length + t('confirm_import_post'));
       if(choice) {
         // Merge: add new ones, update existing by name+brand
         const maxId = Math.max(...state.perfumes.map(p=>p.id||0), state.nextId);
@@ -2663,9 +2618,9 @@ function handleImport(input) {
         state.nextId = Math.max(...imported.map(p=>p.id||0)) + 1;
       }
       save(); render();
-      alert('✓ Importación completada: ' + imported.length + ' perfumes.');
+      alert(t('alert_import_complete_pre') + imported.length + t('alert_import_complete_post'));
     } catch(err) {
-      alert('Error al leer el archivo. Asegúrate de que es un archivo JSON exportado desde perfumes.');
+      alert(t('alert_import_error'));
     }
   };
   reader.readAsText(file);
@@ -2725,24 +2680,6 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{
 })();
 
 
-// ══ WISHLIST ═══════════════════════════════════════════════════
-// ══ WISHLIST – múltiples listas ════════════════════════════════
-function loadWishlists() {
-  try {
-    const data = JSON.parse(localStorage.getItem('pf_wishlists') || 'null');
-    if (data && data.lists) return data;
-    // Migrate old single list
-    const old = JSON.parse(localStorage.getItem('pf_wishlist') || '[]');
-    return { activeList: 'L1', lists: [{ id: 'L1', name: 'Mi lista', items: old }] };
-  } catch(e) { return { activeList: 'L1', lists: [{ id: 'L1', name: 'Mi lista', items: [] }] }; }
-}
-function saveWishlists(data) {
-  try { localStorage.setItem('pf_wishlists', JSON.stringify(data)); } catch(e) {}
-}
-function getActiveList(data) {
-  return data.lists.find(l => l.id === data.activeList) || data.lists[0];
-}
-
 // ══ FAMILIA OLFATIVA — CHIPS ═══════════════════════════════════
 function toggleFamilyChip(btn, fam) {
   btn.classList.toggle('selected');
@@ -2760,11 +2697,11 @@ async function openBarcodeScanner() {
 
   // Check BarcodeDetector support
   if (!('BarcodeDetector' in window)) {
-    status.textContent = '⚠ Escáner no disponible en este navegador. Introduce el código manualmente.';
+    status.textContent = t('scanner_unavailable');
     return;
   }
 
-  status.textContent = 'Iniciando cámara…';
+  status.textContent = t('scanner_starting');
 
   try {
     _barcodeStream = await navigator.mediaDevices.getUserMedia({
@@ -2778,10 +2715,10 @@ async function openBarcodeScanner() {
       formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf','qr_code']
     });
 
-    status.textContent = 'Apunta al código de barras del perfume…';
+    status.textContent = t('scanner_scanning');
     _scanFrame();
   } catch(e) {
-    status.textContent = '⚠ No se pudo acceder a la cámara. Introduce el código manualmente.';
+    status.textContent = t('scanner_camera_error');
   }
 }
 
@@ -2793,7 +2730,7 @@ function _scanFrame() {
     if (barcodes && barcodes.length > 0) {
       const code = barcodes[0].rawValue;
       document.getElementById('pf-barcode').value = code;
-      document.getElementById('barcode-status').textContent = '✓ Código detectado: ' + code;
+      document.getElementById('barcode-status').textContent = t('scanner_detected_pre') + code;
       // Small vibration feedback if available
       if (navigator.vibrate) navigator.vibrate(100);
       setTimeout(() => closeBarcodeScanner(), 800);
@@ -2815,17 +2752,7 @@ function closeBarcodeScanner() {
   const video = document.getElementById('barcode-video');
   if (video) video.srcObject = null;
   document.getElementById('modal-barcode').style.display = 'none';
-  document.getElementById('barcode-status').textContent = 'Apunta la cámara al código de barras';
-}
-
-// ══ PESTAÑA ACTIVA EN LISTAS/NOTAS ════════════════════════════
-let wlActiveTab = 'lists';
-
-function switchWlTab(tab) {
-  wlActiveTab = tab;
-  document.getElementById('wl-panel-lists').style.display = tab === 'lists' ? 'block' : 'none';
-  document.getElementById('wl-panel-notes').style.display = tab === 'notes' ? 'block' : 'none';
-  if (tab === 'notes') renderNotes();
+  document.getElementById('barcode-status').textContent = t('scanner_default_status');
 }
 
 // ══ NOTAS GLOBALES ══════════════════════════════════════════════
@@ -2845,12 +2772,12 @@ function renderNotes() {
   const fab = document.getElementById('note-add-fab');
   if (fab) fab.classList.add('visible');
   if (notes.length === 0) {
-    container.innerHTML = `<div style="text-align:center;padding:24px 0;color:var(--text-light)"><div style="font-size:36px;margin-bottom:8px">📝</div><div style="font-size:12px;letter-spacing:1px">Aún no hay notas</div></div>`;
+    container.innerHTML = `<div style="text-align:center;padding:24px 0;color:var(--text-light)"><div style="font-size:36px;margin-bottom:8px">📝</div><div style="font-size:12px;letter-spacing:1px">${t('empty_notes')}</div></div>`;
     return;
   }
   container.innerHTML = notes.map((n, i) => `
     <div class="note-card" onclick="editNote(${i})">
-      <button class="note-card-x" onclick="event.stopPropagation();deleteNote(${i})" title="Eliminar">✕</button>
+      <button class="note-card-x" onclick="event.stopPropagation();deleteNote(${i})" title="${t('title_delete_note')}">✕</button>
       <div class="note-card-title">${n.title || ''}</div>
       <div class="note-card-body">${n.body || ''}</div>
       <div class="note-card-date">${n.date || ''}</div>
@@ -2874,13 +2801,13 @@ function closeNoteEditor() {
 function saveNote() {
   const title = document.getElementById('nf-title').value.trim();
   const body  = document.getElementById('nf-body').value.trim();
-  if (!title && !body) { alert('Escribe al menos un título o el texto de la nota.'); return; }
+  if (!title && !body) { alert(t('alert_note_required')); return; }
   const notes = loadNotes();
   const editIndex = document.getElementById('modal-note-editor').dataset.editIndex;
   const noteData = {
     title,
     body,
-    date: new Date().toLocaleDateString('es-ES', {day:'2-digit', month:'short', year:'numeric'})
+    date: new Date().toLocaleDateString(currentLang==='en'?'en-GB':'es-ES', {day:'2-digit', month:'short', year:'numeric'})
   };
   if (editIndex !== '' && editIndex !== undefined) {
     notes[parseInt(editIndex)] = noteData;
@@ -2904,195 +2831,11 @@ function editNote(i) {
 }
 
 function deleteNote(i) {
-  if (!confirm('¿Eliminar esta nota?')) return;
+  if (!confirm(t('confirm_delete_note'))) return;
   const notes = loadNotes();
   notes.splice(i, 1);
   saveNotes(notes);
   renderNotes();
-}
-
-function openWishlist() {
-  wlActiveTab = 'notes';
-  renderWishlist();
-  openModal('modal-wishlist');
-}
-
-function renderWishlist() {
-  const data = loadWishlists();
-  const active = getActiveList(data);
-  const container = document.getElementById('wishlist-items');
-
-  // ── List selector bar ──
-  const tabsHtml = `
-    <div id="wl-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
-      ${data.lists.map(l => `
-        <button onclick="switchWishlist('${l.id}')" style="padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:${l.id===data.activeList?'var(--accent)':'var(--surface-alt)'};color:${l.id===data.activeList?'#fff':'var(--text)'};font-size:12px;cursor:pointer;font-family:inherit">${l.name} <span style="opacity:.7">(${(l.items||[]).length})</span></button>
-      `).join('')}
-      <button onclick="createWishlist()" title="Nueva lista" style="width:28px;height:28px;border-radius:50%;border:1px dashed var(--border);background:none;color:var(--accent);font-size:18px;cursor:pointer;line-height:1;padding:0">＋</button>
-    </div>
-    <div style="display:flex;gap:6px;margin-bottom:14px">
-      <button onclick="renameWishlist()" class="btn-secondary" style="flex:1;font-size:11px;padding:5px 0">Renombrar lista</button>
-      ${data.lists.length > 1 ? `<button onclick="deleteWishlist()" class="btn-secondary" style="flex:1;font-size:11px;padding:5px 0;color:var(--danger)">🗑 Eliminar lista</button>` : ''}
-    </div>`;
-
-  // ── Items ──
-  const items = active ? active.items || [] : [];
-  const itemsHtml = items.length === 0
-    ? `<div style="text-align:center;padding:20px 0;color:var(--text-light)"><div style="font-size:12px;letter-spacing:1px">Esta lista está vacía</div></div>`
-    : items.map((item, i) => `
-      <div class="wish-item" onclick="editWishItem(${i})" style="cursor:pointer">
-        ${item.photo
-          ? `<img class="wish-photo" src="${item.photo}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="wish-photo-placeholder" style="display:none">💘</div>`
-          : `<div class="wish-photo-placeholder">💘</div>`}
-        <div class="wish-info">
-          <div class="wish-brand">${(item.brand||'').toUpperCase()}</div>
-          <div class="wish-name">${item.name}</div>
-          ${item.price ? `<div class="wish-price">${item.price}</div>` : ''}
-          ${item.url ? `<a class="wish-link" href="${item.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 ${item.storename || 'Ver en tienda'}</a>` : ''}
-        </div>
-        <span style="color:var(--text-light);font-size:18px;flex-shrink:0">›</span>
-      </div>`).join('');
-
-  container.innerHTML = tabsHtml + itemsHtml;
-}
-
-function switchWishlist(id) {
-  const data = loadWishlists();
-  data.activeList = id;
-  saveWishlists(data);
-  renderWishlist();
-}
-
-function createWishlist() {
-  const name = prompt('Nombre de la nueva lista:');
-  if (!name || !name.trim()) return;
-  const data = loadWishlists();
-  const id = 'L' + Date.now();
-  data.lists.push({ id, name: name.trim(), items: [] });
-  data.activeList = id;
-  saveWishlists(data);
-  renderWishlist();
-}
-
-function renameWishlist() {
-  const data = loadWishlists();
-  const active = getActiveList(data);
-  if (!active) return;
-  const name = prompt('Nuevo nombre para la lista:', active.name);
-  if (!name || !name.trim()) return;
-  active.name = name.trim();
-  saveWishlists(data);
-  renderWishlist();
-}
-
-function deleteWishlist() {
-  const data = loadWishlists();
-  if (data.lists.length <= 1) { alert('No puedes eliminar la única lista.'); return; }
-  const active = getActiveList(data);
-  if (!confirm(`¿Eliminar la lista "${active.name}" y todos sus perfumes?`)) return;
-  data.lists = data.lists.filter(l => l.id !== data.activeList);
-  data.activeList = data.lists[0].id;
-  saveWishlists(data);
-  renderWishlist();
-}
-
-function toggleWishForm() {
-  const f = document.getElementById('wish-form');
-  f.style.display = f.style.display === 'none' ? 'block' : 'none';
-  if (f.style.display === 'block') {
-    // Reset to "new" mode
-    document.getElementById('wish-form').dataset.editIndex = '';
-    document.getElementById('wish-form-title').textContent = '＋ Añadir perfume';
-    document.getElementById('wf-save-btn').textContent = '✦ Guardar';
-    ['wf-name','wf-brand','wf-price','wf-storename','wf-url','wf-photo'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('wf-name').focus();
-  }
-}
-
-function editWishItem(i) {
-  const data = loadWishlists();
-  const active = getActiveList(data);
-  if (!active) return;
-  const item = active.items[i];
-  if (!item) return;
-  const f = document.getElementById('wish-form');
-  f.style.display = 'block';
-  f.dataset.editIndex = i;
-  document.getElementById('wish-form-title').textContent = '✏️ Editar perfume';
-  document.getElementById('wf-save-btn').textContent = '✦ Actualizar';
-  document.getElementById('wf-name').value = item.name || '';
-  document.getElementById('wf-brand').value = item.brand || '';
-  document.getElementById('wf-price').value = item.price || '';
-  document.getElementById('wf-storename').value = item.storename || '';
-  document.getElementById('wf-url').value = item.url || '';
-  document.getElementById('wf-photo').value = item.photo || '';
-  document.getElementById('wf-name').focus();
-  // Scroll to form
-  f.scrollIntoView({behavior:'smooth'});
-}
-
-function saveWishItem() {
-  const name = document.getElementById('wf-name').value.trim();
-  if (!name) { alert('El nombre es obligatorio'); return; }
-  const data = loadWishlists();
-  const active = getActiveList(data);
-  if (!active) return;
-  const editIndex = document.getElementById('wish-form').dataset.editIndex;
-  const itemData = {
-    name,
-    brand:     document.getElementById('wf-brand').value.trim(),
-    price:     document.getElementById('wf-price').value.trim(),
-    storename: document.getElementById('wf-storename').value.trim(),
-    url:       document.getElementById('wf-url').value.trim(),
-    photo:     document.getElementById('wf-photo').value.trim(),
-    added:     new Date().toISOString().split('T')[0]
-  };
-  if (editIndex !== '' && editIndex !== undefined) {
-    active.items[parseInt(editIndex)] = {...active.items[parseInt(editIndex)], ...itemData};
-  } else {
-    active.items.push(itemData);
-  }
-  saveWishlists(data);
-  ['wf-name','wf-brand','wf-price','wf-storename','wf-url','wf-photo'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('wish-form').style.display = 'none';
-  document.getElementById('wish-form').dataset.editIndex = '';
-  renderWishlist();
-}
-
-function openWishDetail(i) {
-  const data = loadWishlists();
-  const active = getActiveList(data);
-  if (!active) return;
-  const item = active.items[i];
-  if (!item) return;
-
-  document.getElementById('wish-detail-body').innerHTML = `
-    <div style="text-align:center;margin-bottom:16px">
-      ${item.photo
-        ? `<img src="${item.photo}" style="width:120px;height:120px;object-fit:cover;border-radius:12px;margin-bottom:10px" onerror="this.style.display='none'"/>`
-        : `<div style="width:120px;height:120px;border-radius:12px;background:var(--surface-alt);display:flex;align-items:center;justify-content:center;font-size:48px;margin:0 auto 10px">💘</div>`}
-      <div style="font-size:11px;letter-spacing:2px;color:var(--text-muted);font-weight:600">${(item.brand||'').toUpperCase()}</div>
-      <div style="font-size:22px;font-weight:700;color:var(--text);margin:4px 0">${item.name}</div>
-      ${item.price ? `<div style="font-size:16px;color:var(--accent);font-weight:600">${item.price}</div>` : ''}
-    </div>
-    ${item.url ? `<a href="${item.url}" target="_blank" rel="noopener" style="display:block;text-align:center;padding:8px;border-radius:10px;background:var(--surface-alt);color:var(--accent);font-size:13px;margin-bottom:14px;text-decoration:none">🔗 Ver en tienda</a>` : ''}
-    ${item.added ? `<div style="font-size:11px;color:var(--text-light);text-align:center;margin-bottom:16px">Añadido el ${item.added}</div>` : ''}
-    <div style="display:flex;gap:10px">
-      <button onclick="closeModal('modal-wish-detail');editWishItem(${i})" class="btn-primary" style="flex:1">✏️ Editar</button>
-      <button onclick="closeModal('modal-wish-detail');deleteWishItem(${i})" class="btn-danger" style="flex:1;padding:10px;border-radius:10px;border:none;background:#fdf0f0;color:var(--danger);font-family:inherit;font-size:14px;cursor:pointer">🗑 Eliminar</button>
-    </div>
-  `;
-  openModal('modal-wish-detail');
-}
-
-function deleteWishItem(i) {
-  if (!confirm('¿Eliminar este perfume de la lista?')) return;
-  const data = loadWishlists();
-  const active = getActiveList(data);
-  if (!active) return;
-  active.items.splice(i, 1);
-  saveWishlists(data);
-  renderWishlist();
 }
 
 // ══ INIT ═══════════════════════════════════════════════════════
@@ -3168,7 +2911,7 @@ window.addEventListener('popstate', function(e) {
   document.querySelectorAll('.modal-overlay.open').forEach(function(el){
     if (el.id !== st.modal) el.classList.remove('open');
   });
-  if (st.modal !== 'modal-wishlist' && st.modal !== 'modal-note-editor') {
+  if (st.modal !== 'modal-notes' && st.modal !== 'modal-note-editor') {
     const fab = document.getElementById('note-add-fab');
     if (fab) fab.classList.remove('visible');
   }
@@ -3189,8 +2932,8 @@ window.addEventListener('popstate', function(e) {
         document.getElementById('nf-body').value = '';
       }
     }
-    if (st.modal === 'modal-wishlist' || st.modal === 'modal-note-editor') {
-      switchWlTab('notes');
+    if (st.modal === 'modal-notes' || st.modal === 'modal-note-editor') {
+      renderNotes();
       document.getElementById('note-add-fab').classList.add('visible');
     }
     document.getElementById(st.modal).classList.add('open');
@@ -3241,8 +2984,8 @@ const I18N = {
     home_search: "Buscar",
     empty_state: "No hay perfumes todavía",
     sort_label: "ORDENAR FICHAS POR", sort_date: "cronológico", sort_name: "alfabético",
-    manage_fields: "Gestionar campos", wishlist: "Lista de deseos", notes: "Notas",
-    menu_perfumes: "Perfumes", menu_fields: "Campos", menu_lists: "Listas", menu_notes: "Notas", menu_classification: "Clasificación",
+    manage_fields: "Gestionar campos", notes: "Notas",
+    menu_perfumes: "Perfumes", menu_fields: "Campos", menu_notes: "Notas", menu_classification: "Clasificación",
     title_home: "Inicio", title_language: "Idioma", title_menu: "Menú",
     title_go_to_perfumes: "Ir a mis perfumes", title_add_perfume: "Añadir perfume",
     title_change_category: "Cambiar categoría", empty_hint: "Prueba a cambiar los filtros",
@@ -3282,6 +3025,31 @@ const I18N = {
     confirm_merge_pre: 'Ya existe "', confirm_merge_mid1: '". ¿Fusionar "', confirm_merge_mid2: '" con "', confirm_merge_post: '"?',
     confirm_delete_item_used_pre: '¿Eliminar "', confirm_delete_item_used_mid: '"? Se quitará de ', confirm_delete_item_used_post_one: ' perfume.', confirm_delete_item_used_post_many: ' perfumes.',
     confirm_delete_item_pre: '¿Eliminar "', confirm_delete_item_post: '"?',
+    // ── Part 4: export/import, notes, barcode scanner ──
+    title_export_collection: "💾 Exportar colección",
+    export_intro: 'Elige el formato. El <strong>JSON</strong> guarda todo incluyendo fotos y es el mejor para hacer copias de seguridad. El <strong>Excel/CSV</strong> es para ver los datos en una hoja de cálculo.',
+    btn_export_json_title: "📦 JSON — Copia de seguridad completa",
+    btn_export_json_sub: "(incluye fotos · recomendado)",
+    btn_export_xlsx: "📊 Excel (.xls) — Para hoja de cálculo",
+    btn_export_csv: "📄 CSV — Compatible con cualquier programa",
+    export_filename_base: "mi_coleccion_perfumes",
+    alert_invalid_file: "Archivo no válido.",
+    confirm_import_pre: "Se han encontrado ",
+    confirm_import_post: " perfumes.\n\n✓ Aceptar = AÑADIR a tu colección actual\n✗ Cancelar = REEMPLAZAR toda la colección",
+    alert_import_complete_pre: "✓ Importación completada: ", alert_import_complete_post: " perfumes.",
+    alert_import_error: "Error al leer el archivo. Asegúrate de que es un archivo JSON exportado desde perfumes.",
+    empty_notes: "Aún no hay notas", title_new_note: "Nueva nota", title_delete_note: "Eliminar",
+    confirm_delete_note: "¿Eliminar esta nota?",
+    alert_note_required: "Escribe al menos un título o el texto de la nota.",
+    placeholder_note_title: "Título", placeholder_note_body: "Escribe tu nota aquí...",
+    btn_cancel: "Cancelar",
+    title_scanner: "📷 Escanear código de barras",
+    scanner_default_status: "Apunta la cámara al código de barras",
+    scanner_unavailable: "⚠ Escáner no disponible en este navegador. Introduce el código manualmente.",
+    scanner_starting: "Iniciando cámara…",
+    scanner_scanning: "Apunta al código de barras del perfume…",
+    scanner_detected_pre: "✓ Código detectado: ",
+    scanner_camera_error: "⚠ No se pudo acceder a la cámara. Introduce el código manualmente.",
   },
   en: {
     menu_export: "Export", menu_import: "Import",
@@ -3289,8 +3057,8 @@ const I18N = {
     home_search: "Search",
     empty_state: "No perfumes yet",
     sort_label: "SORT CARDS BY", sort_date: "chronological", sort_name: "alphabetical",
-    manage_fields: "Manage fields", wishlist: "Wishlist", notes: "Notes",
-    menu_perfumes: "Perfumes", menu_fields: "Fields", menu_lists: "Lists", menu_notes: "Notes", menu_classification: "Classification",
+    manage_fields: "Manage fields", notes: "Notes",
+    menu_perfumes: "Perfumes", menu_fields: "Fields", menu_notes: "Notes", menu_classification: "Classification",
     title_home: "Home", title_language: "Language", title_menu: "Menu",
     title_go_to_perfumes: "Go to my perfumes", title_add_perfume: "Add perfume",
     title_change_category: "Change category", empty_hint: "Try changing the filters",
@@ -3330,6 +3098,31 @@ const I18N = {
     confirm_merge_pre: 'A value "', confirm_merge_mid1: '" already exists. Merge "', confirm_merge_mid2: '" with "', confirm_merge_post: '"?',
     confirm_delete_item_used_pre: 'Delete "', confirm_delete_item_used_mid: '"? It will be removed from ', confirm_delete_item_used_post_one: ' perfume.', confirm_delete_item_used_post_many: ' perfumes.',
     confirm_delete_item_pre: 'Delete "', confirm_delete_item_post: '"?',
+    // ── Part 4: export/import, notes, barcode scanner ──
+    title_export_collection: "💾 Export collection",
+    export_intro: 'Choose a format. <strong>JSON</strong> saves everything, including photos, and is best for backups. <strong>Excel/CSV</strong> is for viewing the data in a spreadsheet.',
+    btn_export_json_title: "📦 JSON — Full backup",
+    btn_export_json_sub: "(includes photos · recommended)",
+    btn_export_xlsx: "📊 Excel (.xls) — For spreadsheets",
+    btn_export_csv: "📄 CSV — Compatible with any program",
+    export_filename_base: "my_perfume_collection",
+    alert_invalid_file: "Invalid file.",
+    confirm_import_pre: "Found ",
+    confirm_import_post: " perfumes.\n\n✓ OK = ADD to your current collection\n✗ Cancel = REPLACE the entire collection",
+    alert_import_complete_pre: "✓ Import complete: ", alert_import_complete_post: " perfumes.",
+    alert_import_error: "Error reading the file. Make sure it's a JSON file exported from perfumes.",
+    empty_notes: "No notes yet", title_new_note: "New note", title_delete_note: "Delete",
+    confirm_delete_note: "Delete this note?",
+    alert_note_required: "Write at least a title or the note text.",
+    placeholder_note_title: "Title", placeholder_note_body: "Write your note here...",
+    btn_cancel: "Cancel",
+    title_scanner: "📷 Scan barcode",
+    scanner_default_status: "Point the camera at the barcode",
+    scanner_unavailable: "⚠ Scanner not available in this browser. Enter the code manually.",
+    scanner_starting: "Starting camera…",
+    scanner_scanning: "Point at the perfume's barcode…",
+    scanner_detected_pre: "✓ Code detected: ",
+    scanner_camera_error: "⚠ Could not access the camera. Enter the code manually.",
   }
 };
 let currentLang = localStorage.getItem('scentic-lang') || 'es';
@@ -3367,6 +3160,10 @@ function applyLanguage(lang) {
   document.querySelectorAll('[data-i18n]').forEach(function(el) {
     const key = el.getAttribute('data-i18n');
     if (dict[key]) el.textContent = dict[key];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
+    const key = el.getAttribute('data-i18n-html');
+    if (dict[key]) el.innerHTML = dict[key];
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
     const key = el.getAttribute('data-i18n-placeholder');
@@ -3418,60 +3215,16 @@ if('serviceWorker' in navigator) {
 </script>
 
 <!-- ══ WISHLIST MODAL ══ -->
-<div class="modal-overlay" id="modal-wishlist">
+<div class="modal-overlay" id="modal-notes">
   <div class="modal">
     <div class="modal-header">
-      <button class="modal-close" onclick="closeModal('modal-wishlist');document.getElementById('note-add-fab').classList.remove('visible')" style="position:static;background:rgba(255,255,255,.8);border-radius:50%;width:32px;height:32px;padding:0">&#8592;</button>
-      <span class="modal-title">Notas</span>
+      <button class="modal-close" onclick="closeModal('modal-notes');document.getElementById('note-add-fab').classList.remove('visible')" style="position:static;background:rgba(255,255,255,.8);border-radius:50%;width:32px;height:32px;padding:0">&#8592;</button>
+      <span class="modal-title" data-i18n="notes">Notas</span>
       <span style="width:32px"></span>
     </div>
     <div class="modal-body">
-      <!-- Pestaña Listas -->
-      <div id="wl-panel-lists" style="display:none">
-        <div id="wishlist-items"></div>
-        <div style="margin-top:10px">
-          <button class="btn-secondary" style="width:100%;margin-bottom:12px" onclick="toggleWishForm()"><span id="wish-form-title">＋ Añadir perfume</span></button>
-          <div id="wish-form" style="display:none" class="wish-add-form">
-            <div class="field-grid" style="grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-              <div class="field-group" style="grid-column:1/-1;margin-bottom:0">
-                <label class="field-label">NOMBRE *</label>
-                <input class="field-input" id="wf-name" placeholder="Nombre del perfume"/>
-              </div>
-              <div class="field-group" style="margin-bottom:0">
-                <label class="field-label">MARCA</label>
-                <input class="field-input" id="wf-brand" placeholder="Marca"/>
-              </div>
-              <div class="field-group" style="margin-bottom:0">
-                <label class="field-label">PRECIO</label>
-                <input class="field-input" id="wf-price" placeholder="Ej: 120€"/>
-              </div>
-              <div class="field-group" style="grid-column:1/-1;margin-bottom:0">
-                <label class="field-label">NOMBRE DE LA TIENDA</label>
-                <input class="field-input" id="wf-storename" placeholder="Ej: Sephora, Notino, Amazon..."/>
-              </div>
-              <div class="field-group" style="grid-column:1/-1;margin-bottom:0">
-                <label class="field-label">URL DE LA TIENDA</label>
-                <input class="field-input" id="wf-url" placeholder="https://..." type="url"/>
-              </div>
-              <div class="field-group" style="grid-column:1/-1;margin-bottom:0">
-                <label class="field-label">URL DE LA FOTO</label>
-                <input class="field-input" id="wf-photo" placeholder="https://... (imagen del perfume)" type="url"/>
-              </div>
-            </div>
-            <div class="btn-row" style="margin-top:10px">
-              <button class="btn-primary" id="wf-save-btn" onclick="saveWishItem()">✦ Guardar</button>
-              <button class="btn-secondary" onclick="toggleWishForm()">Cancelar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pestaña Notas -->
-      <div id="wl-panel-notes">
-        <div id="notes-list"></div>
-      </div>
-      <button id="note-add-fab" onclick="toggleNoteForm()" title="Nueva nota">＋</button>
-
+      <div id="notes-list"></div>
+      <button id="note-add-fab" onclick="toggleNoteForm()" title="Nueva nota" data-i18n-title="title_new_note">＋</button>
     </div>
   </div>
 </div>
@@ -3479,32 +3232,22 @@ if('serviceWorker' in navigator) {
 <!-- ══ NOTE EDITOR (full page) ══ -->
 <div class="modal-overlay note-editor-overlay" id="modal-note-editor">
   <div class="note-editor-inner" onclick="if(event.target===this) document.activeElement.blur()">
-    <button class="note-editor-back" onclick="closeNoteEditor()" title="Volver">&#8592;</button>
-    <input id="nf-title" class="note-editor-title" placeholder="Título"/>
-    <textarea id="nf-body" class="note-editor-body" placeholder="Escribe tu nota aquí..."></textarea>
+    <button class="note-editor-back" onclick="closeNoteEditor()" title="Volver" data-i18n-title="title_back">&#8592;</button>
+    <input id="nf-title" class="note-editor-title" placeholder="Título" data-i18n-placeholder="placeholder_note_title"/>
+    <textarea id="nf-body" class="note-editor-body" placeholder="Escribe tu nota aquí..." data-i18n-placeholder="placeholder_note_body"></textarea>
     <div class="note-editor-actions">
-      <button class="note-editor-cancel" onclick="closeNoteEditor()">Cancelar</button>
-      <button class="note-editor-save" id="nf-save-btn" onclick="saveNote()">Guardar</button>
+      <button class="note-editor-cancel" onclick="closeNoteEditor()" data-i18n="btn_cancel">Cancelar</button>
+      <button class="note-editor-save" id="nf-save-btn" onclick="saveNote()" data-i18n="btn_save">Guardar</button>
     </div>
   </div>
 </div>
 
-<!-- ══ WISH DETAIL MODAL ══ -->
-<div class="modal-overlay" id="modal-wish-detail">
-  <div class="modal" style="max-width:360px">
-    <div class="modal-header">
-      <span class="modal-title">💘 Detalle</span>
-      <button class="modal-close" onclick="closeModal('modal-wish-detail')">✕</button>
-    </div>
-    <div class="modal-body" id="wish-detail-body"></div>
-  </div>
-</div>
 
 <!-- ── MODAL ESCÁNER CÓDIGO DE BARRAS ── -->
 <div class="modal-overlay" id="modal-barcode">
   <div class="modal" style="max-width:380px">
     <div class="modal-header">
-      <span class="modal-title">📷 Escanear código de barras</span>
+      <span class="modal-title" data-i18n="title_scanner">📷 Escanear código de barras</span>
       <button class="modal-close" onclick="closeBarcodeScanner()">✕</button>
     </div>
     <div class="modal-body">
@@ -3512,9 +3255,9 @@ if('serviceWorker' in navigator) {
         <video id="barcode-video" autoplay playsinline muted></video>
         <div id="barcode-aim"></div>
       </div>
-      <div id="barcode-status">Apunta la cámara al código de barras</div>
+      <div id="barcode-status" data-i18n="scanner_default_status">Apunta la cámara al código de barras</div>
       <div class="btn-row">
-        <button class="btn-secondary" onclick="closeBarcodeScanner()">Cancelar</button>
+        <button class="btn-secondary" onclick="closeBarcodeScanner()" data-i18n="btn_cancel">Cancelar</button>
       </div>
     </div>
   </div>
