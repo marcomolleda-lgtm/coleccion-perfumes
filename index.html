@@ -1240,7 +1240,7 @@
 <div class="modal-overlay" id="modal-category">
   <div class="modal" style="max-width:340px">
     <div class="modal-header">
-      <span class="modal-title">Categoría</span>
+      <span class="modal-title" data-i18n="title_category">Categoría</span>
       <button class="modal-close" onclick="closeModal('modal-category')">✕</button>
     </div>
     <div class="modal-body" id="category-picker-list"></div>
@@ -1249,86 +1249,86 @@
 
 <div class="modal-overlay page-overlay" id="modal-fields">
   <div class="page-inner">
-    <button class="page-back" onclick="closeModal('modal-fields');render()" title="Volver">&#8592;</button>
-    <div class="page-title">Campos</div>
+    <button class="page-back" onclick="closeModal('modal-fields');render()" title="Volver" data-i18n-title="title_back">&#8592;</button>
+    <div class="page-title" data-i18n="title_fields">Campos</div>
     <div id="field-mgr-list"></div>
-    <button class="page-link" onclick="addCustomField()">+ Añadir campo</button>
+    <button class="page-link" onclick="addCustomField()" data-i18n="link_add_field">+ Añadir campo</button>
     <div class="page-divider"></div>
-    <button class="page-link" onclick="openClassification()">Gestionar clasificación</button>
+    <button class="page-link" onclick="openClassification()" data-i18n="link_manage_classification">Gestionar clasificación</button>
   </div>
 </div>
 
 <div class="modal-overlay page-overlay" id="modal-families">
   <div class="page-inner">
-    <button class="page-back" onclick="closeModal('modal-families')" title="Volver">&#8592;</button>
-    <div class="page-title">Familias olfativas</div>
+    <button class="page-back" onclick="closeModal('modal-families')" title="Volver" data-i18n-title="title_back">&#8592;</button>
+    <div class="page-title" data-i18n="title_families">Familias olfativas</div>
     <div id="family-mgr-list" class="family-mgr-list"></div>
     <div style="display:flex;gap:10px;margin-top:18px;align-items:center">
-      <input type="text" id="new-family-input" class="page-text-input" placeholder="Nueva familia..." onkeydown="if(event.key==='Enter'){addFamily();}"/>
-      <button class="page-link" onclick="addFamily()">Añadir</button>
+      <input type="text" id="new-family-input" class="page-text-input" placeholder="Nueva familia..." data-i18n-placeholder="placeholder_new_family" onkeydown="if(event.key==='Enter'){addFamily();}"/>
+      <button class="page-link" onclick="addFamily()" data-i18n="btn_add">Añadir</button>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay page-overlay" id="modal-classification">
   <div class="page-inner">
-    <button class="page-back" onclick="closeModal('modal-classification')" title="Volver">&#8592;</button>
-    <div class="page-title">Clasificación</div>
-    <div class="page-subtitle">Añadir, renombrar y eliminar valores</div>
+    <button class="page-back" onclick="closeModal('modal-classification')" title="Volver" data-i18n-title="title_back">&#8592;</button>
+    <div class="page-title" data-i18n="title_classification">Clasificación</div>
+    <div class="page-subtitle" data-i18n="subtitle_classification">Añadir, renombrar y eliminar valores</div>
 
     <div class="class-section">
-      <div class="class-section-title">Categorías</div>
+      <div class="class-section-title" data-i18n="title_categories">Categorías</div>
       <div id="class-categories-list"></div>
     </div>
 
     <div class="class-section">
-      <div class="class-section-title">Familia olfativa</div>
+      <div class="class-section-title" data-i18n="title_family_olfactory">Familia olfativa</div>
       <div class="multi-picker" id="class-family-picker">
         <div class="multi-picker-input-wrap">
-          <input class="multi-picker-input" id="class-family-search" placeholder="Buscar y añadir" autocomplete="off"
+          <input class="multi-picker-input" id="class-family-search" placeholder="Buscar y añadir" data-i18n-placeholder="placeholder_search_add" autocomplete="off"
             oninput="onClassPickerInput('family',this.value)" onfocus="onClassPickerInput('family',this.value)"
             onkeydown="if(event.key==='Enter'){event.preventDefault();classPickerEnter('family',this.value);}"/>
-          <button type="button" class="multi-picker-add" onclick="classPickerEnter('family',document.getElementById('class-family-search').value)" aria-label="Añadir">＋</button>
+          <button type="button" class="multi-picker-add" onclick="classPickerEnter('family',document.getElementById('class-family-search').value)" aria-label="Añadir" data-i18n-aria-label="picker_add_aria">＋</button>
         </div>
         <div class="multi-picker-suggestions" id="class-family-suggestions"></div>
       </div>
       <div class="class-chip-row-wrap">
         <div class="class-chip-row" id="class-family-chips"></div>
-        <button type="button" class="multi-picker-more" id="class-family-more" onclick="toggleClassExpanded('family')">ver todas</button>
+        <button type="button" class="multi-picker-more" id="class-family-more" onclick="toggleClassExpanded('family')" data-i18n="picker_view_all">ver todas</button>
       </div>
     </div>
 
     <div class="class-section">
-      <div class="class-section-title">Notas olfativas</div>
+      <div class="class-section-title" data-i18n="field_notes">Notas olfativas</div>
       <div class="multi-picker" id="class-notes-picker">
         <div class="multi-picker-input-wrap">
-          <input class="multi-picker-input" id="class-notes-search" placeholder="Buscar y añadir" autocomplete="off"
+          <input class="multi-picker-input" id="class-notes-search" placeholder="Buscar y añadir" data-i18n-placeholder="placeholder_search_add" autocomplete="off"
             oninput="onClassPickerInput('notes',this.value)" onfocus="onClassPickerInput('notes',this.value)"
             onkeydown="if(event.key==='Enter'){event.preventDefault();classPickerEnter('notes',this.value);}"/>
-          <button type="button" class="multi-picker-add" onclick="classPickerEnter('notes',document.getElementById('class-notes-search').value)" aria-label="Añadir">＋</button>
+          <button type="button" class="multi-picker-add" onclick="classPickerEnter('notes',document.getElementById('class-notes-search').value)" aria-label="Añadir" data-i18n-aria-label="picker_add_aria">＋</button>
         </div>
         <div class="multi-picker-suggestions" id="class-notes-suggestions"></div>
       </div>
       <div class="class-chip-row-wrap">
         <div class="class-chip-row" id="class-notes-chips"></div>
-        <button type="button" class="multi-picker-more" id="class-notes-more" onclick="toggleClassExpanded('notes')">ver todas</button>
+        <button type="button" class="multi-picker-more" id="class-notes-more" onclick="toggleClassExpanded('notes')" data-i18n="picker_view_all">ver todas</button>
       </div>
     </div>
 
     <div class="class-section">
-      <div class="class-section-title">Etiquetas</div>
+      <div class="class-section-title" data-i18n="field_tags">Etiquetas</div>
       <div class="multi-picker" id="class-tags-picker">
         <div class="multi-picker-input-wrap">
-          <input class="multi-picker-input" id="class-tags-search" placeholder="Buscar y añadir" autocomplete="off"
+          <input class="multi-picker-input" id="class-tags-search" placeholder="Buscar y añadir" data-i18n-placeholder="placeholder_search_add" autocomplete="off"
             oninput="onClassPickerInput('tags',this.value)" onfocus="onClassPickerInput('tags',this.value)"
             onkeydown="if(event.key==='Enter'){event.preventDefault();classPickerEnter('tags',this.value);}"/>
-          <button type="button" class="multi-picker-add" onclick="classPickerEnter('tags',document.getElementById('class-tags-search').value)" aria-label="Añadir">＋</button>
+          <button type="button" class="multi-picker-add" onclick="classPickerEnter('tags',document.getElementById('class-tags-search').value)" aria-label="Añadir" data-i18n-aria-label="picker_add_aria">＋</button>
         </div>
         <div class="multi-picker-suggestions" id="class-tags-suggestions"></div>
       </div>
       <div class="class-chip-row-wrap">
         <div class="class-chip-row" id="class-tags-chips"></div>
-        <button type="button" class="multi-picker-more" id="class-tags-more" onclick="toggleClassExpanded('tags')">ver todas</button>
+        <button type="button" class="multi-picker-more" id="class-tags-more" onclick="toggleClassExpanded('tags')" data-i18n="picker_view_all">ver todas</button>
       </div>
     </div>
   </div>
@@ -1336,7 +1336,7 @@
 
 <div class="modal-overlay page-overlay" id="modal-classification-detail">
   <div class="page-inner">
-    <button class="page-back" onclick="closeModal('modal-classification-detail')" title="Volver">&#8592;</button>
+    <button class="page-back" onclick="closeModal('modal-classification-detail')" title="Volver" data-i18n-title="title_back">&#8592;</button>
     <div class="page-title" id="class-mini-title"></div>
     <div id="class-mini-list"></div>
   </div>
@@ -1611,14 +1611,14 @@ function renderFieldMgr() {
         <div class="switch-track"></div>
       </label>
       <input type="text" value="${f.label}" onchange="renameField(${i},this.value)"/>
-      ${f.required?'<span style="font-size:10px;color:var(--text-light);font-family:\'Jost\',sans-serif">requerido</span>':`<button type="button" class="field-mgr-delete" title="Eliminar campo" onclick="deleteField(${i})">✕</button>`}
+      ${f.required?`<span style="font-size:10px;color:var(--text-light);font-family:'Jost',sans-serif">${t('required_word')}</span>`:`<button type="button" class="field-mgr-delete" title="${t('title_delete_field')}" onclick="deleteField(${i})">✕</button>`}
     </div>`).join('');
 }
 
 function deleteField(i) {
   const f = state.fields[i];
   if (!f || f.required) return;
-  if (!confirm(`¿Eliminar el campo "${f.label}"? Los datos guardados en este campo para todos los perfumes se perderán.`)) return;
+  if (!confirm(`${t('confirm_delete_field_pre')}${fieldLabel(f)}${t('confirm_delete_field_post')}`)) return;
   state.fields.splice(i,1);
   save();
   renderFieldMgr();
@@ -1635,7 +1635,7 @@ function renderFamilyMgr() {
   el.innerHTML = families.map((fam,i)=>`
     <div class="family-mgr-row">
       <span>${fam}</span>
-      <button type="button" class="field-mgr-delete" title="Eliminar familia" onclick="deleteFamilyByName('${escapeHtml(fam)}')">✕</button>
+      <button type="button" class="field-mgr-delete" title="${t('title_delete_family')}" onclick="deleteFamilyByName('${escapeHtml(fam)}')">✕</button>
     </div>`).join('');
 }
 function addFamily() {
@@ -1656,7 +1656,7 @@ function deleteFamilyByName(name) {
 function deleteFamily(i) {
   const fam = state.families[i];
   if (!fam) return;
-  if (!confirm(`¿Eliminar la familia "${fam}"? Los perfumes que la tengan asignada la conservarán en sus datos, pero ya no podrás seleccionarla para nuevos perfumes.`)) return;
+  if (!confirm(`${t('confirm_delete_family_pre')}${fam}${t('confirm_delete_family_post')}`)) return;
   state.families.splice(i,1);
   save();
   renderFamilyMgr();
@@ -1701,12 +1701,12 @@ function renderClassCategories() {
         <span class="row-cat-circle cat-${cat}" style="width:32px;height:32px;font-size:12px;flex-shrink:0">${count}</span>
         <span>${escapeHtml(catLabel(cat))}</span>
       </button>
-      <button type="button" class="field-mgr-delete" title="Renombrar" onclick="event.stopPropagation();renameCategoryLabel('${cat}')">✎</button>
+      <button type="button" class="field-mgr-delete" title="${t('title_rename')}" onclick="event.stopPropagation();renameCategoryLabel('${cat}')">✎</button>
     </div>`;
   }).join('');
 }
 function renameCategoryLabel(cat) {
-  const val = prompt('Nuevo nombre para esta categoría:', catLabel(cat));
+  const val = prompt(t('prompt_rename_category'), catLabel(cat));
   if (val === null) return;
   const trimmed = val.trim();
   if (!trimmed) return;
@@ -1731,10 +1731,10 @@ function renderClassSection(type) {
     const assigned = count > 0;
     return `<div class="class-chip">
       <button type="button" class="class-chip-name" onclick="openClassMiniList('${type}','${escapeHtml(name)}')">${escapeHtml(name)}${assigned?`<span class="class-chip-count">${count}</span>`:''}</button>
-      <button type="button" class="class-chip-icon" title="Renombrar" onclick="event.stopPropagation();renameClassItem('${type}','${escapeHtml(name)}')">✎</button>
-      <button type="button" class="class-chip-icon" title="Eliminar" onclick="event.stopPropagation();deleteClassItem('${type}','${escapeHtml(name)}')">✕</button>
+      <button type="button" class="class-chip-icon" title="${t('title_rename')}" onclick="event.stopPropagation();renameClassItem('${type}','${escapeHtml(name)}')">✎</button>
+      <button type="button" class="class-chip-icon" title="${t('title_delete')}" onclick="event.stopPropagation();deleteClassItem('${type}','${escapeHtml(name)}')">✕</button>
     </div>`;
-  }).join('') : `<div class="class-empty">Sin elementos</div>`;
+  }).join('') : `<div class="class-empty">${t('class_no_items')}</div>`;
 
   const expanded = !!classExpanded[type];
   el.classList.toggle('collapsed', !expanded);
@@ -1742,7 +1742,7 @@ function renderClassSection(type) {
   if (moreBtn) {
     const overflowing = el.scrollHeight > CLASS_CHIPS_COLLAPSED_H + 4;
     moreBtn.classList.toggle('visible', overflowing);
-    moreBtn.textContent = expanded ? 'ver menos' : 'ver todas';
+    moreBtn.textContent = expanded ? t('picker_view_less') : t('picker_view_all');
   }
 }
 function toggleClassExpanded(type) {
@@ -1762,7 +1762,7 @@ function onClassPickerInput(type, value) {
   const matches = classPickerMatches(type, value);
   const exact = (state[type]||[]).some(v => v.toLowerCase() === String(value||'').trim().toLowerCase());
   box.innerHTML = matches.map(v => `<button type="button" class="multi-picker-suggestion" onclick="classSelectSuggestion('${type}','${escapeHtml(v)}')">${escapeHtml(v)}</button>`).join('');
-  if (value.trim() && !exact) box.innerHTML += `<button type="button" class="multi-picker-suggestion" onclick="classCreateItem('${type}',document.getElementById('class-${type}-search').value)">＋ Crear «${escapeHtml(value.trim())}»</button>`;
+  if (value.trim() && !exact) box.innerHTML += `<button type="button" class="multi-picker-suggestion" onclick="classCreateItem('${type}',document.getElementById('class-${type}-search').value)">${t('picker_create_prefix')} «${escapeHtml(value.trim())}»</button>`;
   box.classList.toggle('open', !!value.trim() && box.innerHTML.length > 0);
 }
 function classSelectSuggestion(type, value) {
@@ -1804,7 +1804,7 @@ function reassignClassValue(type, oldName, newName) {
   });
 }
 function renameClassItem(type, oldName) {
-  const val = prompt('Nuevo nombre:', oldName);
+  const val = prompt(t('prompt_rename_item'), oldName);
   if (val === null) return;
   const trimmed = normalizePickerText(val.trim());
   if (!trimmed || trimmed.toLowerCase() === oldName.toLowerCase()) return;
@@ -1812,7 +1812,7 @@ function renameClassItem(type, oldName) {
   const existingIdx = list.findIndex(x=>x.toLowerCase()===trimmed.toLowerCase());
   const oldIdx = list.findIndex(x=>x.toLowerCase()===oldName.toLowerCase());
   if (existingIdx >= 0) {
-    if (!confirm(`Ya existe "${list[existingIdx]}". ¿Fusionar "${oldName}" con "${list[existingIdx]}"?`)) return;
+    if (!confirm(`${t('confirm_merge_pre')}${list[existingIdx]}${t('confirm_merge_mid1')}${oldName}${t('confirm_merge_mid2')}${list[existingIdx]}${t('confirm_merge_post')}`)) return;
     reassignClassValue(type, oldName, list[existingIdx]);
     if (oldIdx >= 0) list.splice(oldIdx,1);
   } else {
@@ -1825,7 +1825,7 @@ function renameClassItem(type, oldName) {
 }
 function deleteClassItem(type, name) {
   const count = classUsageCount(type, name);
-  const msg = count > 0 ? `¿Eliminar "${name}"? Se quitará de ${count} perfume${count!==1?'s':''}.` : `¿Eliminar "${name}"?`;
+  const msg = count > 0 ? `${t('confirm_delete_item_used_pre')}${name}${t('confirm_delete_item_used_mid')}${count}${count!==1?t('confirm_delete_item_used_post_many'):t('confirm_delete_item_used_post_one')}` : `${t('confirm_delete_item_pre')}${name}${t('confirm_delete_item_post')}`;
   if (!confirm(msg)) return;
   const lower = name.toLowerCase();
   state[type] = (state[type]||[]).filter(x=>x.toLowerCase()!==lower);
@@ -1864,7 +1864,7 @@ function openClassMiniList(type, value) {
         ${starsHTML(p.rating||0)}
       </div>
     </div>`;
-  }).join('') : `<div class="class-empty">No hay perfumes con este criterio.</div>`;
+  }).join('') : `<div class="class-empty">${t('class_no_matches')}</div>`;
   openModal('modal-classification-detail');
 }
 
@@ -1901,7 +1901,7 @@ function toggleField(i,v) { state.fields[i].visible=v; save(); }
 function renameField(i,v) { state.fields[i].label=v; save(); }
 function addCustomField() {
   const key='custom_'+Date.now();
-  state.fields.push({key,label:'Nuevo campo',visible:true});
+  state.fields.push({key,label:t('new_field_default'),visible:true});
   save(); renderFieldMgr();
 }
 
@@ -3266,6 +3266,22 @@ const I18N = {
     cover_word: "Portada",
     alert_name_required: "El nombre es obligatorio", confirm_delete_perfume: "¿Eliminar este perfume?",
     cat_perfumes: "perfumes", cat_coleccion: "en colección", cat_deseo: "deseos", cat_probados: "probados",
+    // ── Part 3: field/family manager, classification ──
+    title_category: "Categoría", title_fields: "Campos", link_add_field: "+ Añadir campo",
+    link_manage_classification: "Gestionar clasificación", required_word: "requerido",
+    title_delete_field: "Eliminar campo", new_field_default: "Nuevo campo",
+    title_families: "Familias olfativas", placeholder_new_family: "Nueva familia...",
+    btn_add: "Añadir", title_delete_family: "Eliminar familia",
+    title_classification: "Clasificación", subtitle_classification: "Añadir, renombrar y eliminar valores",
+    title_categories: "Categorías", title_family_olfactory: "Familia olfativa",
+    placeholder_search_add: "Buscar y añadir", title_rename: "Renombrar", title_delete: "Eliminar",
+    class_no_items: "Sin elementos", class_no_matches: "No hay perfumes con este criterio.",
+    confirm_delete_field_pre: '¿Eliminar el campo "', confirm_delete_field_post: '"? Los datos guardados en este campo para todos los perfumes se perderán.',
+    confirm_delete_family_pre: '¿Eliminar la familia "', confirm_delete_family_post: '"? Los perfumes que la tengan asignada la conservarán en sus datos, pero ya no podrás seleccionarla para nuevos perfumes.',
+    prompt_rename_category: "Nuevo nombre para esta categoría:", prompt_rename_item: "Nuevo nombre:",
+    confirm_merge_pre: 'Ya existe "', confirm_merge_mid1: '". ¿Fusionar "', confirm_merge_mid2: '" con "', confirm_merge_post: '"?',
+    confirm_delete_item_used_pre: '¿Eliminar "', confirm_delete_item_used_mid: '"? Se quitará de ', confirm_delete_item_used_post_one: ' perfume.', confirm_delete_item_used_post_many: ' perfumes.',
+    confirm_delete_item_pre: '¿Eliminar "', confirm_delete_item_post: '"?',
   },
   en: {
     menu_export: "Export", menu_import: "Import",
@@ -3298,6 +3314,22 @@ const I18N = {
     cover_word: "Cover",
     alert_name_required: "Name is required", confirm_delete_perfume: "Delete this perfume?",
     cat_perfumes: "perfumes", cat_coleccion: "in collection", cat_deseo: "wishlist", cat_probados: "tried",
+    // ── Part 3: field/family manager, classification ──
+    title_category: "Category", title_fields: "Fields", link_add_field: "+ Add field",
+    link_manage_classification: "Manage classification", required_word: "required",
+    title_delete_field: "Delete field", new_field_default: "New field",
+    title_families: "Olfactory families", placeholder_new_family: "New family...",
+    btn_add: "Add", title_delete_family: "Delete family",
+    title_classification: "Classification", subtitle_classification: "Add, rename, and delete values",
+    title_categories: "Categories", title_family_olfactory: "Olfactory family",
+    placeholder_search_add: "Search and add", title_rename: "Rename", title_delete: "Delete",
+    class_no_items: "No items", class_no_matches: "No perfumes match this criterion.",
+    confirm_delete_field_pre: 'Delete the field "', confirm_delete_field_post: '"? Data saved in this field for all perfumes will be lost.',
+    confirm_delete_family_pre: 'Delete the family "', confirm_delete_family_post: '"? Perfumes that have it assigned will keep it in their data, but you won\'t be able to select it for new perfumes anymore.',
+    prompt_rename_category: "New name for this category:", prompt_rename_item: "New name:",
+    confirm_merge_pre: 'A value "', confirm_merge_mid1: '" already exists. Merge "', confirm_merge_mid2: '" with "', confirm_merge_post: '"?',
+    confirm_delete_item_used_pre: 'Delete "', confirm_delete_item_used_mid: '"? It will be removed from ', confirm_delete_item_used_post_one: ' perfume.', confirm_delete_item_used_post_many: ' perfumes.',
+    confirm_delete_item_pre: 'Delete "', confirm_delete_item_post: '"?',
   }
 };
 let currentLang = localStorage.getItem('scentic-lang') || 'es';
@@ -3347,6 +3379,10 @@ function applyLanguage(lang) {
   document.querySelectorAll('[data-i18n-alt]').forEach(function(el) {
     const key = el.getAttribute('data-i18n-alt');
     if (dict[key]) el.alt = dict[key];
+  });
+  document.querySelectorAll('[data-i18n-aria-label]').forEach(function(el) {
+    const key = el.getAttribute('data-i18n-aria-label');
+    if (dict[key]) el.setAttribute('aria-label', dict[key]);
   });
   const sb = document.getElementById('search-bar');
   if (sb && dict.search_placeholder) sb.placeholder = dict.search_placeholder;
