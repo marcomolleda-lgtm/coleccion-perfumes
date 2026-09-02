@@ -985,6 +985,7 @@
         <div id="panel-lang-menu" class="dropdown-menu" style="left:0;transform:none;">
           <button class="dropdown-item" onclick="setLanguage('es');closePanelLangMenu()">🇪🇸 Español</button>
           <button class="dropdown-item" onclick="setLanguage('en');closePanelLangMenu()">🇬🇧 English</button>
+          <button class="dropdown-item" onclick="setLanguage('ja');closePanelLangMenu()">🇯🇵 日本語</button>
         </div>
       </div>
     </div>
@@ -1015,6 +1016,7 @@
     <div id="home-lang-menu" class="dropdown-menu">
       <button class="dropdown-item" onclick="setLanguage('es')">🇪🇸 Español</button>
       <button class="dropdown-item" onclick="setLanguage('en')">🇬🇧 English</button>
+      <button class="dropdown-item" onclick="setLanguage('ja')">🇯🇵 日本語</button>
     </div>
   </div>
 </div>
@@ -2807,7 +2809,7 @@ function saveNote() {
   const noteData = {
     title,
     body,
-    date: new Date().toLocaleDateString(currentLang==='en'?'en-GB':'es-ES', {day:'2-digit', month:'short', year:'numeric'})
+    date: new Date().toLocaleDateString(currentLang==='en'?'en-GB':currentLang==='ja'?'ja-JP':'es-ES', {day:'2-digit', month:'short', year:'numeric'})
   };
   if (editIndex !== '' && editIndex !== undefined) {
     notes[parseInt(editIndex)] = noteData;
@@ -3123,6 +3125,79 @@ const I18N = {
     scanner_scanning: "Point at the perfume's barcode…",
     scanner_detected_pre: "✓ Code detected: ",
     scanner_camera_error: "⚠ Could not access the camera. Enter the code manually.",
+  },
+  ja: {
+    menu_export: "エクスポート", menu_import: "インポート",
+    search_placeholder: "検索",
+    home_search: "検索",
+    empty_state: "香水がまだありません",
+    sort_label: "並び替え", sort_date: "登録順", sort_name: "アルファベット順",
+    manage_fields: "項目を管理", notes: "メモ",
+    menu_perfumes: "香水", menu_fields: "項目", menu_notes: "メモ", menu_classification: "分類",
+    title_home: "ホーム", title_language: "言語", title_menu: "メニュー",
+    title_go_to_perfumes: "香水一覧へ", title_add_perfume: "香水を追加",
+    title_change_category: "カテゴリーを変更", empty_hint: "フィルターを変更してみてください",
+    // ── Part 2: cards, detail, edit ──
+    card_full_profile: "詳細プロフィール",
+    add_photo_line1: "写真を", add_photo_line2: "追加", add_image_alt: "画像を追加",
+    title_back: "戻る",
+    video_thumbnail_alt: "動画のサムネイル",
+    field_notes: "香りのノート", field_comments: "コメント", video_label_short: "動画",
+    btn_edit: "編集",
+    edit_title_new: "新しい香水", edit_title_edit: "香水を編集",
+    label_photos: "写真（最大6枚）", photo_word: "写真",
+    comments_placeholder: "コメントを追加...",
+    field_video: "YOUTUBE動画", video_url_placeholder: "ここにYouTubeのリンクを貼り付け...", video_found: "動画が見つかりました ✓",
+    field_rating: "評価", field_category: "カテゴリー",
+    field_barcode: "バーコード", title_scan_barcode: "カメラでスキャン",
+    field_tags: "タグ",
+    btn_delete_perfume: "香水を削除", btn_save: "保存",
+    picker_placeholder: "追加・検索", picker_add_aria: "追加",
+    picker_create_prefix: "＋ 作成", picker_view_all: "すべて表示", picker_view_less: "表示を減らす",
+    cover_word: "カバー",
+    alert_name_required: "名前は必須です", confirm_delete_perfume: "この香水を削除しますか？",
+    cat_perfumes: "香水", cat_coleccion: "コレクション", cat_deseo: "欲しいもの", cat_probados: "試した",
+    // ── Part 3: field/family manager, classification ──
+    title_category: "カテゴリー", title_fields: "項目", link_add_field: "＋ 項目を追加",
+    link_manage_classification: "分類を管理", required_word: "必須",
+    title_delete_field: "項目を削除", new_field_default: "新しい項目",
+    title_families: "香りの系統", placeholder_new_family: "新しい系統...",
+    btn_add: "追加", title_delete_family: "系統を削除",
+    title_classification: "分類", subtitle_classification: "値の追加・名前変更・削除",
+    title_categories: "カテゴリー", title_family_olfactory: "香りの系統",
+    placeholder_search_add: "検索して追加", title_rename: "名前を変更", title_delete: "削除",
+    class_no_items: "項目なし", class_no_matches: "この条件に一致する香水はありません。",
+    confirm_delete_field_pre: '項目「', confirm_delete_field_post: '」を削除しますか？すべての香水でこの項目に保存されたデータは失われます。',
+    confirm_delete_family_pre: '系統「', confirm_delete_family_post: '」を削除しますか？割り当て済みの香水はデータを保持しますが、新しい香水には選択できなくなります。',
+    prompt_rename_category: "このカテゴリーの新しい名前：", prompt_rename_item: "新しい名前：",
+    confirm_merge_pre: '「', confirm_merge_mid1: '」はすでに存在します。「', confirm_merge_mid2: '」を「', confirm_merge_post: '」と統合しますか？',
+    confirm_delete_item_used_pre: '「', confirm_delete_item_used_mid: '」を削除しますか？', confirm_delete_item_used_post_one: '件の香水から削除されます。', confirm_delete_item_used_post_many: '件の香水から削除されます。',
+    confirm_delete_item_pre: '「', confirm_delete_item_post: '」を削除しますか？',
+    // ── Part 4: export/import, notes, barcode scanner ──
+    title_export_collection: "💾 コレクションをエクスポート",
+    export_intro: '形式を選んでください。<strong>JSON</strong>は写真を含むすべてを保存し、バックアップに最適です。<strong>Excel/CSV</strong>は表計算ソフトでデータを見るためのものです。',
+    btn_export_json_title: "📦 JSON — 完全バックアップ",
+    btn_export_json_sub: "（写真を含む・推奨）",
+    btn_export_xlsx: "📊 Excel (.xls) — 表計算ソフト用",
+    btn_export_csv: "📄 CSV — どのソフトとも互換",
+    export_filename_base: "香水コレクション",
+    alert_invalid_file: "無効なファイルです。",
+    confirm_import_pre: "",
+    confirm_import_post: " 件の香水が見つかりました。\n\n✓ OK＝現在のコレクションに追加\n✗ キャンセル＝コレクション全体を置き換え",
+    alert_import_complete_pre: "✓ インポート完了：", alert_import_complete_post: " 件の香水。",
+    alert_import_error: "ファイルの読み込みエラー。perfumesからエクスポートしたJSONファイルか確認してください。",
+    empty_notes: "まだメモがありません", title_new_note: "新しいメモ", title_delete_note: "削除",
+    confirm_delete_note: "このメモを削除しますか？",
+    alert_note_required: "タイトルか本文の少なくとも一方を入力してください。",
+    placeholder_note_title: "タイトル", placeholder_note_body: "ここにメモを書く...",
+    btn_cancel: "キャンセル",
+    title_scanner: "📷 バーコードをスキャン",
+    scanner_default_status: "カメラをバーコードに向けてください",
+    scanner_unavailable: "⚠ このブラウザではスキャナーが使用できません。コードを手入力してください。",
+    scanner_starting: "カメラを起動中…",
+    scanner_scanning: "香水のバーコードに向けてください…",
+    scanner_detected_pre: "✓ コードを検出: ",
+    scanner_camera_error: "⚠ カメラにアクセスできませんでした。コードを手入力してください。",
   }
 };
 let currentLang = localStorage.getItem('scentic-lang') || 'es';
@@ -3132,7 +3207,8 @@ function t(key) { return (I18N[currentLang] || I18N.es)[key] || key; }
 // display only when the user hasn't renamed/customized them.
 const DEFAULT_FIELD_LABELS = {
   es: {name:"Nombre",brand:"Marca",concentration:"Concentración",capacity:"Capacidad",launch:"Lanzamiento",perfumer:"Perfumista",bottleDesigner:"Diseñador del frasco",family:"Familia olfativa",gender:"Sexo",notes:"Notas olfativas",boughtAt:"Comprado en",price:"Precio",inCollectionSince:"En colección desde",rating:"Valoración",bottleCount:"Número de frascos",comments:"Comentarios",status:"Categoría",barcode:"Código de barras"},
-  en: {name:"Name",brand:"Brand",concentration:"Concentration",capacity:"Size",launch:"Release year",perfumer:"Perfumer",bottleDesigner:"Bottle designer",family:"Olfactory family",gender:"Gender",notes:"Olfactory notes",boughtAt:"Purchased at",price:"Price",inCollectionSince:"In collection since",rating:"Rating",bottleCount:"Number of bottles",comments:"Comments",status:"Category",barcode:"Barcode"}
+  en: {name:"Name",brand:"Brand",concentration:"Concentration",capacity:"Size",launch:"Release year",perfumer:"Perfumer",bottleDesigner:"Bottle designer",family:"Olfactory family",gender:"Gender",notes:"Olfactory notes",boughtAt:"Purchased at",price:"Price",inCollectionSince:"In collection since",rating:"Rating",bottleCount:"Number of bottles",comments:"Comments",status:"Category",barcode:"Barcode"},
+  ja: {name:"名前",brand:"ブランド",concentration:"濃度",capacity:"容量",launch:"発売年",perfumer:"調香師",bottleDesigner:"ボトルデザイナー",family:"香りの系統",gender:"性別",notes:"香りのノート",boughtAt:"購入場所",price:"価格",inCollectionSince:"コレクション登録日",rating:"評価",bottleCount:"本数",comments:"コメント",status:"カテゴリー",barcode:"バーコード"}
 };
 function fieldLabel(f) {
   const esDefault = DEFAULT_FIELD_LABELS.es[f.key];
@@ -3141,11 +3217,13 @@ function fieldLabel(f) {
 }
 const CONCENTRATION_LABELS = {
   es: {"Aceite":"Aceite","Colonia":"Colonia","EDT":"EDT","EDP":"EDP","Perfume":"Perfume","Extracto de perfume":"Extracto de perfume","Sólido":"Sólido"},
-  en: {"Aceite":"Oil","Colonia":"Cologne","EDT":"EDT","EDP":"EDP","Perfume":"Perfume","Extracto de perfume":"Pure perfume","Sólido":"Solid"}
+  en: {"Aceite":"Oil","Colonia":"Cologne","EDT":"EDT","EDP":"EDP","Perfume":"Perfume","Extracto de perfume":"Pure perfume","Sólido":"Solid"},
+  ja: {"Aceite":"オイル","Colonia":"オーデコロン","EDT":"EDT","EDP":"EDP","Perfume":"パルファン","Extracto de perfume":"エクストレ","Sólido":"練り香水"}
 };
 const GENDER_LABELS = {
   es: {"Masculino":"Masculino","Femenino":"Femenino","Unisex":"Unisex","Andrógino":"Andrógino"},
-  en: {"Masculino":"Masculine","Femenino":"Feminine","Unisex":"Unisex","Andrógino":"Androgynous"}
+  en: {"Masculino":"Masculine","Femenino":"Feminine","Unisex":"Unisex","Andrógino":"Androgynous"},
+  ja: {"Masculino":"メンズ","Femenino":"レディース","Unisex":"ユニセックス","Andrógino":"アンドロジナス"}
 };
 function concentrationLabel(v) { return (CONCENTRATION_LABELS[currentLang]||CONCENTRATION_LABELS.es)[v] || v; }
 function genderLabel(v) { return (GENDER_LABELS[currentLang]||GENDER_LABELS.es)[v] || v; }
