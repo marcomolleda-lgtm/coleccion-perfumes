@@ -199,11 +199,21 @@
     font-size:15px; font-family:'Jost',sans-serif; font-style:italic; color:var(--text-muted);
     line-height:1.5; overflow:hidden; white-space:pre-wrap; word-break:break-word;
   }
-  .row-more-wrap { flex-shrink:0; text-align:center; padding-top:10px; }
+  .row-more-wrap {
+    flex-shrink:0; display:grid; grid-template-columns:1fr auto 1fr;
+    align-items:center; padding-top:10px;
+  }
   .row-more-btn {
+    grid-column:2; justify-self:center;
     background:none; border:none; cursor:pointer; padding:6px 10px;
     font-size:17px; font-family:'Jost',sans-serif; color:var(--star);
   }
+  .row-view-toggle-btn {
+    grid-column:1; justify-self:start;
+    background:none; border:none; cursor:pointer; padding:6px 10px;
+    color:var(--text-muted); display:flex; align-items:center;
+  }
+  .row-view-toggle-btn:active { opacity:.6; }
 
   /* Stars */
   .stars { display:flex; gap:3px; }
@@ -560,6 +570,18 @@
   .row-small-name { font-size:19px; font-family:'Cormorant Garamond',serif; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .row-small-brand { font-size:14px; font-family:'Jost',sans-serif; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .row-small .stars .star { font-size:13px; }
+  .row-small-status { flex-shrink:0; cursor:pointer; }
+  #list-back-bar {
+    display:none; align-items:center; justify-content:flex-start;
+    padding:12px 16px 0;
+  }
+  #list-back-bar.show { display:flex; }
+  .list-back-btn {
+    background:none; border:none; cursor:pointer; padding:6px 10px;
+    color:var(--text-muted); display:flex; align-items:center; gap:6px;
+    font-family:'Jost',sans-serif; font-size:14px;
+  }
+  .list-back-btn:active { opacity:.6; }
   #empty small { font-size:13px; color:var(--text-light); }
 
 
@@ -1049,6 +1071,12 @@
     </button>
     <div class="row-brand-badge results-query-badge" id="results-query-badge" style="display:none"></div>
   </div>
+  <div id="list-back-bar">
+    <button class="list-back-btn" onclick="toggleBrowseView('card')" title="Ver fichas" data-i18n-title="title_view_card">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span data-i18n="btn_view_card">ficha completa</span>
+    </button>
+  </div>
   <div id="list"></div>
   <div id="empty" style="display:none">
     <div class="empty-body">
@@ -1341,7 +1369,7 @@ let state = {
   ],
   nextId: 10,
   sort: 'date',
-  view: 'grid',
+  view: 'card',
   theme: {}
 };
 
@@ -1502,6 +1530,7 @@ async function initState() {
     state.families = uniqueSorted(state.families);
     if (state.category === 'otro') state.category = 'probados';
     if (!state.category) state.category = 'perfumes';
+    if (state.view !== 'list') state.view = 'card';
     // Ensure each perfume has photos array placeholder
     state.perfumes = state.perfumes.map(p => ({...p, photos: [null,null,null], coverIndex: 0}));
     // Load all photos from IDB
@@ -1827,6 +1856,7 @@ function openClassMiniList(type, value) {
         <div class="row-small-brand">${escapeHtml(p.brand||'')}</div>
         ${starsHTML(p.rating||0)}
       </div>
+      <span class="badge-out row-small-status cat-${p.status||'coleccion'}" onclick="event.stopPropagation();openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
     </div>`;
   }).join('') : `<div class="class-empty">${t('class_no_matches')}</div>`;
   openModal('modal-classification-detail');
@@ -1991,6 +2021,12 @@ function starsHTML(n, cls='') {
   return `<div class="stars ${cls}">${[1,2,3,4,5].map(i=>`<span class="star${i<=n?' on':''}">★</span>`).join('')}</div>`;
 }
 
+function toggleBrowseView(mode) {
+  state.view = (mode === 'list') ? 'list' : 'card';
+  save();
+  render();
+}
+
 function render() {
   const filtered = getFiltered();
   const searchQ = document.getElementById('search-bar').value.trim();
@@ -1999,8 +2035,11 @@ function render() {
   const main = document.getElementById('main');
   const rh = document.getElementById('results-header');
   const qBadge = document.getElementById('results-query-badge');
-  const showHeader = searchQ.length>0 || filtered.length===0;
+  const backBar = document.getElementById('list-back-bar');
+  const listAsRows = searchQ.length>0 || state.view === 'list';
+  const showHeader = searchQ.length>0 || filtered.length===0 || state.view === 'list';
   rh.style.display = showHeader ? 'flex' : 'none';
+  backBar.classList.toggle('show', state.view === 'list' && filtered.length>0);
   if (showHeader) {
     document.getElementById('results-cat-circle').className = 'row-cat-circle cat-' + (state.category||'perfumes');
     document.getElementById('results-cat-circle').textContent = String(filtered.length);
@@ -2018,7 +2057,7 @@ function render() {
   }
   document.getElementById('empty').style.display='none';
 
-  if (searchQ) {
+  if (listAsRows) {
     // ── Small compact result cards ──
     main.classList.add('list-mode');
     const listEl = document.getElementById('list');
@@ -2033,6 +2072,7 @@ function render() {
           <div class="row-small-brand">${p.brand||''}</div>
           ${starsHTML(p.rating||0)}
         </div>
+        <span class="badge-out row-small-status cat-${p.status||'coleccion'}" onclick="event.stopPropagation();openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
       </div>`;
     }).join('');
     _setMainHeight();
@@ -2079,6 +2119,9 @@ function render() {
         </div>
         <div class="row-comments"></div>
         <div class="row-more-wrap">
+          <button class="row-view-toggle-btn" onclick="toggleBrowseView('list')" title="${t('title_view_list')}">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
           <button class="row-more-btn" onclick="openDetail(${p.id})">${t('card_full_profile')}</button>
         </div>
       </div>
@@ -2991,6 +3034,7 @@ const I18N = {
     title_home: "Inicio", title_language: "Idioma", title_menu: "Menú",
     title_go_to_perfumes: "Ir a mis perfumes", title_add_perfume: "Añadir perfume",
     title_change_category: "Cambiar categoría", empty_hint: "Prueba a cambiar los filtros",
+    title_view_list: "Ver en lista", title_view_card: "Ver ficha completa", btn_view_card: "ficha completa",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Ficha completa",
     add_photo_line1: "AÑADIR", add_photo_line2: "IMAGEN", add_image_alt: "Añadir imagen",
@@ -3064,6 +3108,7 @@ const I18N = {
     title_home: "Home", title_language: "Language", title_menu: "Menu",
     title_go_to_perfumes: "Go to my perfumes", title_add_perfume: "Add perfume",
     title_change_category: "Change category", empty_hint: "Try changing the filters",
+    title_view_list: "List view", title_view_card: "Full card view", btn_view_card: "full profile",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Full profile",
     add_photo_line1: "ADD", add_photo_line2: "PHOTO", add_image_alt: "Add image",
@@ -3137,6 +3182,7 @@ const I18N = {
     title_home: "ホーム", title_language: "言語", title_menu: "メニュー",
     title_go_to_perfumes: "香水一覧へ", title_add_perfume: "香水を追加",
     title_change_category: "カテゴリーを変更", empty_hint: "フィルターを変更してみてください",
+    title_view_list: "リスト表示", title_view_card: "詳細表示", btn_view_card: "詳細プロフィール",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "詳細プロフィール",
     add_photo_line1: "写真を", add_photo_line2: "追加", add_image_alt: "画像を追加",
