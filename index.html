@@ -1173,9 +1173,9 @@
       <div class="field-group">
         <label class="field-label" data-i18n="field_category">CATEGORÍA</label>
         <div class="cat-toggle-row" id="f-status-toggle">
-          <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')">en colección</button>
-          <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')">deseos</button>
-          <button type="button" class="cat-toggle-btn cat-probados" data-val="probados" onclick="setStatusToggle('probados')">probados</button>
+          <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')" data-i18n="cat_coleccion">en colección</button>
+          <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')" data-i18n="cat_deseo">deseos</button>
+          <button type="button" class="cat-toggle-btn cat-probados" data-val="probados" onclick="setStatusToggle('probados')" data-i18n="cat_probados">probados</button>
         </div>
       </div>
 
@@ -3184,6 +3184,20 @@ function applyLanguage(lang) {
   const sb = document.getElementById('search-bar');
   if (sb && dict.search_placeholder) sb.placeholder = dict.search_placeholder;
   document.documentElement.lang = lang;
+
+  // Re-generate dynamic content (cards, lists, modals) so it reflects the new language immediately,
+  // instead of only updating on the next natural re-render.
+  const isOpen = (id) => { const el = document.getElementById(id); return !!el && el.classList.contains('open'); };
+  if (typeof render === 'function') render();
+  if (isOpen('modal-classification') && typeof renderClassification === 'function') renderClassification();
+  if (isOpen('modal-fields') && typeof renderFieldMgr === 'function') renderFieldMgr();
+  if (isOpen('modal-families') && typeof renderFamilyMgr === 'function') renderFamilyMgr();
+  if (isOpen('modal-notes') && typeof renderNotes === 'function') renderNotes();
+  if (isOpen('modal-detail') && typeof currentDetailId !== 'undefined' && currentDetailId != null && typeof openDetail === 'function') openDetail(currentDetailId);
+  if (isOpen('modal-edit')) {
+    const activeBtn = document.querySelector('#f-status-toggle .cat-toggle-btn.active');
+    if (activeBtn && typeof setStatusToggle === 'function') setStatusToggle(activeBtn.dataset.val);
+  }
 }
 
 (function init() {
@@ -3214,7 +3228,7 @@ if('serviceWorker' in navigator) {
 }
 </script>
 
-<!-- ══ WISHLIST MODAL ══ -->
+<!-- ══ NOTES MODAL ══ -->
 <div class="modal-overlay" id="modal-notes">
   <div class="modal">
     <div class="modal-header">
