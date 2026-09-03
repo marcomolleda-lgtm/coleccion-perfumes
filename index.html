@@ -85,9 +85,9 @@
   #btn-add {
     padding:0; border-radius:0; border:none;
     background:transparent; color:var(--accent-dark); font-weight:700;
-    font-family:'Jost',sans-serif; font-size:32px; cursor:pointer;
+    font-family:'Jost',sans-serif; font-size:20px; cursor:pointer;
     white-space:nowrap; flex-shrink:0;
-    line-height:1; width:40px; height:40px;
+    line-height:1; width:36px; height:36px;
     display:flex; align-items:center; justify-content:center;
   }
   #btn-add:active { opacity:.6; }
@@ -412,8 +412,8 @@
   #detail-add-btn {
     padding:0; border-radius:0; border:none;
     background:transparent; color:var(--accent-dark); font-weight:700;
-    font-family:'Jost',sans-serif; font-size:32px; cursor:pointer;
-    flex-shrink:0; line-height:1; width:40px; height:40px;
+    font-family:'Jost',sans-serif; font-size:20px; cursor:pointer;
+    flex-shrink:0; line-height:1; width:36px; height:36px;
     display:flex; align-items:center; justify-content:center;
   }
   #detail-add-btn:active { opacity:.6; }
@@ -940,9 +940,9 @@
   #home-search:focus { outline: none; }
   #home-add-btn {
     position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%);
-    width: 62px; height: 62px; border-radius: 0;
+    width: 44px; height: 44px; border-radius: 0;
     background: transparent; border: none;
-    color: var(--accent-dark); font-size: 44px; font-family: 'Jost', sans-serif;
+    color: var(--accent-dark); font-size: 26px; font-family: 'Jost', sans-serif;
     box-shadow: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
@@ -2485,7 +2485,7 @@ function openEdit(id) {
     if(f.key==='family') div.style.gridColumn='1 / -1';
     let inner=`<label class="field-label">${fieldLabel(f).toUpperCase()}</label>`;
     const val = p?p[f.key]||'':'';
-    if(f.key==='concentration') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${uniqueSorted(state.concentrations||CONCENTRATIONS).map(o=>`<option value="${o}"${val===o?' selected':''}>${concentrationLabel(o)}</option>`).join('')}</select>`;
+    if(f.key==='concentration') inner+=`<select class="field-select" id="ef-${f.key}" data-prev-value="${escapeHtml(val)}" onchange="handleConcentrationSelectChange(this)">${concentrationOptionsHtml(val)}</select>`;
     else if(f.key==='family') {
       editFamilies = normalizePickerValues(val);
       inner += `<div id="ef-family-picker"></div>`;
@@ -3243,6 +3243,7 @@ const I18N = {
     video_thumbnail_alt: "Miniatura del vídeo",
     field_notes: "Notas olfativas", field_comments: "Comentarios", video_label_short: "Vídeo",
     field_concentration: "Concentración",
+    picker_add_new_concentration: "＋ Añadir nueva...", prompt_new_concentration: "Nueva concentración",
     btn_edit: "Editar",
     edit_title_new: "Nuevo perfume", edit_title_edit: "Editar perfume",
     label_photos: "FOTOS (hasta 6)", photo_word: "FOTO",
@@ -3318,6 +3319,7 @@ const I18N = {
     video_thumbnail_alt: "Video thumbnail",
     field_notes: "Olfactory notes", field_comments: "Comments", video_label_short: "Video",
     field_concentration: "Concentration",
+    picker_add_new_concentration: "＋ Add new...", prompt_new_concentration: "New concentration",
     btn_edit: "Edit",
     edit_title_new: "New perfume", edit_title_edit: "Edit perfume",
     label_photos: "PHOTOS (up to 6)", photo_word: "PHOTO",
@@ -3393,6 +3395,7 @@ const I18N = {
     video_thumbnail_alt: "動画のサムネイル",
     field_notes: "香りのノート", field_comments: "コメント", video_label_short: "動画",
     field_concentration: "濃度",
+    picker_add_new_concentration: "＋ 新規追加...", prompt_new_concentration: "新しい濃度",
     btn_edit: "編集",
     edit_title_new: "新しい香水", edit_title_edit: "香水を編集",
     label_photos: "写真（最大6枚）", photo_word: "写真",
@@ -3476,6 +3479,32 @@ const GENDER_LABELS = {
   ja: {"Masculino":"メンズ","Femenino":"レディース","Unisex":"ユニセックス","Andrógino":"アンドロジナス"}
 };
 function concentrationLabel(v) { return (CONCENTRATION_LABELS[currentLang]||CONCENTRATION_LABELS.es)[v] || v; }
+function concentrationOptionsHtml(selectedVal) {
+  const opts = uniqueSorted(state.concentrations||CONCENTRATIONS);
+  let html = `<option value="">—</option>`;
+  html += opts.map(o=>`<option value="${escapeHtml(o)}"${selectedVal===o?' selected':''}>${escapeHtml(concentrationLabel(o))}</option>`).join('');
+  html += `<option value="__add_new__">${t('picker_add_new_concentration')}</option>`;
+  return html;
+}
+function handleConcentrationSelectChange(sel) {
+  if (sel.value === '__add_new__') {
+    const prev = sel.dataset.prevValue || '';
+    const input = prompt(t('prompt_new_concentration'));
+    if (input === null) { sel.value = prev; return; }
+    const trimmed = input.trim();
+    if (!trimmed) { sel.value = prev; return; }
+    if (!Array.isArray(state.concentrations)) state.concentrations = [...CONCENTRATIONS];
+    if (!state.concentrations.some(x=>x.toLowerCase()===trimmed.toLowerCase())) {
+      state.concentrations.push(trimmed);
+      state.concentrations = uniqueSorted(state.concentrations);
+      save();
+    }
+    sel.innerHTML = concentrationOptionsHtml(trimmed);
+    sel.dataset.prevValue = trimmed;
+  } else {
+    sel.dataset.prevValue = sel.value;
+  }
+}
 function genderLabel(v) { return (GENDER_LABELS[currentLang]||GENDER_LABELS.es)[v] || v; }
 function setLanguage(lang) {
   localStorage.setItem('scentic-lang', lang);
