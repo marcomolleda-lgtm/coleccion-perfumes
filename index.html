@@ -208,12 +208,40 @@
     background:none; border:none; cursor:pointer; padding:6px 10px;
     font-size:17px; font-family:'Jost',sans-serif; color:var(--star);
   }
-  .row-view-toggle-btn {
+  .row-bottom-icons {
     grid-column:1; justify-self:start;
+    display:flex; align-items:center; gap:6px;
+  }
+  .row-view-toggle-btn {
     background:none; border:none; cursor:pointer; padding:6px 10px;
     color:var(--text-muted); display:flex; align-items:center;
   }
   .row-view-toggle-btn:active { opacity:.6; }
+  .sort-alpha-btn {
+    background:none; border:none; cursor:pointer;
+    width:30px; height:30px; border-radius:5px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond',serif; font-weight:700; font-size:18px;
+    color:var(--text-muted); flex-shrink:0;
+  }
+  .sort-alpha-btn.active { background:var(--accent-yellow); color:var(--text); }
+  .sort-alpha-btn:active { opacity:.6; }
+
+  /* ── LIST-MODE SORT/CATEGORY BAR ── */
+  #list-sort-bar {
+    display:none; align-items:center; justify-content:space-between;
+    padding:16px 16px 24px;
+  }
+  #list-sort-bar.show { display:flex; }
+  .list-sort-icons { display:flex; align-items:center; gap:8px; }
+  .list-cat-badge {
+    display:flex; align-items:center; gap:10px;
+    background:none; border:none; cursor:pointer;
+  }
+  .list-cat-label-2line {
+    font-size:11px; font-family:'Jost',sans-serif; color:var(--text-light);
+    line-height:1.35; text-align:left; white-space:normal;
+  }
 
   /* Stars */
   .stars { display:flex; gap:3px; }
@@ -1071,10 +1099,16 @@
     </button>
     <div class="row-brand-badge results-query-badge" id="results-query-badge" style="display:none"></div>
   </div>
-  <div id="list-back-bar">
-    <button class="list-back-btn" onclick="toggleBrowseView('card')" title="Ver fichas" data-i18n-title="title_view_card">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-      <span data-i18n="btn_view_card">ficha completa</span>
+  <div id="list-sort-bar">
+    <div class="list-sort-icons">
+      <button class="row-view-toggle-btn" onclick="toggleBrowseView('card')" title="Ver fichas" data-i18n-title="title_view_card">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+      <button class="sort-alpha-btn" id="list-sort-alpha-btn" onclick="toggleSortAlpha()" title="Orden alfabético" data-i18n-title="title_sort_alpha">A</button>
+    </div>
+    <button class="list-cat-badge" onclick="openCategoryPicker()" title="Cambiar categoría" data-i18n-title="title_change_category">
+      <span class="row-cat-circle" id="list-cat-circle">0</span>
+      <span class="list-cat-label-2line" id="list-cat-label-2line"></span>
     </button>
   </div>
   <div id="list"></div>
@@ -1924,6 +1958,9 @@ document.addEventListener('click', function(e) {
   if(panelLangWrap && !panelLangWrap.contains(e.target)) closePanelLangMenu();
 });
 
+function toggleSortAlpha() {
+  setSort(state.sort === 'name' ? 'date' : 'name');
+}
 function setSort(s) {
   state.sort = s; save();
   applyViewSort();
@@ -2035,17 +2072,24 @@ function render() {
   const main = document.getElementById('main');
   const rh = document.getElementById('results-header');
   const qBadge = document.getElementById('results-query-badge');
-  const backBar = document.getElementById('list-back-bar');
+  const sortBar = document.getElementById('list-sort-bar');
   const listAsRows = searchQ.length>0 || state.view === 'list';
-  const showHeader = searchQ.length>0 || filtered.length===0 || state.view === 'list';
+  const showHeader = searchQ.length>0 || filtered.length===0;
+  const showSortBar = state.view === 'list' && searchQ.length===0 && filtered.length>0;
   rh.style.display = showHeader ? 'flex' : 'none';
-  backBar.classList.toggle('show', state.view === 'list' && filtered.length>0);
+  sortBar.classList.toggle('show', showSortBar);
   if (showHeader) {
     document.getElementById('results-cat-circle').className = 'row-cat-circle cat-' + (state.category||'perfumes');
     document.getElementById('results-cat-circle').textContent = String(filtered.length);
     document.getElementById('results-cat-label').textContent = catLabel(state.category||'perfumes');
     qBadge.style.display = searchQ ? 'inline-block' : 'none';
     if (searchQ) qBadge.textContent = `${searchQ} (${filtered.length})`;
+  }
+  if (showSortBar) {
+    document.getElementById('list-cat-circle').className = 'row-cat-circle cat-' + (state.category||'perfumes');
+    document.getElementById('list-cat-circle').textContent = String(filtered.length);
+    document.getElementById('list-cat-label-2line').textContent = catLabel(state.category||'perfumes');
+    document.getElementById('list-sort-alpha-btn').classList.toggle('active', state.sort==='name');
   }
 
   if(filtered.length===0) {
@@ -2119,9 +2163,12 @@ function render() {
         </div>
         <div class="row-comments"></div>
         <div class="row-more-wrap">
-          <button class="row-view-toggle-btn" onclick="toggleBrowseView('list')" title="${t('title_view_list')}">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
+          <div class="row-bottom-icons">
+            <button class="row-view-toggle-btn" onclick="toggleBrowseView('list')" title="${t('title_view_list')}">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <button class="sort-alpha-btn${state.sort==='name'?' active':''}" onclick="event.stopPropagation();toggleSortAlpha()" title="${t('title_sort_alpha')}">A</button>
+          </div>
           <button class="row-more-btn" onclick="openDetail(${p.id})">${t('card_full_profile')}</button>
         </div>
       </div>
@@ -3034,7 +3081,7 @@ const I18N = {
     title_home: "Inicio", title_language: "Idioma", title_menu: "Menú",
     title_go_to_perfumes: "Ir a mis perfumes", title_add_perfume: "Añadir perfume",
     title_change_category: "Cambiar categoría", empty_hint: "Prueba a cambiar los filtros",
-    title_view_list: "Ver en lista", title_view_card: "Ver ficha completa", btn_view_card: "ficha completa",
+    title_view_list: "Ver en lista", title_view_card: "Ver ficha completa", btn_view_card: "ficha completa", title_sort_alpha: "Orden alfabético",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Ficha completa",
     add_photo_line1: "AÑADIR", add_photo_line2: "IMAGEN", add_image_alt: "Añadir imagen",
@@ -3054,7 +3101,7 @@ const I18N = {
     picker_create_prefix: "＋ Crear", picker_view_all: "ver todas", picker_view_less: "ver menos",
     cover_word: "Portada",
     alert_name_required: "El nombre es obligatorio", confirm_delete_perfume: "¿Eliminar este perfume?",
-    cat_perfumes: "perfumes", cat_coleccion: "en colección", cat_deseo: "deseos", cat_probados: "probados",
+    cat_perfumes: "todos los perfumes", cat_coleccion: "en colección", cat_deseo: "deseos", cat_probados: "probados",
     // ── Part 3: field/family manager, classification ──
     title_category: "Categoría", title_fields: "Campos", link_add_field: "+ Añadir campo",
     link_manage_classification: "Gestionar clasificación", required_word: "requerido",
@@ -3108,7 +3155,7 @@ const I18N = {
     title_home: "Home", title_language: "Language", title_menu: "Menu",
     title_go_to_perfumes: "Go to my perfumes", title_add_perfume: "Add perfume",
     title_change_category: "Change category", empty_hint: "Try changing the filters",
-    title_view_list: "List view", title_view_card: "Full card view", btn_view_card: "full profile",
+    title_view_list: "List view", title_view_card: "Full card view", btn_view_card: "full profile", title_sort_alpha: "Alphabetical order",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Full profile",
     add_photo_line1: "ADD", add_photo_line2: "PHOTO", add_image_alt: "Add image",
@@ -3128,7 +3175,7 @@ const I18N = {
     picker_create_prefix: "＋ Create", picker_view_all: "view all", picker_view_less: "view less",
     cover_word: "Cover",
     alert_name_required: "Name is required", confirm_delete_perfume: "Delete this perfume?",
-    cat_perfumes: "perfumes", cat_coleccion: "in collection", cat_deseo: "wishlist", cat_probados: "tried",
+    cat_perfumes: "all perfumes", cat_coleccion: "in collection", cat_deseo: "wishlist", cat_probados: "tried",
     // ── Part 3: field/family manager, classification ──
     title_category: "Category", title_fields: "Fields", link_add_field: "+ Add field",
     link_manage_classification: "Manage classification", required_word: "required",
@@ -3182,7 +3229,7 @@ const I18N = {
     title_home: "ホーム", title_language: "言語", title_menu: "メニュー",
     title_go_to_perfumes: "香水一覧へ", title_add_perfume: "香水を追加",
     title_change_category: "カテゴリーを変更", empty_hint: "フィルターを変更してみてください",
-    title_view_list: "リスト表示", title_view_card: "詳細表示", btn_view_card: "詳細プロフィール",
+    title_view_list: "リスト表示", title_view_card: "詳細表示", btn_view_card: "詳細プロフィール", title_sort_alpha: "アルファベット順",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "詳細プロフィール",
     add_photo_line1: "写真を", add_photo_line2: "追加", add_image_alt: "画像を追加",
