@@ -83,13 +83,14 @@
     min-height:36px;
   }
   #btn-add {
-    padding:0; border-radius:50%; border:none;
-    background:var(--accent-dark); color:#fff; font-weight:700;
-    font-family:'Jost',sans-serif; font-size:20px; cursor:pointer;
+    padding:0; border-radius:0; border:none;
+    background:transparent; color:var(--accent-dark); font-weight:700;
+    font-family:'Jost',sans-serif; font-size:32px; cursor:pointer;
     white-space:nowrap; flex-shrink:0;
     line-height:1; width:40px; height:40px;
     display:flex; align-items:center; justify-content:center;
   }
+  #btn-add:active { opacity:.6; }
 
 
 
@@ -409,12 +410,13 @@
   }
   #detail-search { flex:1; padding:13px 16px; border-radius:999px; min-height:36px; }
   #detail-add-btn {
-    padding:0; border-radius:50%; border:none;
-    background:var(--accent-dark); color:#fff; font-weight:700;
-    font-family:'Jost',sans-serif; font-size:20px; cursor:pointer;
+    padding:0; border-radius:0; border:none;
+    background:transparent; color:var(--accent-dark); font-weight:700;
+    font-family:'Jost',sans-serif; font-size:32px; cursor:pointer;
     flex-shrink:0; line-height:1; width:40px; height:40px;
     display:flex; align-items:center; justify-content:center;
   }
+  #detail-add-btn:active { opacity:.6; }
   .detail-hero {
     height:34vh; overflow:hidden;
     background:linear-gradient(135deg,#f0f0ee,#e3e2df);
@@ -938,13 +940,13 @@
   #home-search:focus { outline: none; }
   #home-add-btn {
     position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%);
-    width: 62px; height: 62px; border-radius: 50%;
-    background: var(--accent); border: none;
-    color: #fff; font-size: 26px; font-family: 'Jost', sans-serif;
-    box-shadow: var(--shadow); cursor: pointer;
+    width: 62px; height: 62px; border-radius: 0;
+    background: transparent; border: none;
+    color: var(--accent-dark); font-size: 44px; font-family: 'Jost', sans-serif;
+    box-shadow: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
-  #home-add-btn:active { opacity: .8; }
+  #home-add-btn:active { opacity: .6; }
 
   /* ── HOME DOTS MENU (import/export) ── */
   #home-dots-wrap {
@@ -1308,6 +1310,23 @@
     </div>
 
     <div class="class-section">
+      <div class="class-section-title" data-i18n="field_concentration">Concentración</div>
+      <div class="multi-picker" id="class-concentration-picker">
+        <div class="multi-picker-input-wrap">
+          <input class="multi-picker-input" id="class-concentration-search" placeholder="Buscar y añadir" data-i18n-placeholder="placeholder_search_add" autocomplete="off"
+            oninput="onClassConcInput(this.value)" onfocus="onClassConcInput(this.value)"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();classConcEnter(this.value);}"/>
+          <button type="button" class="multi-picker-add" onclick="classConcEnter(document.getElementById('class-concentration-search').value)" aria-label="Añadir" data-i18n-aria-label="picker_add_aria">＋</button>
+        </div>
+        <div class="multi-picker-suggestions" id="class-concentration-suggestions"></div>
+      </div>
+      <div class="class-chip-row-wrap">
+        <div class="class-chip-row" id="class-concentration-chips"></div>
+        <button type="button" class="multi-picker-more" id="class-concentration-more" onclick="toggleClassConcExpanded()" data-i18n="picker_view_all">ver todas</button>
+      </div>
+    </div>
+
+    <div class="class-section">
       <div class="class-section-title" data-i18n="title_family_olfactory">Familia olfativa</div>
       <div class="multi-picker" id="class-family-picker">
         <div class="multi-picker-input-wrap">
@@ -1376,6 +1395,7 @@ const GENDERS = ["Masculino","Femenino","Unisex","Andrógino"];
 
 let state = {
   families: [...DEFAULT_FAMILIES],
+  concentrations: [...CONCENTRATIONS],
   perfumes: [
     {id:1,name:"Santal 33",brand:"Le Labo",concentration:"EDP",capacity:"100ml",launch:"2011",perfumer:"Frank Voelkl",bottleDesigner:"Le Labo Studio",family:"Amaderado",gender:"Unisex",notes:["Cardamomo","Violeta","Iris","Ambrox","Sándalo","Cuero"],boughtAt:"Boutique Le Labo Madrid",price:"310€",inCollectionSince:"2023-04-12",rating:5,bottleCount:1,bottleStatus:"Medio",myOpinion:"Un clásico moderno imprescindible.",comments:"Lo reservo para ocasiones especiales.",inCollection:true,tags:["favorito","especial"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-04-12"},
     {id:2,name:"Baccarat Rouge 540",brand:"MFK",concentration:"EDP",capacity:"70ml",launch:"2015",perfumer:"Francis Kurkdjian",bottleDesigner:"Georges Chevalier",family:"Floral",gender:"Unisex",notes:["Azafrán","Jazmín","Ambroxan","Cedro","Musgo"],boughtAt:"El Corte Inglés",price:"395€",inCollectionSince:"2023-09-01",rating:5,bottleCount:1,bottleStatus:"Lleno",myOpinion:"Sofisticado y adictivo.",comments:"",inCollection:true,tags:["lujo"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-09-01"},
@@ -1547,6 +1567,8 @@ async function initState() {
   if (saved) {
     state = saved;
     if (!Array.isArray(state.families) || !state.families.length) state.families = [...DEFAULT_FAMILIES];
+    if (!Array.isArray(state.concentrations) || !state.concentrations.length) state.concentrations = [...CONCENTRATIONS];
+    else CONCENTRATIONS.forEach(c => { if (!state.concentrations.some(x=>x.toLowerCase()===c.toLowerCase())) state.concentrations.push(c); });
     const REQUIRED_CARD_FIELDS = ["name","brand","concentration","capacity","launch","perfumer","notes","comments","rating"];
     if (Array.isArray(state.fields)) {
       state.fields.forEach(f => { if (REQUIRED_CARD_FIELDS.includes(f.key)) f.required = true; });
@@ -1707,12 +1729,14 @@ function classUsageCount(type, value) {
 
 function openClassification() {
   classSearch = {family:'', notes:'', tags:''};
-  classExpanded = {family:false, notes:false, tags:false};
+  classConcSearch = '';
+  classExpanded = {family:false, notes:false, tags:false, concentration:false};
   renderClassification();
   openModal('modal-classification');
 }
 function renderClassification() {
   renderClassCategories();
+  renderClassConcentration();
   renderClassSection('family');
   renderClassSection('notes');
   renderClassSection('tags');
@@ -1864,6 +1888,136 @@ function deleteClassItem(type, name) {
   });
   save();
   renderClassSection(type);
+}
+
+// ── Concentración: gestión de valores (fijo + personalizados) ──
+let classConcSearch = '';
+function classConcUsageCount(name) {
+  const v = String(name).toLowerCase();
+  return state.perfumes.filter(p => p.concentration && p.concentration.toLowerCase() === v).length;
+}
+function renderClassConcentration() {
+  const el = document.getElementById('class-concentration-chips');
+  if (!el) return;
+  let items = uniqueSorted(state.concentrations || CONCENTRATIONS);
+  const q = _stripAccents(classConcSearch.toLowerCase().trim());
+  if (q) items = items.filter(i => _stripAccents(i.toLowerCase()).includes(q));
+  el.innerHTML = items.length ? items.map(name => {
+    const count = classConcUsageCount(name);
+    const assigned = count > 0;
+    return `<div class="class-chip">
+      <button type="button" class="class-chip-name" onclick="openClassConcMiniList('${escapeHtml(name)}')">${escapeHtml(concentrationLabel(name))}${assigned?`<span class="class-chip-count">${count}</span>`:''}</button>
+      <button type="button" class="class-chip-icon" title="${t('title_rename')}" onclick="event.stopPropagation();renameClassConc('${escapeHtml(name)}')">✎</button>
+      <button type="button" class="class-chip-icon" title="${t('title_delete')}" onclick="event.stopPropagation();deleteClassConc('${escapeHtml(name)}')">✕</button>
+    </div>`;
+  }).join('') : `<div class="class-empty">${t('class_no_items')}</div>`;
+  const expanded = !!classExpanded.concentration;
+  el.classList.toggle('collapsed', !expanded);
+  const moreBtn = document.getElementById('class-concentration-more');
+  if (moreBtn) {
+    const overflowing = el.scrollHeight > CLASS_CHIPS_COLLAPSED_H + 4;
+    moreBtn.classList.toggle('visible', overflowing);
+    moreBtn.textContent = expanded ? t('picker_view_less') : t('picker_view_all');
+  }
+}
+function toggleClassConcExpanded() {
+  classExpanded.concentration = !classExpanded.concentration;
+  renderClassConcentration();
+}
+function classConcMatches(q) {
+  const items = uniqueSorted(state.concentrations || CONCENTRATIONS);
+  const needle = _stripAccents(String(q||'').toLowerCase().trim());
+  if (!needle) return [];
+  return items.filter(v => _stripAccents(v.toLowerCase()).includes(needle)).slice(0,12);
+}
+function onClassConcInput(value) {
+  classConcSearch = value;
+  renderClassConcentration();
+  const box = document.getElementById('class-concentration-suggestions'); if (!box) return;
+  const matches = classConcMatches(value);
+  const exact = (state.concentrations||[]).some(v => v.toLowerCase() === String(value||'').trim().toLowerCase());
+  box.innerHTML = matches.map(v => `<button type="button" class="multi-picker-suggestion" onclick="classConcSelectSuggestion('${escapeHtml(v)}')">${escapeHtml(concentrationLabel(v))}</button>`).join('');
+  if (value.trim() && !exact) box.innerHTML += `<button type="button" class="multi-picker-suggestion" onclick="classConcCreateItem(document.getElementById('class-concentration-search').value)">${t('picker_create_prefix')} «${escapeHtml(value.trim())}»</button>`;
+  box.classList.toggle('open', !!value.trim() && box.innerHTML.length > 0);
+}
+function classConcSelectSuggestion(value) {
+  const box = document.getElementById('class-concentration-suggestions'); if (box) box.classList.remove('open');
+  const input = document.getElementById('class-concentration-search'); if (input) input.value = '';
+  classConcSearch = '';
+  renderClassConcentration();
+  openClassConcMiniList(value);
+}
+function classConcCreateItem(value) {
+  const val = String(value||'').trim();
+  if (!val) return;
+  if (!Array.isArray(state.concentrations)) state.concentrations = [...CONCENTRATIONS];
+  if (!state.concentrations.some(x => x.toLowerCase() === val.toLowerCase())) {
+    state.concentrations.push(val);
+    state.concentrations = uniqueSorted(state.concentrations);
+    save();
+  }
+  const box = document.getElementById('class-concentration-suggestions'); if (box) box.classList.remove('open');
+  const input = document.getElementById('class-concentration-search'); if (input) input.value = '';
+  classConcSearch = '';
+  renderClassConcentration();
+}
+function classConcEnter(value) {
+  const val = String(value||'').trim();
+  if (!val) return;
+  const exact = (state.concentrations||[]).find(x => x.toLowerCase() === val.toLowerCase());
+  if (exact) classConcSelectSuggestion(exact); else classConcCreateItem(val);
+}
+function renameClassConc(oldName) {
+  const val = prompt(t('prompt_rename_item'), oldName);
+  if (val === null) return;
+  const trimmed = val.trim();
+  if (!trimmed || trimmed.toLowerCase() === oldName.toLowerCase()) return;
+  const list = state.concentrations || [];
+  const existingIdx = list.findIndex(x=>x.toLowerCase()===trimmed.toLowerCase());
+  const oldIdx = list.findIndex(x=>x.toLowerCase()===oldName.toLowerCase());
+  const oldLower = oldName.toLowerCase();
+  if (existingIdx >= 0 && existingIdx !== oldIdx) {
+    if (!confirm(`${t('confirm_merge_pre')}${list[existingIdx]}${t('confirm_merge_mid1')}${oldName}${t('confirm_merge_mid2')}${list[existingIdx]}${t('confirm_merge_post')}`)) return;
+    state.perfumes.forEach(p => { if (p.concentration && p.concentration.toLowerCase() === oldLower) p.concentration = list[existingIdx]; });
+    if (oldIdx >= 0) list.splice(oldIdx,1);
+  } else {
+    if (oldIdx >= 0) list[oldIdx] = trimmed;
+    state.perfumes.forEach(p => { if (p.concentration && p.concentration.toLowerCase() === oldLower) p.concentration = trimmed; });
+  }
+  state.concentrations = uniqueSorted(list);
+  save();
+  renderClassConcentration();
+}
+function deleteClassConc(name) {
+  const count = classConcUsageCount(name);
+  const msg = count > 0 ? `${t('confirm_delete_item_used_pre')}${name}${t('confirm_delete_item_used_mid')}${count}${count!==1?t('confirm_delete_item_used_post_many'):t('confirm_delete_item_used_post_one')}` : `${t('confirm_delete_item_pre')}${name}${t('confirm_delete_item_post')}`;
+  if (!confirm(msg)) return;
+  const lower = name.toLowerCase();
+  state.concentrations = (state.concentrations||[]).filter(x=>x.toLowerCase()!==lower);
+  state.perfumes.forEach(p => { if (p.concentration && p.concentration.toLowerCase() === lower) p.concentration = ''; });
+  save();
+  renderClassConcentration();
+}
+function openClassConcMiniList(value) {
+  document.getElementById('class-mini-title').textContent = concentrationLabel(value);
+  const lower = String(value).toLowerCase();
+  const list = state.perfumes.filter(p => p.concentration && p.concentration.toLowerCase() === lower)
+    .sort((a,b)=>a.name.localeCompare(b.name,'es'));
+  const el = document.getElementById('class-mini-list');
+  el.innerHTML = list.length ? list.map(p=>{
+    const photo = p.photos && p.photos[p.coverIndex||0];
+    return `
+    <div class="row-small" onclick="classGoToDetail(${p.id})">
+      <div class="row-small-thumb">${photo?`<img src="${photo}" alt="${escapeHtml(p.name)}"/>`:`<span class="no-photo">🫙</span>`}</div>
+      <div class="row-small-info">
+        <div class="row-small-name">${escapeHtml(p.name)}</div>
+        <div class="row-small-brand">${escapeHtml(p.brand||'')}</div>
+        ${starsHTML(p.rating||0)}
+      </div>
+      <span class="badge-out row-small-status cat-${p.status||'coleccion'}" onclick="event.stopPropagation();openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
+    </div>`;
+  }).join('') : `<div class="class-empty">${t('class_no_matches')}</div>`;
+  openModal('modal-classification-detail');
 }
 
 function classGoToDetail(id) {
@@ -2331,7 +2485,7 @@ function openEdit(id) {
     if(f.key==='family') div.style.gridColumn='1 / -1';
     let inner=`<label class="field-label">${fieldLabel(f).toUpperCase()}</label>`;
     const val = p?p[f.key]||'':'';
-    if(f.key==='concentration') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${CONCENTRATIONS.map(o=>`<option value="${o}"${val===o?' selected':''}>${concentrationLabel(o)}</option>`).join('')}</select>`;
+    if(f.key==='concentration') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${uniqueSorted(state.concentrations||CONCENTRATIONS).map(o=>`<option value="${o}"${val===o?' selected':''}>${concentrationLabel(o)}</option>`).join('')}</select>`;
     else if(f.key==='family') {
       editFamilies = normalizePickerValues(val);
       inner += `<div id="ef-family-picker"></div>`;
@@ -3088,6 +3242,7 @@ const I18N = {
     title_back: "Volver",
     video_thumbnail_alt: "Miniatura del vídeo",
     field_notes: "Notas olfativas", field_comments: "Comentarios", video_label_short: "Vídeo",
+    field_concentration: "Concentración",
     btn_edit: "Editar",
     edit_title_new: "Nuevo perfume", edit_title_edit: "Editar perfume",
     label_photos: "FOTOS (hasta 6)", photo_word: "FOTO",
@@ -3162,6 +3317,7 @@ const I18N = {
     title_back: "Back",
     video_thumbnail_alt: "Video thumbnail",
     field_notes: "Olfactory notes", field_comments: "Comments", video_label_short: "Video",
+    field_concentration: "Concentration",
     btn_edit: "Edit",
     edit_title_new: "New perfume", edit_title_edit: "Edit perfume",
     label_photos: "PHOTOS (up to 6)", photo_word: "PHOTO",
@@ -3236,6 +3392,7 @@ const I18N = {
     title_back: "戻る",
     video_thumbnail_alt: "動画のサムネイル",
     field_notes: "香りのノート", field_comments: "コメント", video_label_short: "動画",
+    field_concentration: "濃度",
     btn_edit: "編集",
     edit_title_new: "新しい香水", edit_title_edit: "香水を編集",
     label_photos: "写真（最大6枚）", photo_word: "写真",
