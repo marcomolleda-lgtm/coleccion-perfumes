@@ -2391,6 +2391,35 @@ function _clampComments(filtered) {
 // ══ DETAIL ═════════════════════════════════════════════════════
 var currentDetailPhotos = [];
 var currentDetailId = null;
+function renderBottlesDetailHtml(p) {
+  const bottles = (p.bottles||[]).filter(b=>b && Object.values(b).some(v=>v!==undefined && v!==null && v!==''));
+  if (!bottles.length) return '';
+  const L = (DEFAULT_FIELD_LABELS[currentLang]||DEFAULT_FIELD_LABELS.es);
+  const rowsFor = (b) => {
+    const items = [
+      ['concentration', b.concentration ? concentrationLabel(b.concentration) : ''],
+      ['capacity', b.capacity],
+      ['since', b.since],
+      ['boughtAt', b.boughtAt],
+      ['price', b.price],
+      ['barcode', b.barcode],
+      ['batchNumber', b.batchNumber],
+    ].filter(([,v])=>v!==undefined && v!==null && v!=='');
+    const labelFor = (k) => k==='since' ? L.inCollectionSince : k==='barcode' ? t('field_barcode') : L[k];
+    return items.map(([k,v])=>`
+      <div>
+        <div class="detail-field-label">${labelFor(k)}</div>
+        <div class="detail-field-value">${v}</div>
+      </div>`).join('');
+  };
+  return bottles.map((b,i)=>`
+    <div class="detail-block">
+      <div class="detail-block-label">${bottleLabel(i)}</div>
+      <div class="detail-fields">${rowsFor(b)}</div>
+      ${b.comments?`<div class="detail-field-value" style="margin-top:10px;font-style:italic;color:var(--text-muted)">${b.comments}</div>`:''}
+    </div>`).join('');
+}
+
 function openDetail(id) {
   const p = state.perfumes.find(x=>x.id===id);
   if(!p) return;
@@ -2424,6 +2453,7 @@ function openDetail(id) {
             <div class="detail-field-value${f.key==='brand'?' brand-badge':''}">${f.key==='family'?(Array.isArray(p.family)?p.family.join(' · '):(p.family||'')):f.key==='concentration'?concentrationLabel(p[f.key]):f.key==='gender'?genderLabel(p[f.key]):p[f.key]}</div>
           </div>`).join('')}
       </div>
+      ${renderBottlesDetailHtml(p)}
       ${(Array.isArray(p.notes)?p.notes.length:p.notes)?`<div class="detail-block"><div class="detail-block-label">${t('field_notes')}</div><div class="detail-block-value">${Array.isArray(p.notes)?p.notes.join(', '):p.notes}</div></div>`:''}
       ${(p.tags||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:20px">${(p.tags||[]).map(tg=>`<span class="tag-chip">#${tg}</span>`).join('')}</div>`:''}
       ${p.videoUrl?(()=>{
@@ -2628,12 +2658,20 @@ function updateBottlesQuestion() {
   el.textContent = t('bottles_question').replace('{name}', name || t('bottles_question_fallback'));
 }
 
+function bottleLabel(i) {
+  return currentLang === 'es' ? `Frasco n<sup>o</sup> ${i+2}` : `${t('bottle_label')} ${i+2}`;
+}
+function bottleLabelPlain(i) {
+  return currentLang === 'es' ? `Frasco n\u00ba ${i+2}` : `${t('bottle_label')} ${i+2}`;
+}
+
 function addBottle() {
-  editBottles.push({ concentration:'', capacity:'', since:'', boughtAt:'', barcode:'', batchNumber:'', comments:'' });
+  editBottles.push({ concentration:'', capacity:'', since:'', boughtAt:'', price:'', barcode:'', batchNumber:'', comments:'' });
   renderBottlesList();
 }
 
 function removeBottle(i) {
+  if (!confirm(`${t('confirm_delete_bottle_pre')}${bottleLabelPlain(i)}${t('confirm_delete_bottle_post')}`)) return;
   collectBottlesFromForm();
   editBottles.splice(i,1);
   renderBottlesList();
@@ -2645,6 +2683,7 @@ function collectBottlesFromForm() {
     capacity: (document.getElementById('eb-capacity-'+i)||{}).value || '',
     since: (document.getElementById('eb-since-'+i)||{}).value || '',
     boughtAt: (document.getElementById('eb-boughtAt-'+i)||{}).value || '',
+    price: (document.getElementById('eb-price-'+i)||{}).value || '',
     barcode: (document.getElementById('eb-barcode-'+i)||{}).value || '',
     batchNumber: (document.getElementById('eb-batch-'+i)||{}).value || '',
     comments: (document.getElementById('eb-comments-'+i)||{}).value || '',
@@ -2658,7 +2697,7 @@ function renderBottlesList() {
   el.innerHTML = editBottles.map((b,i)=>`
     <div class="bottle-block" data-idx="${i}">
       <div class="bottle-block-header">
-        <span class="bottle-block-title">${t('bottle_label')} ${i+2}</span>
+        <span class="bottle-block-title">${bottleLabel(i)}</span>
         <button type="button" class="bottle-remove-btn" onclick="removeBottle(${i})">✕</button>
       </div>
       <div class="field-group">
@@ -2676,6 +2715,10 @@ function renderBottlesList() {
       <div class="field-group">
         <label class="field-label">${L.boughtAt.toUpperCase()}</label>
         <input class="field-input" id="eb-boughtAt-${i}" value="${escapeHtml(b.boughtAt||'')}"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">${L.price.toUpperCase()}</label>
+        <input class="field-input" id="eb-price-${i}" value="${escapeHtml(b.price||'')}"/>
       </div>
       <div class="field-group">
         <label class="field-label">${t('field_barcode')}</label>
@@ -3388,6 +3431,7 @@ const I18N = {
     placeholder_search_add: "Buscar y añadir", title_rename: "Renombrar", title_delete: "Eliminar",
     class_no_items: "Sin elementos", class_no_matches: "No hay perfumes con este criterio.",
     confirm_delete_field_pre: '¿Eliminar el campo "', confirm_delete_field_post: '"? Los datos guardados en este campo para todos los perfumes se perderán.',
+    confirm_delete_bottle_pre: '¿Eliminar el ', confirm_delete_bottle_post: '? Se perderán todos los datos guardados para este frasco.',
     confirm_delete_family_pre: '¿Eliminar la familia "', confirm_delete_family_post: '"? Los perfumes que la tengan asignada la conservarán en sus datos, pero ya no podrás seleccionarla para nuevos perfumes.',
     prompt_rename_category: "Nuevo nombre para esta categoría:", prompt_rename_item: "Nuevo nombre:",
     confirm_merge_pre: 'Ya existe "', confirm_merge_mid1: '". ¿Fusionar "', confirm_merge_mid2: '" con "', confirm_merge_post: '"?',
@@ -3466,6 +3510,7 @@ const I18N = {
     placeholder_search_add: "Search and add", title_rename: "Rename", title_delete: "Delete",
     class_no_items: "No items", class_no_matches: "No perfumes match this criterion.",
     confirm_delete_field_pre: 'Delete the field "', confirm_delete_field_post: '"? Data saved in this field for all perfumes will be lost.',
+    confirm_delete_bottle_pre: 'Delete ', confirm_delete_bottle_post: '? All data saved for this bottle will be lost.',
     confirm_delete_family_pre: 'Delete the family "', confirm_delete_family_post: '"? Perfumes that have it assigned will keep it in their data, but you won\'t be able to select it for new perfumes anymore.',
     prompt_rename_category: "New name for this category:", prompt_rename_item: "New name:",
     confirm_merge_pre: 'A value "', confirm_merge_mid1: '" already exists. Merge "', confirm_merge_mid2: '" with "', confirm_merge_post: '"?',
@@ -3544,6 +3589,7 @@ const I18N = {
     placeholder_search_add: "検索して追加", title_rename: "名前を変更", title_delete: "削除",
     class_no_items: "項目なし", class_no_matches: "この条件に一致する香水はありません。",
     confirm_delete_field_pre: '項目「', confirm_delete_field_post: '」を削除しますか？すべての香水でこの項目に保存されたデータは失われます。',
+    confirm_delete_bottle_pre: '', confirm_delete_bottle_post: 'を削除しますか？この本の保存データはすべて失われます。',
     confirm_delete_family_pre: '系統「', confirm_delete_family_post: '」を削除しますか？割り当て済みの香水はデータを保持しますが、新しい香水には選択できなくなります。',
     prompt_rename_category: "このカテゴリーの新しい名前：", prompt_rename_item: "新しい名前：",
     confirm_merge_pre: '「', confirm_merge_mid1: '」はすでに存在します。「', confirm_merge_mid2: '」を「', confirm_merge_post: '」と統合しますか？',
