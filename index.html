@@ -1202,8 +1202,8 @@
         </label>
       </div>
 
-      <!-- Fields grid -->
-      <div class="field-grid" id="fields-grid"></div>
+      <!-- Fields grid 1: nombre, marca, perfumista, lanzamiento, concentración, capacidad, diseñador, familia -->
+      <div class="field-grid" id="fields-grid-1"></div>
 
       <!-- Notes -->
       <div class="field-group" id="fg-notes">
@@ -1211,10 +1211,35 @@
         <div id="edit-notes-picker"></div>
       </div>
 
-      <!-- Comments -->
-      <div class="field-group" id="fg-comments">
-        <label class="field-label" data-i18n="field_comments">COMENTARIOS</label>
-        <textarea class="field-textarea" id="f-comments" rows="4" placeholder="Añade comentarios..." data-i18n-placeholder="comments_placeholder"></textarea>
+      <!-- Fields grid 2: sexo, comprado en, precio -->
+      <div class="field-grid" id="fields-grid-2"></div>
+
+      <!-- Barcode -->
+      <div class="field-group" id="fg-barcode">
+        <label class="field-label" data-i18n="field_barcode">CÓDIGO DE BARRAS</label>
+        <div class="barcode-input-wrap">
+          <input class="field-input" id="pf-barcode" placeholder="EAN / UPC" inputmode="numeric"/>
+          <button class="barcode-scan-btn" onclick="openBarcodeScanner()" title="Escanear con cámara" data-i18n-title="title_scan_barcode">📷</button>
+        </div>
+      </div>
+
+      <!-- Fields grid 3: no. de batch, en colección desde -->
+      <div class="field-grid" id="fields-grid-3"></div>
+
+      <!-- Category status -->
+      <div class="field-group">
+        <label class="field-label" data-i18n="field_category">CATEGORÍA</label>
+        <div class="cat-toggle-row" id="f-status-toggle">
+          <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')" data-i18n="cat_coleccion">en colección</button>
+          <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')" data-i18n="cat_deseo">deseos</button>
+          <button type="button" class="cat-toggle-btn cat-probados" data-val="probados" onclick="setStatusToggle('probados')" data-i18n="cat_probados">probados</button>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="field-group">
+        <label class="field-label" data-i18n="field_tags">ETIQUETAS</label>
+        <div id="edit-tags-picker"></div>
       </div>
 
       <!-- Video -->
@@ -1229,34 +1254,16 @@
         </div>
       </div>
 
+      <!-- Comments -->
+      <div class="field-group" id="fg-comments">
+        <label class="field-label" data-i18n="field_comments">COMENTARIOS</label>
+        <textarea class="field-textarea" id="f-comments" rows="4" placeholder="Añade comentarios..." data-i18n-placeholder="comments_placeholder"></textarea>
+      </div>
+
       <!-- Rating -->
       <div class="field-group">
         <label class="field-label" data-i18n="field_rating">VALORACIÓN</label>
         <div class="stars interactive lg" id="edit-stars"></div>
-      </div>
-
-      <!-- Category status -->
-      <div class="field-group">
-        <label class="field-label" data-i18n="field_category">CATEGORÍA</label>
-        <div class="cat-toggle-row" id="f-status-toggle">
-          <button type="button" class="cat-toggle-btn cat-coleccion" data-val="coleccion" onclick="setStatusToggle('coleccion')" data-i18n="cat_coleccion">en colección</button>
-          <button type="button" class="cat-toggle-btn cat-deseo" data-val="deseo" onclick="setStatusToggle('deseo')" data-i18n="cat_deseo">deseos</button>
-          <button type="button" class="cat-toggle-btn cat-probados" data-val="probados" onclick="setStatusToggle('probados')" data-i18n="cat_probados">probados</button>
-        </div>
-      </div>
-
-      <!-- Tags -->
-      <div class="field-group" id="fg-barcode">
-        <label class="field-label" data-i18n="field_barcode">CÓDIGO DE BARRAS</label>
-        <div class="barcode-input-wrap">
-          <input class="field-input" id="pf-barcode" placeholder="EAN / UPC" inputmode="numeric"/>
-          <button class="barcode-scan-btn" onclick="openBarcodeScanner()" title="Escanear con cámara" data-i18n-title="title_scan_barcode">📷</button>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label class="field-label" data-i18n="field_tags">ETIQUETAS</label>
-        <div id="edit-tags-picker"></div>
       </div>
 
       <button class="page-link" id="btn-delete" onclick="deletePerfume()" style="display:none;color:var(--danger);margin-top:10px" data-i18n="btn_delete_perfume">Eliminar perfume</button>
@@ -1397,29 +1404,29 @@ let state = {
   families: [...DEFAULT_FAMILIES],
   concentrations: [...CONCENTRATIONS],
   perfumes: [
-    {id:1,name:"Santal 33",brand:"Le Labo",concentration:"EDP",capacity:"100ml",launch:"2011",perfumer:"Frank Voelkl",bottleDesigner:"Le Labo Studio",family:"Amaderado",gender:"Unisex",notes:["Cardamomo","Violeta","Iris","Ambrox","Sándalo","Cuero"],boughtAt:"Boutique Le Labo Madrid",price:"310€",inCollectionSince:"2023-04-12",rating:5,bottleCount:1,bottleStatus:"Medio",myOpinion:"Un clásico moderno imprescindible.",comments:"Lo reservo para ocasiones especiales.",inCollection:true,tags:["favorito","especial"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-04-12"},
-    {id:2,name:"Baccarat Rouge 540",brand:"MFK",concentration:"EDP",capacity:"70ml",launch:"2015",perfumer:"Francis Kurkdjian",bottleDesigner:"Georges Chevalier",family:"Floral",gender:"Unisex",notes:["Azafrán","Jazmín","Ambroxan","Cedro","Musgo"],boughtAt:"El Corte Inglés",price:"395€",inCollectionSince:"2023-09-01",rating:5,bottleCount:1,bottleStatus:"Lleno",myOpinion:"Sofisticado y adictivo.",comments:"",inCollection:true,tags:["lujo"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-09-01"},
-    {id:3,name:"Oud Wood",brand:"Tom Ford",concentration:"EDP",capacity:"50ml",launch:"2007",perfumer:"Richard Herpin",bottleDesigner:"Tom Ford Beauty",family:"Oriental",gender:"Masculino",notes:["Palo de Rosa","Oud","Sándalo","Vainilla","Ámbar"],boughtAt:"Tom Ford Online",price:"280€",inCollectionSince:"2024-01-20",rating:4,bottleCount:2,bottleStatus:"Casi vacío",myOpinion:"Cálido y envolvente.",comments:"Perfecto para invierno.",inCollection:true,tags:["invierno","noche"],lists:[],photos:[null,null,null,null,null,null],added:"2024-01-20"},
+    {id:1,name:"Santal 33",brand:"Le Labo",concentration:"EDP",capacity:"100ml",launch:"2011",perfumer:"Frank Voelkl",bottleDesigner:"Le Labo Studio",family:"Amaderado",gender:"Unisex",notes:["Cardamomo","Violeta","Iris","Ambrox","Sándalo","Cuero"],boughtAt:"Boutique Le Labo Madrid",price:"310€",inCollectionSince:"2023-04-12",rating:5,bottleStatus:"Medio",myOpinion:"Un clásico moderno imprescindible.",comments:"Lo reservo para ocasiones especiales.",inCollection:true,tags:["favorito","especial"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-04-12"},
+    {id:2,name:"Baccarat Rouge 540",brand:"MFK",concentration:"EDP",capacity:"70ml",launch:"2015",perfumer:"Francis Kurkdjian",bottleDesigner:"Georges Chevalier",family:"Floral",gender:"Unisex",notes:["Azafrán","Jazmín","Ambroxan","Cedro","Musgo"],boughtAt:"El Corte Inglés",price:"395€",inCollectionSince:"2023-09-01",rating:5,bottleStatus:"Lleno",myOpinion:"Sofisticado y adictivo.",comments:"",inCollection:true,tags:["lujo"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-09-01"},
+    {id:3,name:"Oud Wood",brand:"Tom Ford",concentration:"EDP",capacity:"50ml",launch:"2007",perfumer:"Richard Herpin",bottleDesigner:"Tom Ford Beauty",family:"Oriental",gender:"Masculino",notes:["Palo de Rosa","Oud","Sándalo","Vainilla","Ámbar"],boughtAt:"Tom Ford Online",price:"280€",inCollectionSince:"2024-01-20",rating:4,bottleStatus:"Casi vacío",myOpinion:"Cálido y envolvente.",comments:"Perfecto para invierno.",inCollection:true,tags:["invierno","noche"],lists:[],photos:[null,null,null,null,null,null],added:"2024-01-20"},
   ],
   fields: [
     {key:"name",label:"Nombre",visible:true,required:true},
     {key:"brand",label:"Marca",visible:true,required:true},
+    {key:"perfumer",label:"Perfumista",visible:true,required:true},
+    {key:"launch",label:"Lanzamiento",visible:true,required:true},
     {key:"concentration",label:"Concentración",visible:true,required:true},
     {key:"capacity",label:"Capacidad",visible:true,required:true},
-    {key:"launch",label:"Lanzamiento",visible:true,required:true},
-    {key:"perfumer",label:"Perfumista",visible:true,required:true},
     {key:"bottleDesigner",label:"Diseñador del frasco",visible:true},
     {key:"family",label:"Familia olfativa",visible:true},
-    {key:"gender",label:"Sexo",visible:true},
     {key:"notes",label:"Notas olfativas",visible:true,required:true},
+    {key:"gender",label:"Sexo",visible:true},
     {key:"boughtAt",label:"Comprado en",visible:true},
     {key:"price",label:"Precio",visible:true},
-    {key:"inCollectionSince",label:"En colección desde",visible:true},
-    {key:"rating",label:"Valoración",visible:true,required:true},
-    {key:"bottleCount",label:"Número de frascos",visible:true},
-    {key:"comments",label:"Comentarios",visible:true,required:true},
-    {key:"status",label:"Categoría",visible:true},
     {key:"barcode",label:"Código de barras",visible:true},
+    {key:"batchNumber",label:"No. de Batch",visible:true},
+    {key:"inCollectionSince",label:"En colección desde",visible:true},
+    {key:"status",label:"Categoría",visible:true},
+    {key:"comments",label:"Comentarios",visible:true,required:true},
+    {key:"rating",label:"Valoración",visible:true,required:true},
   ],
   nextId: 10,
   sort: 'date',
@@ -2399,7 +2406,7 @@ function openDetail(id) {
           </div>`).join('')}
       </div>
       ${(Array.isArray(p.notes)?p.notes.length:p.notes)?`<div class="detail-block"><div class="detail-block-label">${t('field_notes')}</div><div class="detail-block-value">${Array.isArray(p.notes)?p.notes.join(', '):p.notes}</div></div>`:''}
-      ${p.comments?`<div class="detail-block"><div class="detail-block-label">${t('field_comments')}</div><div class="detail-block-value">${p.comments}</div></div>`:''}
+      ${(p.tags||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:20px">${(p.tags||[]).map(tg=>`<span class="tag-chip">#${tg}</span>`).join('')}</div>`:''}
       ${p.videoUrl?(()=>{
         const vid=getYouTubeId(p.videoUrl);
         return vid?`<div class="detail-block" style="border-top:none;margin-top:20px;padding-top:0">
@@ -2410,7 +2417,7 @@ function openDetail(id) {
           </div>
         </div>`:'';
       })():''}
-      ${(p.tags||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:20px">${(p.tags||[]).map(tg=>`<span class="tag-chip">#${tg}</span>`).join('')}</div>`:''}
+      ${p.comments?`<div class="detail-block"><div class="detail-block-label">${t('field_comments')}</div><div class="detail-block-value">${p.comments}</div></div>`:''}
       <button class="detail-edit-btn" onclick="openEdit(${p.id})">${t('btn_edit')}</button>
     </div>`;
   openModal('modal-detail');
@@ -2461,42 +2468,51 @@ function openEdit(id) {
   // Render photo slots
   for(let i=0;i<3;i++) renderPhotoSlot(i);
 
-  // Build dynamic fields
-  const skipKeys = ['name','brand','rating','status','notes','myOpinion','comments','barcode'];
-  const dynFields = state.fields.filter(f=>f.visible && !skipKeys.includes(f.key));
-  const grid = document.getElementById('fields-grid');
-  grid.innerHTML = '';
+  // Build dynamic fields, split across three grids interleaved with the
+  // static blocks (notas, código de barras, categoría...) to match the
+  // requested field order.
+  const SEG_A = ['perfumer','launch','concentration','capacity','bottleDesigner','family'];
+  const SEG_B = ['gender','boughtAt','price'];
+  const SEG_C = ['batchNumber','inCollectionSince'];
 
-  // Always show name & brand first
-  ['name','brand'].forEach(k=>{
-    const f = state.fields.find(x=>x.key===k);
-    if(!f||!f.visible) return;
-    const div = document.createElement('div');
-    div.className='field-group';
-    div.style.gridColumn='1 / -1';
-    div.innerHTML=`<label class="field-label">${fieldLabel(f).toUpperCase()}${f.required?' *':''}</label>
-      <input class="field-input" id="ef-${k}" value="${p?p[k]||'':''}"/>`;
-    grid.appendChild(div);
-  });
-
-  dynFields.forEach(f=>{
-    const div=document.createElement('div');
-    div.className='field-group';
-    if(f.key==='family') div.style.gridColumn='1 / -1';
-    let inner=`<label class="field-label">${fieldLabel(f).toUpperCase()}</label>`;
-    const val = p?p[f.key]||'':'';
-    if(f.key==='concentration') inner+=`<select class="field-select" id="ef-${f.key}" data-prev-value="${escapeHtml(val)}" onchange="handleConcentrationSelectChange(this)">${concentrationOptionsHtml(val)}</select>`;
-    else if(f.key==='family') {
-      editFamilies = normalizePickerValues(val);
-      inner += `<div id="ef-family-picker"></div>`;
+  function renderFieldSegment(containerId, keys, includeNameBrand) {
+    const grid = document.getElementById(containerId);
+    grid.innerHTML = '';
+    if (includeNameBrand) {
+      ['name','brand'].forEach(k=>{
+        const f = state.fields.find(x=>x.key===k);
+        if(!f||!f.visible) return;
+        const div = document.createElement('div');
+        div.className='field-group';
+        div.style.gridColumn='1 / -1';
+        div.innerHTML=`<label class="field-label">${fieldLabel(f).toUpperCase()}${f.required?' *':''}</label>
+          <input class="field-input" id="ef-${k}" value="${p?p[k]||'':''}"/>`;
+        grid.appendChild(div);
+      });
     }
-    else if(f.key==='gender') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${GENDERS.map(o=>`<option value="${o}"${val===o?' selected':''}>${genderLabel(o)}</option>`).join('')}</select>`;
-    else if(f.key==='inCollectionSince') inner+=`<input class="field-input" type="date" id="ef-${f.key}" value="${val}"/>`;
-    else if(f.key==='bottleCount') inner+=`<input class="field-input" type="number" min="0" id="ef-${f.key}" value="${val}"/>`;
-    else inner+=`<input class="field-input" id="ef-${f.key}" value="${val}"/>`;
-    div.innerHTML=inner;
-    grid.appendChild(div);
-  });
+    const segFields = state.fields.filter(f=>f.visible && keys.includes(f.key));
+    segFields.forEach(f=>{
+      const div=document.createElement('div');
+      div.className='field-group';
+      if(f.key==='family') div.style.gridColumn='1 / -1';
+      let inner=`<label class="field-label">${fieldLabel(f).toUpperCase()}</label>`;
+      const val = p?p[f.key]||'':'';
+      if(f.key==='concentration') inner+=`<select class="field-select" id="ef-${f.key}" data-prev-value="${escapeHtml(val)}" onchange="handleConcentrationSelectChange(this)">${concentrationOptionsHtml(val)}</select>`;
+      else if(f.key==='family') {
+        editFamilies = normalizePickerValues(val);
+        inner += `<div id="ef-family-picker"></div>`;
+      }
+      else if(f.key==='gender') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${GENDERS.map(o=>`<option value="${o}"${val===o?' selected':''}>${genderLabel(o)}</option>`).join('')}</select>`;
+      else if(f.key==='inCollectionSince') inner+=`<input class="field-input" type="date" id="ef-${f.key}" value="${val}"/>`;
+      else inner+=`<input class="field-input" id="ef-${f.key}" value="${val}"/>`;
+      div.innerHTML=inner;
+      grid.appendChild(div);
+    });
+  }
+
+  renderFieldSegment('fields-grid-1', SEG_A, true);
+  renderFieldSegment('fields-grid-2', SEG_B, false);
+  renderFieldSegment('fields-grid-3', SEG_C, false);
 
   // Unified multi-value pickers
   editNotes = p ? normalizePickerValues(p.notes) : [];
@@ -2678,7 +2694,7 @@ function savePerfume() {
   };
 
   state.fields.forEach(f=>{
-    if(['rating','status','notes','comments'].includes(f.key)) return;
+    if(['rating','status','notes','comments','barcode'].includes(f.key)) return;
     obj[f.key]=getFieldVal(f.key);
   });
 
@@ -3459,9 +3475,9 @@ function t(key) { return (I18N[currentLang] || I18N.es)[key] || key; }
 // Default (unmodified) labels for built-in fields/options, used to translate
 // display only when the user hasn't renamed/customized them.
 const DEFAULT_FIELD_LABELS = {
-  es: {name:"Nombre",brand:"Marca",concentration:"Concentración",capacity:"Capacidad",launch:"Lanzamiento",perfumer:"Perfumista",bottleDesigner:"Diseñador del frasco",family:"Familia olfativa",gender:"Sexo",notes:"Notas olfativas",boughtAt:"Comprado en",price:"Precio",inCollectionSince:"En colección desde",rating:"Valoración",bottleCount:"Número de frascos",comments:"Comentarios",status:"Categoría",barcode:"Código de barras"},
-  en: {name:"Name",brand:"Brand",concentration:"Concentration",capacity:"Size",launch:"Release year",perfumer:"Perfumer",bottleDesigner:"Bottle designer",family:"Olfactory family",gender:"Gender",notes:"Olfactory notes",boughtAt:"Purchased at",price:"Price",inCollectionSince:"In collection since",rating:"Rating",bottleCount:"Number of bottles",comments:"Comments",status:"Category",barcode:"Barcode"},
-  ja: {name:"名前",brand:"ブランド",concentration:"濃度",capacity:"容量",launch:"発売年",perfumer:"調香師",bottleDesigner:"ボトルデザイナー",family:"香りの系統",gender:"性別",notes:"香りのノート",boughtAt:"購入場所",price:"価格",inCollectionSince:"コレクション登録日",rating:"評価",bottleCount:"本数",comments:"コメント",status:"カテゴリー",barcode:"バーコード"}
+  es: {name:"Nombre",brand:"Marca",concentration:"Concentración",capacity:"Capacidad",launch:"Lanzamiento",perfumer:"Perfumista",bottleDesigner:"Diseñador del frasco",family:"Familia olfativa",gender:"Sexo",notes:"Notas olfativas",boughtAt:"Comprado en",price:"Precio",inCollectionSince:"En colección desde",rating:"Valoración",batchNumber:"No. de Batch",comments:"Comentarios",status:"Categoría",barcode:"Código de barras"},
+  en: {name:"Name",brand:"Brand",concentration:"Concentration",capacity:"Size",launch:"Release year",perfumer:"Perfumer",bottleDesigner:"Bottle designer",family:"Olfactory family",gender:"Gender",notes:"Olfactory notes",boughtAt:"Purchased at",price:"Price",inCollectionSince:"In collection since",rating:"Rating",batchNumber:"Batch No.",comments:"Comments",status:"Category",barcode:"Barcode"},
+  ja: {name:"名前",brand:"ブランド",concentration:"濃度",capacity:"容量",launch:"発売年",perfumer:"調香師",bottleDesigner:"ボトルデザイナー",family:"香りの系統",gender:"性別",notes:"香りのノート",boughtAt:"購入場所",price:"価格",inCollectionSince:"コレクション登録日",rating:"評価",batchNumber:"バッチ番号",comments:"コメント",status:"カテゴリー",barcode:"バーコード"}
 };
 function fieldLabel(f) {
   const esDefault = DEFAULT_FIELD_LABELS.es[f.key];
