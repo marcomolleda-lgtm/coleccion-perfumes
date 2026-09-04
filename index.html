@@ -3745,13 +3745,11 @@ function applyLanguage(lang) {
 </script>
 
 <script>
-// Unregister any old service worker and clear cache
+// Registrar el service worker: permite que la app funcione sin conexión
+// y sea instalable como una app real.
 if('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(function(regs) {
-    regs.forEach(function(reg) { reg.unregister(); });
-  });
-  caches.keys().then(function(keys) {
-    keys.forEach(function(key) { caches.delete(key); });
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js');
   });
 }
 </script>
