@@ -2,6 +2,7 @@
   "name": "perfumes",
   "short_name": "perfumes",
   "description": "Mi archivo personal de perfumes",
+  "id": "./index.html",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
