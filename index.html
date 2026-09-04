@@ -557,6 +557,12 @@
   }
   .page-link:active { opacity:.6; }
   .page-divider { height:1px; background:#ededec; margin:20px 0; }
+  .bottles-question { font-family:'Jost',sans-serif; font-size:14px; color:var(--text-muted); margin-bottom:10px; }
+  .bottle-block { border-top:1px solid var(--border); padding-top:14px; margin-top:14px; }
+  .bottle-block-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .bottle-block-title { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:600; color:var(--text); }
+  .bottle-remove-btn { background:none; border:none; color:var(--text-light); font-size:13px; cursor:pointer; padding:4px; }
+  .bottle-remove-btn:active { color:var(--danger); }
   .page-text-input {
     flex:1; border:none; border-bottom:1px solid var(--border); background:none;
     font-family:'Jost',sans-serif; font-size:16px; color:var(--text);
@@ -1244,7 +1250,7 @@
 
       <!-- Video -->
       <div class="field-group">
-        <label class="field-label" data-i18n="field_video">VÍDEO DE YOUTUBE</label>
+        <label class="field-label" data-i18n="field_video">VÍDEO FAVORITO</label>
         <input class="field-input" id="f-video" placeholder="Pega aquí el enlace de YouTube..." data-i18n-placeholder="video_url_placeholder" oninput="previewVideo(this.value)"/>
         <div id="video-preview" style="margin-top:10px;display:none">
           <div class="video-input-preview">
@@ -1266,7 +1272,19 @@
         <div class="stars interactive lg" id="edit-stars"></div>
       </div>
 
-      <button class="page-link" id="btn-delete" onclick="deletePerfume()" style="display:none;color:var(--danger);margin-top:10px" data-i18n="btn_delete_perfume">Eliminar perfume</button>
+      <div class="page-divider"></div>
+
+      <!-- Extra bottles -->
+      <div class="field-group">
+        <div class="bottles-question" id="bottles-question"></div>
+        <div id="bottles-extra-list"></div>
+        <button class="page-link" type="button" onclick="addBottle()" data-i18n="link_add_bottle">+ Añadir frasco</button>
+      </div>
+
+      <div class="page-divider"></div>
+
+      <button class="page-link" type="button" onclick="openFieldMgr()" data-i18n="link_manage_fields">Gestionar campos</button>
+      <button class="page-link" id="btn-delete" onclick="deletePerfume()" style="display:none;color:var(--danger)" data-i18n="btn_delete_perfume">Eliminar perfume</button>
   </div>
   <button class="detail-edit-btn" onclick="savePerfume()" data-i18n="btn_save">Guardar</button>
 </div>
@@ -1440,6 +1458,7 @@ let editRating = 0;
 let editTags = [];
 let editFamilies = [];
 let editNotes = [];
+let editBottles = [];
 let editId = null;
 const pickerExpanded = {family:false, notes:false, tags:false};
 
@@ -2460,6 +2479,7 @@ function openEdit(id) {
   editCoverIndex = p ? (p.coverIndex||0) : 0;
   editRating = p ? (p.rating||0) : 0;
   editTags = p ? [...(p.tags||[])] : [];
+  editBottles = p ? JSON.parse(JSON.stringify(p.bottles||[])) : [];
   document.getElementById('pf-barcode').value = p ? (p.barcode||'') : '';
 
   document.getElementById('edit-title').textContent = p ? t('edit_title_edit') : t('edit_title_new');
@@ -2486,7 +2506,7 @@ function openEdit(id) {
         div.className='field-group';
         div.style.gridColumn='1 / -1';
         div.innerHTML=`<label class="field-label">${fieldLabel(f).toUpperCase()}${f.required?' *':''}</label>
-          <input class="field-input" id="ef-${k}" value="${p?p[k]||'':''}"/>`;
+          <input class="field-input" id="ef-${k}" value="${p?p[k]||'':''}" ${k==='name'?'oninput="updateBottlesQuestion()"':''}/>`;
         grid.appendChild(div);
       });
     }
@@ -2513,6 +2533,10 @@ function openEdit(id) {
   renderFieldSegment('fields-grid-1', SEG_A, true);
   renderFieldSegment('fields-grid-2', SEG_B, false);
   renderFieldSegment('fields-grid-3', SEG_C, false);
+
+  // Extra bottles
+  renderBottlesList();
+  updateBottlesQuestion();
 
   // Unified multi-value pickers
   editNotes = p ? normalizePickerValues(p.notes) : [];
@@ -2594,6 +2618,80 @@ function renderEditStars() {
   el.innerHTML=[1,2,3,4,5].map(i=>`<span class="star${i<=editRating?' on':''}" onclick="setEditRating(${i})">★</span>`).join('');
 }
 function setEditRating(n){ editRating=n; renderEditStars(); }
+
+// ══ EXTRA BOTTLES (per perfume, beyond the first) ═══════════════
+function updateBottlesQuestion() {
+  const el = document.getElementById('bottles-question');
+  if (!el) return;
+  const nameEl = document.getElementById('ef-name');
+  const name = nameEl ? nameEl.value.trim() : '';
+  el.textContent = t('bottles_question').replace('{name}', name || t('bottles_question_fallback'));
+}
+
+function addBottle() {
+  editBottles.push({ concentration:'', capacity:'', since:'', boughtAt:'', barcode:'', batchNumber:'', comments:'' });
+  renderBottlesList();
+}
+
+function removeBottle(i) {
+  collectBottlesFromForm();
+  editBottles.splice(i,1);
+  renderBottlesList();
+}
+
+function collectBottlesFromForm() {
+  editBottles = editBottles.map((b,i)=>({
+    concentration: (document.getElementById('eb-concentration-'+i)||{}).value || '',
+    capacity: (document.getElementById('eb-capacity-'+i)||{}).value || '',
+    since: (document.getElementById('eb-since-'+i)||{}).value || '',
+    boughtAt: (document.getElementById('eb-boughtAt-'+i)||{}).value || '',
+    barcode: (document.getElementById('eb-barcode-'+i)||{}).value || '',
+    batchNumber: (document.getElementById('eb-batch-'+i)||{}).value || '',
+    comments: (document.getElementById('eb-comments-'+i)||{}).value || '',
+  }));
+}
+
+function renderBottlesList() {
+  const el = document.getElementById('bottles-extra-list');
+  if (!el) return;
+  const L = (DEFAULT_FIELD_LABELS[currentLang]||DEFAULT_FIELD_LABELS.es);
+  el.innerHTML = editBottles.map((b,i)=>`
+    <div class="bottle-block" data-idx="${i}">
+      <div class="bottle-block-header">
+        <span class="bottle-block-title">${t('bottle_label')} ${i+2}</span>
+        <button type="button" class="bottle-remove-btn" onclick="removeBottle(${i})">✕</button>
+      </div>
+      <div class="field-group">
+        <label class="field-label">${L.concentration.toUpperCase()}</label>
+        <select class="field-select" id="eb-concentration-${i}" data-prev-value="${escapeHtml(b.concentration||'')}" onchange="handleConcentrationSelectChange(this)">${concentrationOptionsHtml(b.concentration||'')}</select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">${L.capacity.toUpperCase()}</label>
+        <input class="field-input" id="eb-capacity-${i}" value="${escapeHtml(b.capacity||'')}"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">${L.inCollectionSince.toUpperCase()}</label>
+        <input class="field-input" type="date" id="eb-since-${i}" value="${b.since||''}"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">${L.boughtAt.toUpperCase()}</label>
+        <input class="field-input" id="eb-boughtAt-${i}" value="${escapeHtml(b.boughtAt||'')}"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">${t('field_barcode')}</label>
+        <input class="field-input" id="eb-barcode-${i}" value="${escapeHtml(b.barcode||'')}"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">${L.batchNumber.toUpperCase()}</label>
+        <input class="field-input" id="eb-batch-${i}" value="${escapeHtml(b.batchNumber||'')}"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">${L.comments.toUpperCase()}</label>
+        <textarea class="field-textarea" id="eb-comments-${i}" rows="3">${escapeHtml(b.comments||'')}</textarea>
+      </div>
+    </div>
+  `).join('');
+}
 
 function setStatusToggle(cat) {
   document.querySelectorAll('#f-status-toggle .cat-toggle-btn').forEach(function(btn){
@@ -2677,6 +2775,8 @@ function savePerfume() {
   const name = getFieldVal('name');
   if(!name.trim()){ alert(t('alert_name_required')); return; }
 
+  collectBottlesFromForm();
+
   const perfId = editId || state.nextId++;
   const obj = {
     id: perfId,
@@ -2691,6 +2791,7 @@ function savePerfume() {
     notes: [...editNotes],
     comments: document.getElementById('f-comments').value,
     videoUrl: document.getElementById('f-video').value.trim(),
+    bottles: [...editBottles],
   };
 
   state.fields.forEach(f=>{
@@ -3264,10 +3365,12 @@ const I18N = {
     edit_title_new: "Nuevo perfume", edit_title_edit: "Editar perfume",
     label_photos: "FOTOS (hasta 6)", photo_word: "FOTO",
     comments_placeholder: "Añade comentarios...",
-    field_video: "VÍDEO DE YOUTUBE", video_url_placeholder: "Pega aquí el enlace de YouTube...", video_found: "Vídeo encontrado ✓",
+    field_video: "VÍDEO FAVORITO", video_url_placeholder: "Pega aquí el enlace de YouTube...", video_found: "Vídeo encontrado ✓",
     field_rating: "VALORACIÓN", field_category: "CATEGORÍA",
     field_barcode: "CÓDIGO DE BARRAS", title_scan_barcode: "Escanear con cámara",
     field_tags: "ETIQUETAS",
+    bottles_question: "¿Tienes más frascos de {name}?", bottles_question_fallback: "este perfume",
+    link_add_bottle: "+ Añadir frasco", bottle_label: "Frasco no.", link_manage_fields: "Gestionar campos",
     btn_delete_perfume: "Eliminar perfume", btn_save: "Guardar",
     picker_placeholder: "Añadir - buscar", picker_add_aria: "Añadir",
     picker_create_prefix: "＋ Crear", picker_view_all: "ver todas", picker_view_less: "ver menos",
@@ -3344,6 +3447,8 @@ const I18N = {
     field_rating: "RATING", field_category: "CATEGORY",
     field_barcode: "BARCODE", title_scan_barcode: "Scan with camera",
     field_tags: "TAGS",
+    bottles_question: "Do you have more bottles of {name}?", bottles_question_fallback: "this perfume",
+    link_add_bottle: "+ Add bottle", bottle_label: "Bottle no.", link_manage_fields: "Manage fields",
     btn_delete_perfume: "Delete perfume", btn_save: "Save",
     picker_placeholder: "Add - search", picker_add_aria: "Add",
     picker_create_prefix: "＋ Create", picker_view_all: "view all", picker_view_less: "view less",
@@ -3420,6 +3525,8 @@ const I18N = {
     field_rating: "評価", field_category: "カテゴリー",
     field_barcode: "バーコード", title_scan_barcode: "カメラでスキャン",
     field_tags: "タグ",
+    bottles_question: "{name}のボトルは他にもありますか？", bottles_question_fallback: "この香水",
+    link_add_bottle: "＋ ボトルを追加", bottle_label: "ボトル No.", link_manage_fields: "項目を管理",
     btn_delete_perfume: "香水を削除", btn_save: "保存",
     picker_placeholder: "追加・検索", picker_add_aria: "追加",
     picker_create_prefix: "＋ 作成", picker_view_all: "すべて表示", picker_view_less: "表示を減らす",
@@ -3570,6 +3677,8 @@ function applyLanguage(lang) {
   if (isOpen('modal-edit')) {
     const activeBtn = document.querySelector('#f-status-toggle .cat-toggle-btn.active');
     if (activeBtn && typeof setStatusToggle === 'function') setStatusToggle(activeBtn.dataset.val);
+    if (typeof renderBottlesList === 'function') renderBottlesList();
+    if (typeof updateBottlesQuestion === 'function') updateBottlesQuestion();
   }
 }
 
