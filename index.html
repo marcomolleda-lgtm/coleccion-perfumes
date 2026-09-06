@@ -772,6 +772,7 @@
   .multi-picker-more:active { opacity:.6; }
 
   /* ── BARCODE SCANNER ── */
+  #modal-barcode { z-index:1300; }
   #modal-barcode .modal { max-width:380px; }
   #barcode-video-wrap {
     position:relative; background:#000; border-radius:12px;
@@ -3062,7 +3063,11 @@ function closeModal(id){
 
 // Close on overlay click
 document.querySelectorAll('.modal-overlay').forEach(el=>{
-  el.addEventListener('click',function(e){ if(e.target===this) closeModal(this.id); });
+  el.addEventListener('click',function(e){
+    if(e.target!==this) return;
+    if(this.id==='modal-barcode') closeBarcodeScanner();
+    else closeModal(this.id);
+  });
 });
 
 // Swipe-left-to-go-back on any open modal
@@ -3071,7 +3076,8 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{
   function currentScreen(){
     const lb = document.getElementById('lightbox');
     if(lb && lb.classList.contains('open')) return lb;
-    return document.querySelector('.modal-overlay.open');
+    const opens = document.querySelectorAll('.modal-overlay.open');
+    return opens.length ? opens[opens.length-1] : null;
   }
   document.addEventListener('touchstart', function(e){
     if(e.target.closest('.hero-carousel, #lightbox-carousel')) { active=null; return; }
@@ -3086,6 +3092,7 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{
     const dy = e.changedTouches[0].clientY - sy;
     if(dx < -70 && Math.abs(dx) > Math.abs(dy)*1.5){
       if(active.id==='lightbox') closeLightbox();
+      else if(active.id==='modal-barcode') closeBarcodeScanner();
       else active.classList.remove('open');
     }
     active = null;
@@ -3105,7 +3112,7 @@ let _barcodeRaf = null;
 
 async function openBarcodeScanner() {
   const overlay = document.getElementById('modal-barcode');
-  overlay.style.display = 'flex';
+  overlay.classList.add('open');
   const status = document.getElementById('barcode-status');
 
   // Check BarcodeDetector support
@@ -3156,7 +3163,7 @@ function _scanFrame() {
   });
 }
 
-function closeBarcodeScanner() {
+function _stopBarcodeStream() {
   if (_barcodeRaf) { cancelAnimationFrame(_barcodeRaf); _barcodeRaf = null; }
   if (_barcodeStream) {
     _barcodeStream.getTracks().forEach(t => t.stop());
@@ -3165,7 +3172,11 @@ function closeBarcodeScanner() {
   _barcodeDetector = null;
   const video = document.getElementById('barcode-video');
   if (video) video.srcObject = null;
-  document.getElementById('modal-barcode').style.display = 'none';
+}
+
+function closeBarcodeScanner() {
+  _stopBarcodeStream();
+  document.getElementById('modal-barcode').classList.remove('open');
   document.getElementById('barcode-status').textContent = t('scanner_default_status');
 }
 
@@ -3382,6 +3393,10 @@ function showPerfumes() {
 window.addEventListener('popstate', function(e) {
   const st = e.state || {view:'home', modal:null};
   _suppressHistory = true;
+  const barcodeModal = document.getElementById('modal-barcode');
+  if (barcodeModal && barcodeModal.classList.contains('open') && st.modal !== 'modal-barcode') {
+    _stopBarcodeStream();
+  }
   document.querySelectorAll('.modal-overlay.open').forEach(function(el){
     if (el.id !== st.modal) el.classList.remove('open');
   });
