@@ -802,6 +802,12 @@
     justify-content:center; transition:opacity .2s;
   }
   .barcode-scan-btn:active { opacity:.6; }
+  .barcode-lookup-status {
+    font-size:12px; color:var(--text-muted); margin-top:6px; min-height:1.4em;
+    transition:opacity .3s;
+  }
+  .barcode-lookup-status.found { color:var(--success); }
+  .barcode-lookup-status.not-found { color:var(--text-light); }
 
   .note-card {
     background:var(--surface); border:1px solid var(--border);
@@ -1224,9 +1230,10 @@
       <div class="field-group" id="fg-barcode">
         <label class="field-label" data-i18n="field_barcode">CÓDIGO DE BARRAS</label>
         <div class="barcode-input-wrap">
-          <input class="field-input" id="pf-barcode" placeholder="EAN / UPC" inputmode="numeric"/>
+          <input class="field-input" id="pf-barcode" placeholder="EAN / UPC" inputmode="numeric" onchange="lookupBarcodeProduct(this.value.trim())"/>
           <button class="barcode-scan-btn" onclick="openBarcodeScanner()" title="Escanear con cámara" data-i18n-title="title_scan_barcode">📷</button>
         </div>
+        <div id="barcode-lookup-status" class="barcode-lookup-status" style="display:none;"></div>
       </div>
 
       <!-- Fields grid 3: no. de batch, en colección desde -->
@@ -3140,6 +3147,7 @@ function _scanFrame() {
       // Small vibration feedback if available
       if (navigator.vibrate) navigator.vibrate(100);
       setTimeout(() => closeBarcodeScanner(), 800);
+      lookupBarcodeProduct(code);
       return;
     }
     _barcodeRaf = requestAnimationFrame(_scanFrame);
@@ -3159,6 +3167,66 @@ function closeBarcodeScanner() {
   if (video) video.srcObject = null;
   document.getElementById('modal-barcode').style.display = 'none';
   document.getElementById('barcode-status').textContent = t('scanner_default_status');
+}
+
+// ── Autocompletado a partir del código de barras (Open Beauty Facts) ──
+// Solo rellena campos que estén vacíos: nunca sobrescribe algo que el
+// usuario ya haya escrito. Es un servicio comunitario y gratuito, así que
+// la cobertura de perfumes de nicho puede ser escasa; los perfumes de
+// gran distribución tienen más probabilidad de aparecer.
+let _lookupSeq = 0;
+async function lookupBarcodeProduct(code) {
+  const statusEl = document.getElementById('barcode-lookup-status');
+  if (!code || code.length < 6) return;
+  const seq = ++_lookupSeq;
+  if (statusEl) {
+    statusEl.className = 'barcode-lookup-status';
+    statusEl.style.display = 'block';
+    statusEl.textContent = 'Buscando datos del producto…';
+  }
+  try {
+    const res = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${encodeURIComponent(code)}.json`);
+    const data = await res.json();
+    if (seq !== _lookupSeq) return; // a newer lookup superseded this one
+    if (data && data.status === 1 && data.product) {
+      const prod = data.product;
+      const filledLabels = [];
+      const nameEl = document.getElementById('ef-name');
+      const brandEl = document.getElementById('ef-brand');
+      const capEl = document.getElementById('ef-capacity');
+      if (nameEl && !nameEl.value.trim() && prod.product_name) {
+        nameEl.value = prod.product_name;
+        filledLabels.push('nombre');
+        if (typeof updateBottlesQuestion === 'function') updateBottlesQuestion();
+      }
+      if (brandEl && !brandEl.value.trim() && prod.brands) {
+        brandEl.value = prod.brands.split(',')[0].trim();
+        filledLabels.push('marca');
+      }
+      if (capEl && !capEl.value.trim() && prod.quantity) {
+        capEl.value = prod.quantity;
+        filledLabels.push('capacidad');
+      }
+      if (statusEl) {
+        statusEl.className = 'barcode-lookup-status ' + (filledLabels.length ? 'found' : 'not-found');
+        statusEl.textContent = filledLabels.length
+          ? ('Rellenado automáticamente: ' + filledLabels.join(', '))
+          : 'Producto encontrado, pero sin datos que rellenar.';
+      }
+    } else if (statusEl) {
+      statusEl.className = 'barcode-lookup-status not-found';
+      statusEl.textContent = 'No se encontró información para este código.';
+    }
+  } catch (e) {
+    console.error('barcode lookup failed', e);
+    if (statusEl && seq === _lookupSeq) {
+      statusEl.className = 'barcode-lookup-status not-found';
+      statusEl.textContent = 'No se pudo consultar la base de datos ahora mismo.';
+    }
+  }
+  if (statusEl) {
+    setTimeout(() => { if (seq === _lookupSeq) statusEl.style.display = 'none'; }, 5000);
+  }
 }
 
 // ══ NOTAS GLOBALES ══════════════════════════════════════════════
