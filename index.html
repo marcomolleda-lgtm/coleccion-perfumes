@@ -1224,7 +1224,7 @@
         <div id="edit-notes-picker"></div>
       </div>
 
-      <!-- Fields grid 2: sexo, comprado en, precio -->
+      <!-- Fields grid 2: género, comprado en, precio -->
       <div class="field-grid" id="fields-grid-2"></div>
 
       <!-- Barcode -->
@@ -1425,7 +1425,7 @@
 // ══ STATE ══════════════════════════════════════════════════════
 const DEFAULT_FAMILIES = ["floral","oriental","amaderado","fresco","cítrico","fougère","chipre","gourmand","acuático","especiado","cuero","almizclado","animálico","ambarado","verde","incensado","resinoso","limpio"];
 const CONCENTRATIONS = ["Aceite","Colonia","EDT","EDP","Perfume","Extracto de perfume","Sólido"];
-const GENDERS = ["Masculino","Femenino","Unisex","Andrógino"];
+const GENDERS = ["Masculino","Femenino","Unisex"];
 
 let state = {
   families: [...DEFAULT_FAMILIES],
@@ -1445,7 +1445,7 @@ let state = {
     {key:"bottleDesigner",label:"Diseñador del frasco",visible:true},
     {key:"family",label:"Familia olfativa",visible:true},
     {key:"notes",label:"Notas olfativas",visible:true,required:true},
-    {key:"gender",label:"Sexo",visible:true},
+    {key:"gender",label:"Género",visible:true},
     {key:"boughtAt",label:"Comprado en",visible:true},
     {key:"price",label:"Precio",visible:true},
     {key:"barcode",label:"Código de barras",visible:true},
@@ -3712,7 +3712,7 @@ function t(key) { return (I18N[currentLang] || I18N.es)[key] || key; }
 // Default (unmodified) labels for built-in fields/options, used to translate
 // display only when the user hasn't renamed/customized them.
 const DEFAULT_FIELD_LABELS = {
-  es: {name:"Nombre",brand:"Marca",concentration:"Concentración",capacity:"Capacidad",launch:"Lanzamiento",perfumer:"Perfumista",bottleDesigner:"Diseñador del frasco",family:"Familia olfativa",gender:"Sexo",notes:"Notas olfativas",boughtAt:"Comprado en",price:"Precio",inCollectionSince:"En colección desde",rating:"Valoración",batchNumber:"No. de Batch",comments:"Comentarios",status:"Categoría",barcode:"Código de barras"},
+  es: {name:"Nombre",brand:"Marca",concentration:"Concentración",capacity:"Capacidad",launch:"Lanzamiento",perfumer:"Perfumista",bottleDesigner:"Diseñador del frasco",family:"Familia olfativa",gender:"Género",notes:"Notas olfativas",boughtAt:"Comprado en",price:"Precio",inCollectionSince:"En colección desde",rating:"Valoración",batchNumber:"No. de Batch",comments:"Comentarios",status:"Categoría",barcode:"Código de barras"},
   en: {name:"Name",brand:"Brand",concentration:"Concentration",capacity:"Size",launch:"Release year",perfumer:"Perfumer",bottleDesigner:"Bottle designer",family:"Olfactory family",gender:"Gender",notes:"Olfactory notes",boughtAt:"Purchased at",price:"Price",inCollectionSince:"In collection since",rating:"Rating",batchNumber:"Batch No.",comments:"Comments",status:"Category",barcode:"Barcode"},
   ja: {name:"名前",brand:"ブランド",concentration:"濃度",capacity:"容量",launch:"発売年",perfumer:"調香師",bottleDesigner:"ボトルデザイナー",family:"香りの系統",gender:"性別",notes:"香りのノート",boughtAt:"購入場所",price:"価格",inCollectionSince:"コレクション登録日",rating:"評価",batchNumber:"バッチ番号",comments:"コメント",status:"カテゴリー",barcode:"バーコード"}
 };
@@ -3727,9 +3727,9 @@ const CONCENTRATION_LABELS = {
   ja: {"Aceite":"オイル","Colonia":"オーデコロン","EDT":"EDT","EDP":"EDP","Perfume":"パルファン","Extracto de perfume":"エクストレ","Sólido":"練り香水"}
 };
 const GENDER_LABELS = {
-  es: {"Masculino":"Masculino","Femenino":"Femenino","Unisex":"Unisex","Andrógino":"Andrógino"},
-  en: {"Masculino":"Masculine","Femenino":"Feminine","Unisex":"Unisex","Andrógino":"Androgynous"},
-  ja: {"Masculino":"メンズ","Femenino":"レディース","Unisex":"ユニセックス","Andrógino":"アンドロジナス"}
+  es: {"Masculino":"Masculino","Femenino":"Femenino","Unisex":"Unisex"},
+  en: {"Masculino":"Masculine","Femenino":"Feminine","Unisex":"Unisex"},
+  ja: {"Masculino":"メンズ","Femenino":"レディース","Unisex":"ユニセックス"}
 };
 function concentrationLabel(v) { return (CONCENTRATION_LABELS[currentLang]||CONCENTRATION_LABELS.es)[v] || v; }
 function concentrationOptionsHtml(selectedVal) {
