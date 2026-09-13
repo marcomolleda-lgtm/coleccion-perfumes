@@ -615,6 +615,13 @@
   .row-small-brand { font-size:14px; font-family:'Jost',sans-serif; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .row-small .stars .star { font-size:13px; }
   .row-small-status { flex-shrink:0; cursor:pointer; }
+  .row-offer-btn {
+    flex-shrink:0; width:30px; height:30px; border-radius:50%;
+    background:var(--surface-alt); border:1px solid var(--border); color:var(--text);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;
+  }
+  .row-offers-mini { display:flex; gap:8px; flex-wrap:wrap; }
+  .offer-link-btn--sm { padding:5px 14px; font-size:12px; }
   #list-back-bar {
     display:none; align-items:center; justify-content:flex-start;
     padding:12px 16px 0;
@@ -2322,6 +2329,9 @@ function render() {
           ${starsHTML(p.rating||0)}
         </div>
         <span class="badge-out row-small-status cat-${p.status||'coleccion'}" onclick="event.stopPropagation();openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
+        <button class="row-offer-btn" onclick="event.stopPropagation();openDetail(${p.id})" title="${t('title_offers')}" aria-label="${t('title_offers')}">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
       </div>`;
     }).join('');
     _setMainHeight();
@@ -2357,6 +2367,12 @@ function render() {
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           ${starsHTML(p.rating||0)}
           <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
+        </div>
+        <div class="row-offers-mini" onclick="event.stopPropagation()">
+          ${(()=>{ const links = getOfferLinks(p); return `
+          <a class="offer-link-btn offer-link-btn--sm" href="${links[0].url}" target="_blank" rel="noopener">${links[0].label}</a>
+          <a class="offer-link-btn offer-link-btn--sm" href="${links[1].url}" target="_blank" rel="noopener">${links[1].label}</a>
+          <button class="offer-link-btn offer-link-btn--sm" onclick="openDetail(${p.id})">${t('title_other_stores')}</button>`; })()}
         </div>
         <div class="row-cols">
           <div class="row-brand-badge">${p.brand||''}</div>
@@ -2455,12 +2471,15 @@ const OFFER_AMAZON_DOMAIN = {
 const OFFER_MERCADOLIBRE_DOMAIN = { AR:'mercadolibre.com.ar', CO:'mercadolibre.com.co', CL:'mercadolibre.cl' };
 const OFFER_LANG_DEFAULT_COUNTRY = { es:'ES', en:'US', de:'DE', fr:'FR', it:'IT', ja:'JP', pt:'PT' };
 function getOfferCountry() {
-  const lang = (navigator.language || 'en-US');
-  const parts = lang.split('-');
-  const region = parts[1] ? parts[1].toUpperCase() : null;
+  const langDefault = OFFER_LANG_DEFAULT_COUNTRY[currentLang] || 'US';
   const knownRegions = Object.keys(OFFER_AMAZON_DOMAIN).concat(Object.keys(OFFER_MERCADOLIBRE_DOMAIN));
-  if (region && knownRegions.includes(region)) return region;
-  return OFFER_LANG_DEFAULT_COUNTRY[parts[0].toLowerCase()] || 'US';
+  const navParts = (navigator.language || '').split('-');
+  const navBase = (navParts[0] || '').toLowerCase();
+  const navRegion = navParts[1] ? navParts[1].toUpperCase() : null;
+  // El idioma elegido en la app manda; el país del dispositivo solo afina
+  // la región cuando coincide con ese mismo idioma (p.ej. es-AR con app en español).
+  if (navBase === currentLang && navRegion && knownRegions.includes(navRegion)) return navRegion;
+  return langDefault;
 }
 function getOfferLinks(p) {
   const country = getOfferCountry();
@@ -3535,7 +3554,7 @@ const I18N = {
     title_view_list: "Ver en lista", title_view_card: "Ver ficha completa", btn_view_card: "ficha completa", title_sort_alpha: "Orden alfabético",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Ficha completa",
-    title_offers: "Buscar ofertas",
+    title_offers: "Buscar ofertas", title_other_stores: "otras tiendas",
     add_photo_line1: "AÑADIR", add_photo_line2: "IMAGEN", add_image_alt: "Añadir imagen",
     title_back: "Volver",
     video_thumbnail_alt: "Miniatura del vídeo",
@@ -3615,7 +3634,7 @@ const I18N = {
     title_view_list: "List view", title_view_card: "Full card view", btn_view_card: "full profile", title_sort_alpha: "Alphabetical order",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Full profile",
-    title_offers: "Search offers",
+    title_offers: "Search offers", title_other_stores: "other stores",
     add_photo_line1: "ADD", add_photo_line2: "PHOTO", add_image_alt: "Add image",
     title_back: "Back",
     video_thumbnail_alt: "Video thumbnail",
@@ -3695,7 +3714,7 @@ const I18N = {
     title_view_list: "リスト表示", title_view_card: "詳細表示", btn_view_card: "詳細プロフィール", title_sort_alpha: "アルファベット順",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "詳細プロフィール",
-    title_offers: "オファーを検索",
+    title_offers: "オファーを検索", title_other_stores: "その他の店舗",
     add_photo_line1: "写真を", add_photo_line2: "追加", add_image_alt: "画像を追加",
     title_back: "戻る",
     video_thumbnail_alt: "動画のサムネイル",
@@ -3776,7 +3795,7 @@ const I18N = {
     title_view_list: "Listenansicht", title_view_card: "Vollständige Karte", btn_view_card: "vollständiges Profil", title_sort_alpha: "Alphabetische Reihenfolge",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Vollständiges Profil",
-    title_offers: "Angebote suchen",
+    title_offers: "Angebote suchen", title_other_stores: "weitere Shops",
     add_photo_line1: "FOTO", add_photo_line2: "HINZUFÜGEN", add_image_alt: "Bild hinzufügen",
     title_back: "Zurück",
     video_thumbnail_alt: "Video-Miniaturansicht",
@@ -3857,7 +3876,7 @@ const I18N = {
     title_view_list: "Vue en liste", title_view_card: "Fiche complète", btn_view_card: "fiche complète", title_sort_alpha: "Ordre alphabétique",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Fiche complète",
-    title_offers: "Rechercher des offres",
+    title_offers: "Rechercher des offres", title_other_stores: "autres boutiques",
     add_photo_line1: "AJOUTER", add_photo_line2: "PHOTO", add_image_alt: "Ajouter une image",
     title_back: "Retour",
     video_thumbnail_alt: "Miniature de la vidéo",
@@ -3938,7 +3957,7 @@ const I18N = {
     title_view_list: "Vista elenco", title_view_card: "Scheda completa", btn_view_card: "scheda completa", title_sort_alpha: "Ordine alfabetico",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Scheda completa",
-    title_offers: "Cerca offerte",
+    title_offers: "Cerca offerte", title_other_stores: "altri negozi",
     add_photo_line1: "AGGIUNGI", add_photo_line2: "IMMAGINE", add_image_alt: "Aggiungi immagine",
     title_back: "Indietro",
     video_thumbnail_alt: "Miniatura del video",
@@ -4019,7 +4038,7 @@ const I18N = {
     title_view_list: "Ver em lista", title_view_card: "Ficha completa", btn_view_card: "ficha completa", title_sort_alpha: "Ordem alfabética",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Ficha completa",
-    title_offers: "Procurar ofertas",
+    title_offers: "Procurar ofertas", title_other_stores: "outras lojas",
     add_photo_line1: "ADICIONAR", add_photo_line2: "IMAGEM", add_image_alt: "Adicionar imagem",
     title_back: "Voltar",
     video_thumbnail_alt: "Miniatura do vídeo",
