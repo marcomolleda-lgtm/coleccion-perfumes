@@ -447,6 +447,14 @@
   .detail-field-label { font-size:11px; color:var(--text-light); letter-spacing:1.5px; font-family:'Jost',sans-serif; font-weight:500; margin-bottom:3px; text-transform:uppercase; }
   .detail-field-value { font-size:17px; color:var(--text); font-family:'Jost',sans-serif; }
   .detail-field-value.brand-badge { display:inline-block; background:var(--accent-yellow); padding:2px 8px; }
+  .detail-offers { padding-top:16px; margin-top:16px; border-top:1px solid #ededec; }
+  .detail-offers-label { font-size:11px; color:var(--text-light); letter-spacing:1.5px; font-family:'Jost',sans-serif; font-weight:500; margin-bottom:8px; text-transform:uppercase; }
+  .detail-offers-links { display:flex; gap:8px; flex-wrap:wrap; }
+  .offer-link-btn {
+    display:inline-block; padding:8px 18px; border-radius:999px;
+    background:var(--surface-alt); color:var(--text); border:1px solid var(--border);
+    font-family:'Jost',sans-serif; font-size:13px; font-weight:500; text-decoration:none; cursor:pointer;
+  }
   .detail-block { padding-top:16px; margin-top:16px; border-top:1px solid #ededec; }
   .detail-block-label { font-size:11px; color:var(--text-light); letter-spacing:1.5px; font-family:'Jost',sans-serif; font-weight:500; margin-bottom:6px; text-transform:uppercase; }
   .detail-block-value { font-size:16px; color:var(--text-muted); font-family:'Jost',sans-serif; font-style:italic; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
@@ -2437,6 +2445,37 @@ function renderBottlesDetailHtml(p) {
     </div>`).join('');
 }
 
+// ══ OFERTAS: detección de país y enlaces de búsqueda ═══════════
+// Amazon regional por país. Portugal usa Amazon.es (versión traducida al portugués).
+const OFFER_AMAZON_DOMAIN = {
+  ES:'amazon.es', PT:'amazon.es', MX:'amazon.com.mx', DE:'amazon.de',
+  US:'amazon.com', FR:'amazon.fr', IT:'amazon.it', GB:'amazon.co.uk', JP:'amazon.co.jp'
+};
+// Argentina, Colombia y Chile usan Mercado Libre como tienda global por defecto.
+const OFFER_MERCADOLIBRE_DOMAIN = { AR:'mercadolibre.com.ar', CO:'mercadolibre.com.co', CL:'mercadolibre.cl' };
+const OFFER_LANG_DEFAULT_COUNTRY = { es:'ES', en:'US', de:'DE', fr:'FR', it:'IT', ja:'JP', pt:'PT' };
+function getOfferCountry() {
+  const lang = (navigator.language || 'en-US');
+  const parts = lang.split('-');
+  const region = parts[1] ? parts[1].toUpperCase() : null;
+  const knownRegions = Object.keys(OFFER_AMAZON_DOMAIN).concat(Object.keys(OFFER_MERCADOLIBRE_DOMAIN));
+  if (region && knownRegions.includes(region)) return region;
+  return OFFER_LANG_DEFAULT_COUNTRY[parts[0].toLowerCase()] || 'US';
+}
+function getOfferLinks(p) {
+  const country = getOfferCountry();
+  const query = [p.brand, p.name].filter(Boolean).join(' ').trim() || (p.name||'');
+  const q = encodeURIComponent(query);
+  const links = [];
+  if (OFFER_MERCADOLIBRE_DOMAIN[country]) {
+    links.push({ label:'Mercado Libre', url:`https://listado.${OFFER_MERCADOLIBRE_DOMAIN[country]}/${q}` });
+  } else {
+    const domain = OFFER_AMAZON_DOMAIN[country] || 'amazon.com';
+    links.push({ label: domain==='amazon.es' ? 'Amazon.es' : 'Amazon', url:`https://www.${domain}/s?k=${q}` });
+  }
+  links.push({ label:'Google Shopping', url:`https://www.google.com/search?tbm=shop&q=${q}` });
+  return links;
+}
 function openDetail(id) {
   const p = state.perfumes.find(x=>x.id===id);
   if(!p) return;
@@ -2462,6 +2501,12 @@ function openDetail(id) {
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         ${starsHTML(p.rating||0,'lg')}
         <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
+      </div>
+      <div class="detail-offers">
+        <div class="detail-offers-label">${t('title_offers')}</div>
+        <div class="detail-offers-links">
+          ${getOfferLinks(p).map(l=>`<a class="offer-link-btn" href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join('')}
+        </div>
       </div>
       <div class="detail-fields">
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
@@ -3490,6 +3535,7 @@ const I18N = {
     title_view_list: "Ver en lista", title_view_card: "Ver ficha completa", btn_view_card: "ficha completa", title_sort_alpha: "Orden alfabético",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Ficha completa",
+    title_offers: "Buscar ofertas",
     add_photo_line1: "AÑADIR", add_photo_line2: "IMAGEN", add_image_alt: "Añadir imagen",
     title_back: "Volver",
     video_thumbnail_alt: "Miniatura del vídeo",
@@ -3511,7 +3557,7 @@ const I18N = {
     picker_create_prefix: "＋ Crear", picker_view_all: "ver todas", picker_view_less: "ver menos",
     cover_word: "Portada",
     alert_name_required: "El nombre es obligatorio", confirm_delete_perfume: "¿Eliminar este perfume?",
-    cat_perfumes: "todos los perfumes", cat_coleccion: "en colección", cat_deseo: "deseos", cat_probados: "probados",
+    cat_perfumes: "todos los perfumes", cat_coleccion: "en colección", cat_deseo: "deseos", cat_probados: "solo probados",
     // ── Part 3: field/family manager, classification ──
     title_category: "Categoría", title_fields: "Campos", subtitle_fields: "Añadir, ordenar y eliminar campos", link_add_field: "+ Añadir campo",
     link_manage_classification: "Gestionar clasificación", required_word: "requerido",
@@ -3569,6 +3615,7 @@ const I18N = {
     title_view_list: "List view", title_view_card: "Full card view", btn_view_card: "full profile", title_sort_alpha: "Alphabetical order",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Full profile",
+    title_offers: "Search offers",
     add_photo_line1: "ADD", add_photo_line2: "PHOTO", add_image_alt: "Add image",
     title_back: "Back",
     video_thumbnail_alt: "Video thumbnail",
@@ -3648,6 +3695,7 @@ const I18N = {
     title_view_list: "リスト表示", title_view_card: "詳細表示", btn_view_card: "詳細プロフィール", title_sort_alpha: "アルファベット順",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "詳細プロフィール",
+    title_offers: "オファーを検索",
     add_photo_line1: "写真を", add_photo_line2: "追加", add_image_alt: "画像を追加",
     title_back: "戻る",
     video_thumbnail_alt: "動画のサムネイル",
@@ -3728,6 +3776,7 @@ const I18N = {
     title_view_list: "Listenansicht", title_view_card: "Vollständige Karte", btn_view_card: "vollständiges Profil", title_sort_alpha: "Alphabetische Reihenfolge",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Vollständiges Profil",
+    title_offers: "Angebote suchen",
     add_photo_line1: "FOTO", add_photo_line2: "HINZUFÜGEN", add_image_alt: "Bild hinzufügen",
     title_back: "Zurück",
     video_thumbnail_alt: "Video-Miniaturansicht",
@@ -3808,6 +3857,7 @@ const I18N = {
     title_view_list: "Vue en liste", title_view_card: "Fiche complète", btn_view_card: "fiche complète", title_sort_alpha: "Ordre alphabétique",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Fiche complète",
+    title_offers: "Rechercher des offres",
     add_photo_line1: "AJOUTER", add_photo_line2: "PHOTO", add_image_alt: "Ajouter une image",
     title_back: "Retour",
     video_thumbnail_alt: "Miniature de la vidéo",
@@ -3888,6 +3938,7 @@ const I18N = {
     title_view_list: "Vista elenco", title_view_card: "Scheda completa", btn_view_card: "scheda completa", title_sort_alpha: "Ordine alfabetico",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Scheda completa",
+    title_offers: "Cerca offerte",
     add_photo_line1: "AGGIUNGI", add_photo_line2: "IMMAGINE", add_image_alt: "Aggiungi immagine",
     title_back: "Indietro",
     video_thumbnail_alt: "Miniatura del video",
@@ -3968,6 +4019,7 @@ const I18N = {
     title_view_list: "Ver em lista", title_view_card: "Ficha completa", btn_view_card: "ficha completa", title_sort_alpha: "Ordem alfabética",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Ficha completa",
+    title_offers: "Procurar ofertas",
     add_photo_line1: "ADICIONAR", add_photo_line2: "IMAGEM", add_image_alt: "Adicionar imagem",
     title_back: "Voltar",
     video_thumbnail_alt: "Miniatura do vídeo",
