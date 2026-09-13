@@ -1050,6 +1050,10 @@
         <div id="panel-lang-menu" class="dropdown-menu" style="left:0;transform:none;">
           <button class="dropdown-item" onclick="setLanguage('es');closePanelLangMenu()">🇪🇸 Español</button>
           <button class="dropdown-item" onclick="setLanguage('en');closePanelLangMenu()">🇬🇧 English</button>
+          <button class="dropdown-item" onclick="setLanguage('de');closePanelLangMenu()">🇩🇪 Deutsch</button>
+          <button class="dropdown-item" onclick="setLanguage('fr');closePanelLangMenu()">🇫🇷 Français</button>
+          <button class="dropdown-item" onclick="setLanguage('it');closePanelLangMenu()">🇮🇹 Italiano</button>
+          <button class="dropdown-item" onclick="setLanguage('pt');closePanelLangMenu()">🇵🇹 Português</button>
           <button class="dropdown-item" onclick="setLanguage('ja');closePanelLangMenu()">🇯🇵 日本語</button>
         </div>
       </div>
@@ -1081,6 +1085,10 @@
     <div id="home-lang-menu" class="dropdown-menu">
       <button class="dropdown-item" onclick="setLanguage('es')">🇪🇸 Español</button>
       <button class="dropdown-item" onclick="setLanguage('en')">🇬🇧 English</button>
+      <button class="dropdown-item" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
+      <button class="dropdown-item" onclick="setLanguage('fr')">🇫🇷 Français</button>
+      <button class="dropdown-item" onclick="setLanguage('it')">🇮🇹 Italiano</button>
+      <button class="dropdown-item" onclick="setLanguage('pt')">🇵🇹 Português</button>
       <button class="dropdown-item" onclick="setLanguage('ja')">🇯🇵 日本語</button>
     </div>
   </div>
@@ -3293,7 +3301,7 @@ function saveNote() {
   const noteData = {
     title,
     body,
-    date: new Date().toLocaleDateString(currentLang==='en'?'en-GB':currentLang==='ja'?'ja-JP':'es-ES', {day:'2-digit', month:'short', year:'numeric'})
+    date: new Date().toLocaleDateString(({en:'en-GB',ja:'ja-JP',de:'de-DE',fr:'fr-FR',it:'it-IT',pt:'pt-PT'})[currentLang] || 'es-ES', {day:'2-digit', month:'short', year:'numeric'})
   };
   if (editIndex !== '' && editIndex !== undefined) {
     notes[parseInt(editIndex)] = noteData;
@@ -3704,6 +3712,62 @@ const I18N = {
     scanner_scanning: "香水のバーコードに向けてください…",
     scanner_detected_pre: "✓ コードを検出: ",
     scanner_camera_error: "⚠ カメラにアクセスできませんでした。コードを手入力してください。",
+  },
+  de: {
+    // ── Part 1: header, home ──
+    menu_export: "Exportieren", menu_import: "Importieren",
+    search_placeholder: "Suchen",
+    home_search: "Suchen",
+    empty_state: "Noch keine Parfums",
+    sort_label: "KARTEN SORTIEREN NACH", sort_date: "chronologisch", sort_name: "alphabetisch",
+    manage_fields: "Felder verwalten", notes: "Notizen",
+    menu_perfumes: "Parfums", menu_fields: "Felder", menu_notes: "Notizen", menu_classification: "Klassifizierung",
+    title_home: "Start", title_language: "Sprache", title_menu: "Menü",
+    title_go_to_perfumes: "Zu meinen Parfums", title_add_perfume: "Parfum hinzufügen",
+    title_change_category: "Kategorie ändern", empty_hint: "Versuche die Filter zu ändern",
+    title_view_list: "Listenansicht", title_view_card: "Vollständige Karte", btn_view_card: "vollständiges Profil", title_sort_alpha: "Alphabetische Reihenfolge",
+  },
+  fr: {
+    // ── Part 1: header, home ──
+    menu_export: "Exporter", menu_import: "Importer",
+    search_placeholder: "Rechercher",
+    home_search: "Rechercher",
+    empty_state: "Pas encore de parfums",
+    sort_label: "TRIER LES FICHES PAR", sort_date: "chronologique", sort_name: "alphabétique",
+    manage_fields: "Gérer les champs", notes: "Notes",
+    menu_perfumes: "Parfums", menu_fields: "Champs", menu_notes: "Notes", menu_classification: "Classification",
+    title_home: "Accueil", title_language: "Langue", title_menu: "Menu",
+    title_go_to_perfumes: "Aller à mes parfums", title_add_perfume: "Ajouter un parfum",
+    title_change_category: "Changer de catégorie", empty_hint: "Essayez de modifier les filtres",
+    title_view_list: "Vue en liste", title_view_card: "Fiche complète", btn_view_card: "fiche complète", title_sort_alpha: "Ordre alphabétique",
+  },
+  it: {
+    // ── Part 1: header, home ──
+    menu_export: "Esporta", menu_import: "Importa",
+    search_placeholder: "Cerca",
+    home_search: "Cerca",
+    empty_state: "Ancora nessun profumo",
+    sort_label: "ORDINA SCHEDE PER", sort_date: "cronologico", sort_name: "alfabetico",
+    manage_fields: "Gestisci campi", notes: "Note",
+    menu_perfumes: "Profumi", menu_fields: "Campi", menu_notes: "Note", menu_classification: "Classificazione",
+    title_home: "Home", title_language: "Lingua", title_menu: "Menu",
+    title_go_to_perfumes: "Vai ai miei profumi", title_add_perfume: "Aggiungi profumo",
+    title_change_category: "Cambia categoria", empty_hint: "Prova a cambiare i filtri",
+    title_view_list: "Vista elenco", title_view_card: "Scheda completa", btn_view_card: "scheda completa", title_sort_alpha: "Ordine alfabetico",
+  },
+  pt: {
+    // ── Part 1: header, home ──
+    menu_export: "Exportar", menu_import: "Importar",
+    search_placeholder: "Pesquisar",
+    home_search: "Pesquisar",
+    empty_state: "Ainda não há perfumes",
+    sort_label: "ORDENAR FICHAS POR", sort_date: "cronológico", sort_name: "alfabético",
+    manage_fields: "Gerir campos", notes: "Notas",
+    menu_perfumes: "Perfumes", menu_fields: "Campos", menu_notes: "Notas", menu_classification: "Classificação",
+    title_home: "Início", title_language: "Idioma", title_menu: "Menu",
+    title_go_to_perfumes: "Ir para os meus perfumes", title_add_perfume: "Adicionar perfume",
+    title_change_category: "Mudar categoria", empty_hint: "Tente mudar os filtros",
+    title_view_list: "Ver em lista", title_view_card: "Ficha completa", btn_view_card: "ficha completa", title_sort_alpha: "Ordem alfabética",
   }
 };
 let currentLang = localStorage.getItem('scentic-lang') || 'es';
