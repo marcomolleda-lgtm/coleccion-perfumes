@@ -1,9 +1,19 @@
-const CACHE = 'perfumes-v18';
+const CACHE = 'perfumes-v19';
+const ASSETS = ['./index.html', './manifest.json', './icon-192-v7.png', './icon-512-v7.png', './icon-192-maskable-v7.png', './icon-512-maskable-v7.png', './sample-chanel5-v1.jpg', './sample-shalimar-v1.jpg', './sample-acquadigio-v1.jpg'];
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(CACHE).then(function(cache) {
-      return cache.addAll(['./index.html', './manifest.json', './icon-192-v7.png', './icon-512-v7.png', './icon-192-maskable-v7.png', './icon-512-maskable-v7.png', './sample-chanel5-v1.jpg', './sample-shalimar-v1.jpg', './sample-acquadigio-v1.jpg']);
+      // cache.add each file separately so one slow/missing file (e.g. a CDN
+      // propagation delay right after deploying) doesn't block the whole
+      // update — previously cache.addAll() failed all-or-nothing here.
+      return Promise.all(
+        ASSETS.map(function(url) {
+          return cache.add(url).catch(function(err) {
+            console.warn('sw: failed to precache', url, err);
+          });
+        })
+      );
     })
   );
   self.skipWaiting();
