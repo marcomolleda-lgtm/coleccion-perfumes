@@ -1,4 +1,4 @@
-const CACHE = 'perfumes-v15';
+const CACHE = 'perfumes-v16';
 
 self.addEventListener('install', function(e) {
   e.waitUntil(

@@ -1446,17 +1446,21 @@
 
 <script>
 // ══ STATE ══════════════════════════════════════════════════════
-const DEFAULT_FAMILIES = ["floral","oriental","amaderado","fresco","cítrico","fougère","chipre","gourmand","acuático","especiado","cuero","almizclado","animálico","ambarado","verde","incensado","resinoso","limpio"];
+const DEFAULT_FAMILIES = ["cítrica","floral","fougère","chipre","amaderada","ambarada","gourmand","acuerada","aromática","acuática","verde","aldehídica","frutal","almizclada","especiada"];
+const DEFAULT_NOTES = ["bergamota","limón","naranja","rosa","jazmín","lavanda","neroli","iris","violeta","heliotropo","lirio de los valles","ylang-ylang","sándalo","cedro","pachulí","vetiver","oud","musgo de roble","vainilla","haba tonka","ámbar","ládano","incienso","mirra","benjuí","almizcle","algalia","castóreo","pimienta negra","cardamomo","hojas de violeta","aldehídos"];
+const DEFAULT_TAGS = ["frescos","limpio","oscuro","día","noche","beast mode","oficina","gim"];
 const CONCENTRATIONS = ["Aceite","Colonia","EDT","EDP","Perfume","Extracto de perfume","Sólido"];
 const GENDERS = ["Masculino","Femenino","Unisex"];
 
 let state = {
   families: [...DEFAULT_FAMILIES],
+  notes: [...DEFAULT_NOTES],
+  tags: [...DEFAULT_TAGS],
   concentrations: [...CONCENTRATIONS],
   perfumes: [
-    {id:1,name:"Santal 33",brand:"Le Labo",concentration:"EDP",capacity:"100ml",launch:"2011",perfumer:"Frank Voelkl",bottleDesigner:"Le Labo Studio",family:"Amaderado",gender:"Unisex",notes:["Cardamomo","Violeta","Iris","Ambrox","Sándalo","Cuero"],boughtAt:"Boutique Le Labo Madrid",price:"310€",inCollectionSince:"2023-04-12",rating:5,bottleStatus:"Medio",myOpinion:"Un clásico moderno imprescindible.",comments:"Lo reservo para ocasiones especiales.",inCollection:true,tags:["favorito","especial"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-04-12"},
-    {id:2,name:"Baccarat Rouge 540",brand:"MFK",concentration:"EDP",capacity:"70ml",launch:"2015",perfumer:"Francis Kurkdjian",bottleDesigner:"Georges Chevalier",family:"Floral",gender:"Unisex",notes:["Azafrán","Jazmín","Ambroxan","Cedro","Musgo"],boughtAt:"El Corte Inglés",price:"395€",inCollectionSince:"2023-09-01",rating:5,bottleStatus:"Lleno",myOpinion:"Sofisticado y adictivo.",comments:"",inCollection:true,tags:["lujo"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-09-01"},
-    {id:3,name:"Oud Wood",brand:"Tom Ford",concentration:"EDP",capacity:"50ml",launch:"2007",perfumer:"Richard Herpin",bottleDesigner:"Tom Ford Beauty",family:"Oriental",gender:"Masculino",notes:["Palo de Rosa","Oud","Sándalo","Vainilla","Ámbar"],boughtAt:"Tom Ford Online",price:"280€",inCollectionSince:"2024-01-20",rating:4,bottleStatus:"Casi vacío",myOpinion:"Cálido y envolvente.",comments:"Perfecto para invierno.",inCollection:true,tags:["invierno","noche"],lists:[],photos:[null,null,null,null,null,null],added:"2024-01-20"},
+    {id:1,name:"Santal 33",brand:"Le Labo",concentration:"EDP",capacity:"100ml",launch:"2011",perfumer:"Frank Voelkl",bottleDesigner:"Le Labo Studio",family:"amaderada",gender:"Unisex",notes:["cardamomo","violeta","iris","sándalo","almizcle","vetiver"],boughtAt:"Boutique Le Labo Madrid",price:"310€",inCollectionSince:"2023-04-12",rating:5,bottleStatus:"Medio",myOpinion:"Un clásico moderno imprescindible.",comments:"Lo reservo para ocasiones especiales.",inCollection:true,tags:["día","oficina"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-04-12"},
+    {id:2,name:"Baccarat Rouge 540",brand:"MFK",concentration:"EDP",capacity:"70ml",launch:"2015",perfumer:"Francis Kurkdjian",bottleDesigner:"Georges Chevalier",family:"floral",gender:"Unisex",notes:["jazmín","cedro","ámbar","almizcle","musgo de roble"],boughtAt:"El Corte Inglés",price:"395€",inCollectionSince:"2023-09-01",rating:5,bottleStatus:"Lleno",myOpinion:"Sofisticado y adictivo.",comments:"",inCollection:true,tags:["noche","oscuro"],lists:["Favoritos"],photos:[null,null,null,null,null,null],added:"2023-09-01"},
+    {id:3,name:"Oud Wood",brand:"Tom Ford",concentration:"EDP",capacity:"50ml",launch:"2007",perfumer:"Richard Herpin",bottleDesigner:"Tom Ford Beauty",family:"ambarada",gender:"Masculino",notes:["oud","sándalo","vainilla","ámbar","cardamomo"],boughtAt:"Tom Ford Online",price:"280€",inCollectionSince:"2024-01-20",rating:4,bottleStatus:"Casi vacío",myOpinion:"Cálido y envolvente.",comments:"Perfecto para invierno.",inCollection:true,tags:["noche","beast mode"],lists:[],photos:[null,null,null,null,null,null],added:"2024-01-20"},
   ],
   fields: [
     {key:"name",label:"Nombre",visible:true,required:true},
@@ -1625,6 +1629,12 @@ async function initState() {
   if (saved) {
     state = saved;
     if (!Array.isArray(state.families) || !state.families.length) state.families = [...DEFAULT_FAMILIES];
+    if (!state.taxonomyResetV2) {
+      state.families = [...DEFAULT_FAMILIES];
+      state.notes = [...DEFAULT_NOTES];
+      state.tags = [...DEFAULT_TAGS];
+      state.taxonomyResetV2 = true;
+    }
     if (!Array.isArray(state.concentrations) || !state.concentrations.length) state.concentrations = [...CONCENTRATIONS];
     else CONCENTRATIONS.forEach(c => { if (!state.concentrations.some(x=>x.toLowerCase()===c.toLowerCase())) state.concentrations.push(c); });
     const REQUIRED_CARD_FIELDS = ["name","brand","concentration","capacity","launch","perfumer","notes","comments","rating"];
@@ -1839,7 +1849,7 @@ function renderClassSection(type) {
     const count = classUsageCount(type, name);
     const assigned = count > 0;
     return `<div class="class-chip">
-      <button type="button" class="class-chip-name" onclick="openClassMiniList('${type}','${escapeHtml(name)}')">${escapeHtml(name)}${assigned?`<span class="class-chip-count">${count}</span>`:''}</button>
+      <button type="button" class="class-chip-name" onclick="openClassMiniList('${type}','${escapeHtml(name)}')">${escapeHtml(classLabel(type,name))}${assigned?`<span class="class-chip-count">${count}</span>`:''}</button>
       <button type="button" class="class-chip-icon" title="${t('title_rename')}" onclick="event.stopPropagation();renameClassItem('${type}','${escapeHtml(name)}')">✎</button>
       <button type="button" class="class-chip-icon" title="${t('title_delete')}" onclick="event.stopPropagation();deleteClassItem('${type}','${escapeHtml(name)}')">✕</button>
     </div>`;
@@ -1870,7 +1880,7 @@ function onClassPickerInput(type, value) {
   const box = document.getElementById('class-' + type + '-suggestions'); if (!box) return;
   const matches = classPickerMatches(type, value);
   const exact = (state[type]||[]).some(v => v.toLowerCase() === String(value||'').trim().toLowerCase());
-  box.innerHTML = matches.map(v => `<button type="button" class="multi-picker-suggestion" onclick="classSelectSuggestion('${type}','${escapeHtml(v)}')">${escapeHtml(v)}</button>`).join('');
+  box.innerHTML = matches.map(v => `<button type="button" class="multi-picker-suggestion" onclick="classSelectSuggestion('${type}','${escapeHtml(v)}')">${escapeHtml(classLabel(type,v))}</button>`).join('');
   if (value.trim() && !exact) box.innerHTML += `<button type="button" class="multi-picker-suggestion" onclick="classCreateItem('${type}',document.getElementById('class-${type}-search').value)">${t('picker_create_prefix')} «${escapeHtml(value.trim())}»</button>`;
   box.classList.toggle('open', !!value.trim() && box.innerHTML.length > 0);
 }
@@ -2084,7 +2094,7 @@ function classGoToDetail(id) {
   openDetail(id);
 }
 function openClassMiniList(type, value) {
-  const label = type === 'category' ? catLabel(value) : value;
+  const label = type === 'category' ? catLabel(value) : classLabel(type, value);
   document.getElementById('class-mini-title').textContent = label;
   const list = state.perfumes.filter(p => {
     if (type === 'category') return value === 'perfumes' ? true : (p.status||'coleccion') === value;
@@ -2379,8 +2389,8 @@ function render() {
           <div class="row-perfumer">${p.perfumer||''}</div>
           <div class="row-year">${p.launch||''}</div>
           <div class="row-specs">${[p.concentration?concentrationLabel(p.concentration):'',p.capacity].filter(Boolean).join('  -  ')}</div>
-          <div class="row-family">${Array.isArray(p.family)?p.family.join(', '):(p.family||'')}</div>
-          <div class="row-notes">${Array.isArray(p.notes)?p.notes.join(', '):(p.notes||'')}</div>
+          <div class="row-family">${Array.isArray(p.family)?p.family.map(v=>classLabel('family',v)).join(', '):(p.family?classLabel('family',p.family):'')}</div>
+          <div class="row-notes">${Array.isArray(p.notes)?p.notes.map(v=>classLabel('notes',v)).join(', '):(p.notes?classLabel('notes',p.notes):'')}</div>
         </div>
         <div class="row-comments"></div>
         <div class="row-more-wrap">
@@ -2531,12 +2541,12 @@ function openDetail(id) {
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
           <div>
             <div class="detail-field-label">${fieldLabel(f)}</div>
-            <div class="detail-field-value${f.key==='brand'?' brand-badge':''}">${f.key==='family'?(Array.isArray(p.family)?p.family.join(' · '):(p.family||'')):f.key==='concentration'?concentrationLabel(p[f.key]):f.key==='gender'?genderLabel(p[f.key]):p[f.key]}</div>
+            <div class="detail-field-value${f.key==='brand'?' brand-badge':''}">${f.key==='family'?(Array.isArray(p.family)?p.family.map(v=>classLabel('family',v)).join(' · '):(p.family?classLabel('family',p.family):'')):f.key==='concentration'?concentrationLabel(p[f.key]):f.key==='gender'?genderLabel(p[f.key]):p[f.key]}</div>
           </div>`).join('')}
       </div>
       ${renderBottlesDetailHtml(p)}
-      ${(Array.isArray(p.notes)?p.notes.length:p.notes)?`<div class="detail-block"><div class="detail-block-label">${t('field_notes')}</div><div class="detail-block-value">${Array.isArray(p.notes)?p.notes.join(', '):p.notes}</div></div>`:''}
-      ${(p.tags||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:20px">${(p.tags||[]).map(tg=>`<span class="tag-chip">#${tg}</span>`).join('')}</div>`:''}
+      ${(Array.isArray(p.notes)?p.notes.length:p.notes)?`<div class="detail-block"><div class="detail-block-label">${t('field_notes')}</div><div class="detail-block-value">${Array.isArray(p.notes)?p.notes.map(v=>classLabel('notes',v)).join(', '):classLabel('notes',p.notes)}</div></div>`:''}
+      ${(p.tags||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:20px">${(p.tags||[]).map(tg=>`<span class="tag-chip">#${escapeHtml(classLabel('tags',tg))}</span>`).join('')}</div>`:''}
       ${p.videoUrl?(()=>{
         const vid=getYouTubeId(p.videoUrl);
         return vid?`<div class="detail-block" style="border-top:none;margin-top:20px;padding-top:0">
@@ -2850,7 +2860,7 @@ function renderMultiPicker(type, mountId, selected, options, placeholder) {
       </div>
       <div class="multi-picker-suggestions" id="${type}-picker-suggestions"></div>
       <div class="multi-picker-chips${expanded?'':' collapsed'}" id="${type}-picker-chips">
-        ${visible.map(v=>`<button type="button" class="multi-picker-chip${selected.some(s=>s.toLowerCase()===v.toLowerCase())?' selected':''}" onclick="togglePickerValue('${type}','${escapeHtml(v)}')">${escapeHtml(v)}</button>`).join('')}
+        ${visible.map(v=>`<button type="button" class="multi-picker-chip${selected.some(s=>s.toLowerCase()===v.toLowerCase())?' selected':''}" onclick="togglePickerValue('${type}','${escapeHtml(v)}')">${escapeHtml(classLabel(type,v))}</button>`).join('')}
       </div>
       ${needsMore?`<button type="button" class="multi-picker-more visible" onclick="togglePickerExpanded('${type}')">${expanded?t('picker_view_less'):t('picker_view_all')}</button>`:''}
     </div>`;
@@ -2864,7 +2874,7 @@ function onPickerInput(type,value) {
   const box=document.getElementById(type+'-picker-suggestions'); if(!box) return;
   const matches=pickerMatches(type,value);
   const exact=getPickerData(type).options.some(v=>v.toLowerCase()===String(value||'').trim().toLowerCase());
-  box.innerHTML=matches.map(v=>`<button type="button" class="multi-picker-suggestion" onclick="selectPickerSuggestion('${type}','${escapeHtml(v)}')">${escapeHtml(v)}</button>`).join('');
+  box.innerHTML=matches.map(v=>`<button type="button" class="multi-picker-suggestion" onclick="selectPickerSuggestion('${type}','${escapeHtml(v)}')">${escapeHtml(classLabel(type,v))}</button>`).join('');
   if(value.trim() && !exact) box.innerHTML += `<button type="button" class="multi-picker-suggestion" onclick="addPickerValue('${type}',document.getElementById('${type}-picker-input').value)">${t('picker_create_prefix')} «${escapeHtml(value.trim())}»</button>`;
   box.classList.toggle('open', !!value.trim() && box.innerHTML.length>0);
 }
@@ -4170,6 +4180,40 @@ function handleConcentrationSelectChange(sel) {
   }
 }
 function genderLabel(v) { return (GENDER_LABELS[currentLang]||GENDER_LABELS.es)[v] || v; }
+const FAMILY_LABELS = {
+  es: {"cítrica":"Cítrica","floral":"Floral","fougère":"Fougère","chipre":"Chipre","amaderada":"Amaderada","ambarada":"Ambarada","gourmand":"Gourmand","acuerada":"Acuerada","aromática":"Aromática","acuática":"Acuática","verde":"Verde","aldehídica":"Aldehídica","frutal":"Frutal","almizclada":"Almizclada","especiada":"Especiada"},
+  en: {"cítrica":"Citrus","floral":"Floral","fougère":"Fougère","chipre":"Chypre","amaderada":"Woody","ambarada":"Amber","gourmand":"Gourmand","acuerada":"Leather","aromática":"Aromatic","acuática":"Aquatic","verde":"Green","aldehídica":"Aldehydic","frutal":"Fruity","almizclada":"Musky","especiada":"Spicy"},
+  ja: {"cítrica":"シトラス","floral":"フローラル","fougère":"フゼア","chipre":"シプレ","amaderada":"ウッディ","ambarada":"アンバー","gourmand":"グルマン","acuerada":"レザー","aromática":"アロマティック","acuática":"アクアティック","verde":"グリーン","aldehídica":"アルデハイド","frutal":"フルーティ","almizclada":"ムスク","especiada":"スパイシー"},
+  de: {"cítrica":"Zitrus","floral":"Blumig","fougère":"Fougère","chipre":"Chypre","amaderada":"Holzig","ambarada":"Amber","gourmand":"Gourmand","acuerada":"Leder","aromática":"Aromatisch","acuática":"Aquatisch","verde":"Grün","aldehídica":"Aldehydisch","frutal":"Fruchtig","almizclada":"Moschusartig","especiada":"Würzig"},
+  fr: {"cítrica":"Hespéridée","floral":"Floral","fougère":"Fougère","chipre":"Chypre","amaderada":"Boisé","ambarada":"Ambré","gourmand":"Gourmand","acuerada":"Cuir","aromática":"Aromatique","acuática":"Aquatique","verde":"Vert","aldehídica":"Aldéhydé","frutal":"Fruité","almizclada":"Musqué","especiada":"Épicé"},
+  it: {"cítrica":"Agrumato","floral":"Floreale","fougère":"Fougère","chipre":"Chypre","amaderada":"Legnoso","ambarada":"Ambrato","gourmand":"Gourmand","acuerada":"Cuoio","aromática":"Aromatico","acuática":"Acquatico","verde":"Verde","aldehídica":"Aldeidico","frutal":"Fruttato","almizclada":"Muschiato","especiada":"Speziato"},
+  pt: {"cítrica":"Cítrico","floral":"Floral","fougère":"Fougère","chipre":"Chipre","amaderada":"Amadeirado","ambarada":"Ambarado","gourmand":"Gourmand","acuerada":"Couro","aromática":"Aromático","acuática":"Aquático","verde":"Verde","aldehídica":"Aldeídico","frutal":"Frutado","almizclada":"Almiscarado","especiada":"Especiado"}
+};
+const NOTE_LABELS = {
+  es: {"bergamota":"Bergamota","limón":"Limón","naranja":"Naranja","rosa":"Rosa","jazmín":"Jazmín","lavanda":"Lavanda","neroli":"Neroli","iris":"Iris","violeta":"Violeta","heliotropo":"Heliotropo","lirio de los valles":"Lirio de los valles","ylang-ylang":"Ylang-ylang","sándalo":"Sándalo","cedro":"Cedro","pachulí":"Pachulí","vetiver":"Vetiver","oud":"Oud","musgo de roble":"Musgo de roble","vainilla":"Vainilla","haba tonka":"Haba tonka","ámbar":"Ámbar","ládano":"Ládano","incienso":"Incienso","mirra":"Mirra","benjuí":"Benjuí","almizcle":"Almizcle","algalia":"Algalia","castóreo":"Castóreo","pimienta negra":"Pimienta negra","cardamomo":"Cardamomo","hojas de violeta":"Hojas de violeta","aldehídos":"Aldehídos"},
+  en: {"bergamota":"Bergamot","limón":"Lemon","naranja":"Orange","rosa":"Rose","jazmín":"Jasmine","lavanda":"Lavender","neroli":"Neroli","iris":"Iris","violeta":"Violet","heliotropo":"Heliotrope","lirio de los valles":"Lily of the valley","ylang-ylang":"Ylang-ylang","sándalo":"Sandalwood","cedro":"Cedarwood","pachulí":"Patchouli","vetiver":"Vetiver","oud":"Oud","musgo de roble":"Oakmoss","vainilla":"Vanilla","haba tonka":"Tonka bean","ámbar":"Amber","ládano":"Labdanum","incienso":"Frankincense","mirra":"Myrrh","benjuí":"Benzoin","almizcle":"Musk","algalia":"Civet","castóreo":"Castoreum","pimienta negra":"Black pepper","cardamomo":"Cardamom","hojas de violeta":"Violet leaf","aldehídos":"Aldehydes"},
+  ja: {"bergamota":"ベルガモット","limón":"レモン","naranja":"オレンジ","rosa":"ローズ","jazmín":"ジャスミン","lavanda":"ラベンダー","neroli":"ネロリ","iris":"アイリス","violeta":"バイオレット","heliotropo":"ヘリオトロープ","lirio de los valles":"スズラン","ylang-ylang":"イランイラン","sándalo":"サンダルウッド","cedro":"シダーウッド","pachulí":"パチュリ","vetiver":"ベチバー","oud":"ウード","musgo de roble":"オークモス","vainilla":"バニラ","haba tonka":"トンカビーン","ámbar":"アンバー","ládano":"ラブダナム","incienso":"フランキンセンス","mirra":"ミルラ","benjuí":"ベンゾイン","almizcle":"ムスク","algalia":"シベット","castóreo":"カストリウム","pimienta negra":"ブラックペッパー","cardamomo":"カルダモン","hojas de violeta":"バイオレットリーフ","aldehídos":"アルデヒド"},
+  de: {"bergamota":"Bergamotte","limón":"Zitrone","naranja":"Orange","rosa":"Rose","jazmín":"Jasmin","lavanda":"Lavendel","neroli":"Neroli","iris":"Iris","violeta":"Veilchen","heliotropo":"Heliotrop","lirio de los valles":"Maiglöckchen","ylang-ylang":"Ylang-Ylang","sándalo":"Sandelholz","cedro":"Zedernholz","pachulí":"Patschuli","vetiver":"Vetiver","oud":"Oud","musgo de roble":"Eichenmoos","vainilla":"Vanille","haba tonka":"Tonkabohne","ámbar":"Amber","ládano":"Labdanum","incienso":"Weihrauch","mirra":"Myrrhe","benjuí":"Benzoe","almizcle":"Moschus","algalia":"Zibet","castóreo":"Castoreum","pimienta negra":"Schwarzer Pfeffer","cardamomo":"Kardamom","hojas de violeta":"Veilchenblätter","aldehídos":"Aldehyde"},
+  fr: {"bergamota":"Bergamote","limón":"Citron","naranja":"Orange","rosa":"Rose","jazmín":"Jasmin","lavanda":"Lavande","neroli":"Néroli","iris":"Iris","violeta":"Violette","heliotropo":"Héliotrope","lirio de los valles":"Muguet","ylang-ylang":"Ylang-ylang","sándalo":"Santal","cedro":"Cèdre","pachulí":"Patchouli","vetiver":"Vétiver","oud":"Oud","musgo de roble":"Mousse de chêne","vainilla":"Vanille","haba tonka":"Fève tonka","ámbar":"Ambre","ládano":"Labdanum","incienso":"Encens","mirra":"Myrrhe","benjuí":"Benjoin","almizcle":"Musc","algalia":"Civette","castóreo":"Castoréum","pimienta negra":"Poivre noir","cardamomo":"Cardamome","hojas de violeta":"Feuilles de violette","aldehídos":"Aldéhydes"},
+  it: {"bergamota":"Bergamotto","limón":"Limone","naranja":"Arancia","rosa":"Rosa","jazmín":"Gelsomino","lavanda":"Lavanda","neroli":"Neroli","iris":"Iris","violeta":"Violetta","heliotropo":"Eliotropio","lirio de los valles":"Mughetto","ylang-ylang":"Ylang-ylang","sándalo":"Sandalo","cedro":"Cedro","pachulí":"Patchouli","vetiver":"Vetiver","oud":"Oud","musgo de roble":"Muschio di quercia","vainilla":"Vaniglia","haba tonka":"Fava tonka","ámbar":"Ambra","ládano":"Labdano","incienso":"Incenso","mirra":"Mirra","benjuí":"Benzoino","almizcle":"Muschio","algalia":"Zibetto","castóreo":"Castoreo","pimienta negra":"Pepe nero","cardamomo":"Cardamomo","hojas de violeta":"Foglie di violetta","aldehídos":"Aldeidi"},
+  pt: {"bergamota":"Bergamota","limón":"Limão","naranja":"Laranja","rosa":"Rosa","jazmín":"Jasmim","lavanda":"Lavanda","neroli":"Nerolí","iris":"Íris","violeta":"Violeta","heliotropo":"Heliotrópio","lirio de los valles":"Lírio-do-vale","ylang-ylang":"Ylang-ylang","sándalo":"Sândalo","cedro":"Cedro","pachulí":"Patchouli","vetiver":"Vetiver","oud":"Oud","musgo de roble":"Musgo de carvalho","vainilla":"Baunilha","haba tonka":"Fava tonka","ámbar":"Âmbar","ládano":"Lábdano","incienso":"Incenso","mirra":"Mirra","benjuí":"Benjoim","almizcle":"Almíscar","algalia":"Algália","castóreo":"Castóreo","pimienta negra":"Pimenta preta","cardamomo":"Cardamomo","hojas de violeta":"Folhas de violeta","aldehídos":"Aldeídos"}
+};
+const TAG_LABELS = {
+  es: {"frescos":"Frescos","limpio":"Limpio","oscuro":"Oscuro","día":"Día","noche":"Noche","beast mode":"Beast mode","oficina":"Oficina","gim":"Gim"},
+  en: {"frescos":"Fresh","limpio":"Clean","oscuro":"Dark","día":"Day","noche":"Night","beast mode":"Beast mode","oficina":"Office","gim":"Gym"},
+  ja: {"frescos":"フレッシュ","limpio":"クリーン","oscuro":"ダーク","día":"デイ","noche":"ナイト","beast mode":"ビーストモード","oficina":"オフィス","gim":"ジム"},
+  de: {"frescos":"Frisch","limpio":"Sauber","oscuro":"Dunkel","día":"Tag","noche":"Nacht","beast mode":"Beast Mode","oficina":"Büro","gim":"Fitnessstudio"},
+  fr: {"frescos":"Frais","limpio":"Propre","oscuro":"Sombre","día":"Jour","noche":"Nuit","beast mode":"Beast mode","oficina":"Bureau","gim":"Salle de sport"},
+  it: {"frescos":"Fresco","limpio":"Pulito","oscuro":"Scuro","día":"Giorno","noche":"Notte","beast mode":"Beast mode","oficina":"Ufficio","gim":"Palestra"},
+  pt: {"frescos":"Fresco","limpio":"Limpo","oscuro":"Escuro","día":"Dia","noche":"Noite","beast mode":"Beast mode","oficina":"Escritório","gim":"Ginásio"}
+};
+function classLabel(type, value) {
+  const maps = {family:FAMILY_LABELS, notes:NOTE_LABELS, tags:TAG_LABELS};
+  const map = maps[type];
+  if (!map) return value;
+  const dict = map[currentLang] || map.es;
+  return dict[String(value||'').toLowerCase()] || value;
+}
 function setLanguage(lang) {
   localStorage.setItem('scentic-lang', lang);
   applyLanguage(lang);
