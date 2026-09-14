@@ -620,7 +620,7 @@
     background:var(--surface-alt); border:1px solid var(--border); color:var(--text);
     display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;
   }
-  .row-offers-mini { display:flex; gap:8px; flex-wrap:wrap; }
+  .row-offers-mini { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; padding-top:14px; border-top:1px solid #ededec; }
   .offer-link-btn--sm { padding:5px 14px; font-size:12px; }
   #list-back-bar {
     display:none; align-items:center; justify-content:flex-start;
@@ -1295,6 +1295,12 @@
       <div class="field-group" id="fg-comments">
         <label class="field-label" data-i18n="field_comments">COMENTARIOS</label>
         <textarea class="field-textarea" id="f-comments" rows="4" placeholder="Añade comentarios..." data-i18n-placeholder="comments_placeholder"></textarea>
+      </div>
+
+      <!-- Photo credit -->
+      <div class="field-group" id="fg-photo-credit">
+        <label class="field-label" data-i18n="field_photo_credit">CRÉDITOS DE LA FOTO</label>
+        <input class="field-input" id="f-photo-credit" placeholder="Autor y licencia de la foto..." data-i18n-placeholder="photo_credit_placeholder"/>
       </div>
 
       <!-- Rating -->
@@ -2558,6 +2564,7 @@ function openDetail(id) {
         </div>`:'';
       })():''}
       ${p.comments?`<div class="detail-block"><div class="detail-block-label">${t('field_comments')}</div><div class="detail-block-value">${p.comments}</div></div>`:''}
+      ${p.photoCredit?`<div class="detail-block"><div class="detail-block-label">${t('field_photo_credit')}</div><div class="detail-block-value">${p.photoCredit}</div></div>`:''}
       <button class="detail-edit-btn" onclick="openEdit(${p.id})">${t('btn_edit')}</button>
     </div>`;
   openModal('modal-detail');
@@ -2668,6 +2675,7 @@ function openEdit(id) {
 
   // Text areas (other free text)
   document.getElementById('f-comments').value = p ? p.comments || '' : '';
+  document.getElementById('f-photo-credit').value = p ? p.photoCredit || '' : '';
   document.getElementById('f-video').value = p?p.videoUrl||'':'';
   previewVideo(p?p.videoUrl||'':'');
 
@@ -2924,6 +2932,7 @@ function savePerfume() {
     status: document.querySelector('#f-status-toggle .cat-toggle-btn.active').dataset.val,
     notes: [...editNotes],
     comments: document.getElementById('f-comments').value,
+    photoCredit: document.getElementById('f-photo-credit').value,
     videoUrl: document.getElementById('f-video').value.trim(),
     bottles: [...editBottles],
   };
@@ -3568,13 +3577,13 @@ const I18N = {
     add_photo_line1: "AÑADIR", add_photo_line2: "IMAGEN", add_image_alt: "Añadir imagen",
     title_back: "Volver",
     video_thumbnail_alt: "Miniatura del vídeo",
-    field_notes: "Notas olfativas", field_comments: "Comentarios", video_label_short: "Vídeo",
+    field_notes: "Notas olfativas", field_comments: "Comentarios", field_photo_credit: "Créditos de la foto", video_label_short: "Vídeo",
     field_concentration: "Concentración",
     picker_add_new_concentration: "＋ Añadir nueva...", prompt_new_concentration: "Nueva concentración",
     btn_edit: "Editar",
     edit_title_new: "Nuevo perfume", edit_title_edit: "Editar perfume",
     label_photos: "FOTOS (hasta 6)", photo_word: "FOTO",
-    comments_placeholder: "Añade comentarios...",
+    comments_placeholder: "Añade comentarios...", photo_credit_placeholder: "Autor y licencia de la foto...",
     field_video: "VÍDEO FAVORITO", video_url_placeholder: "Pega aquí el enlace de YouTube...", video_found: "Vídeo encontrado ✓",
     field_rating: "VALORACIÓN", field_category: "CATEGORÍA",
     field_barcode: "CÓDIGO DE BARRAS", title_scan_barcode: "Escanear con cámara",
@@ -3648,13 +3657,13 @@ const I18N = {
     add_photo_line1: "ADD", add_photo_line2: "PHOTO", add_image_alt: "Add image",
     title_back: "Back",
     video_thumbnail_alt: "Video thumbnail",
-    field_notes: "Olfactory notes", field_comments: "Comments", video_label_short: "Video",
+    field_notes: "Olfactory notes", field_comments: "Comments", field_photo_credit: "Photo credit", video_label_short: "Video",
     field_concentration: "Concentration",
     picker_add_new_concentration: "＋ Add new...", prompt_new_concentration: "New concentration",
     btn_edit: "Edit",
     edit_title_new: "New perfume", edit_title_edit: "Edit perfume",
     label_photos: "PHOTOS (up to 6)", photo_word: "PHOTO",
-    comments_placeholder: "Add comments...",
+    comments_placeholder: "Add comments...", photo_credit_placeholder: "Photo author and license...",
     field_video: "YOUTUBE VIDEO", video_url_placeholder: "Paste the YouTube link here...", video_found: "Video found ✓",
     field_rating: "RATING", field_category: "CATEGORY",
     field_barcode: "BARCODE", title_scan_barcode: "Scan with camera",
@@ -3728,13 +3737,13 @@ const I18N = {
     add_photo_line1: "写真を", add_photo_line2: "追加", add_image_alt: "画像を追加",
     title_back: "戻る",
     video_thumbnail_alt: "動画のサムネイル",
-    field_notes: "香りのノート", field_comments: "コメント", video_label_short: "動画",
+    field_notes: "香りのノート", field_comments: "コメント", field_photo_credit: "写真クレジット", video_label_short: "動画",
     field_concentration: "濃度",
     picker_add_new_concentration: "＋ 新規追加...", prompt_new_concentration: "新しい濃度",
     btn_edit: "編集",
     edit_title_new: "新しい香水", edit_title_edit: "香水を編集",
     label_photos: "写真（最大6枚）", photo_word: "写真",
-    comments_placeholder: "コメントを追加...",
+    comments_placeholder: "コメントを追加...", photo_credit_placeholder: "写真の作者とライセンス...",
     field_video: "YOUTUBE動画", video_url_placeholder: "ここにYouTubeのリンクを貼り付け...", video_found: "動画が見つかりました ✓",
     field_rating: "評価", field_category: "カテゴリー",
     field_barcode: "バーコード", title_scan_barcode: "カメラでスキャン",
@@ -3809,13 +3818,13 @@ const I18N = {
     add_photo_line1: "FOTO", add_photo_line2: "HINZUFÜGEN", add_image_alt: "Bild hinzufügen",
     title_back: "Zurück",
     video_thumbnail_alt: "Video-Miniaturansicht",
-    field_notes: "Duftnoten", field_comments: "Kommentare", video_label_short: "Video",
+    field_notes: "Duftnoten", field_comments: "Kommentare", field_photo_credit: "Bildnachweis", video_label_short: "Video",
     field_concentration: "Konzentration",
     picker_add_new_concentration: "＋ Neue hinzufügen...", prompt_new_concentration: "Neue Konzentration",
     btn_edit: "Bearbeiten",
     edit_title_new: "Neues Parfum", edit_title_edit: "Parfum bearbeiten",
     label_photos: "FOTOS (bis zu 6)", photo_word: "FOTO",
-    comments_placeholder: "Kommentar hinzufügen...",
+    comments_placeholder: "Kommentar hinzufügen...", photo_credit_placeholder: "Fotograf und Lizenz...",
     field_video: "LIEBLINGSVIDEO", video_url_placeholder: "Füge hier den YouTube-Link ein...", video_found: "Video gefunden ✓",
     field_rating: "BEWERTUNG", field_category: "KATEGORIE",
     field_barcode: "BARCODE", title_scan_barcode: "Mit Kamera scannen",
@@ -3890,13 +3899,13 @@ const I18N = {
     add_photo_line1: "AJOUTER", add_photo_line2: "PHOTO", add_image_alt: "Ajouter une image",
     title_back: "Retour",
     video_thumbnail_alt: "Miniature de la vidéo",
-    field_notes: "Notes olfactives", field_comments: "Commentaires", video_label_short: "Vidéo",
+    field_notes: "Notes olfactives", field_comments: "Commentaires", field_photo_credit: "Crédit photo", video_label_short: "Vidéo",
     field_concentration: "Concentration",
     picker_add_new_concentration: "＋ Ajouter une nouvelle...", prompt_new_concentration: "Nouvelle concentration",
     btn_edit: "Modifier",
     edit_title_new: "Nouveau parfum", edit_title_edit: "Modifier le parfum",
     label_photos: "PHOTOS (jusqu'à 6)", photo_word: "PHOTO",
-    comments_placeholder: "Ajouter un commentaire...",
+    comments_placeholder: "Ajouter un commentaire...", photo_credit_placeholder: "Auteur et licence de la photo...",
     field_video: "VIDÉO PRÉFÉRÉE", video_url_placeholder: "Collez ici le lien YouTube...", video_found: "Vidéo trouvée ✓",
     field_rating: "NOTE", field_category: "CATÉGORIE",
     field_barcode: "CODE-BARRES", title_scan_barcode: "Scanner avec la caméra",
@@ -3971,13 +3980,13 @@ const I18N = {
     add_photo_line1: "AGGIUNGI", add_photo_line2: "IMMAGINE", add_image_alt: "Aggiungi immagine",
     title_back: "Indietro",
     video_thumbnail_alt: "Miniatura del video",
-    field_notes: "Note olfattive", field_comments: "Commenti", video_label_short: "Video",
+    field_notes: "Note olfattive", field_comments: "Commenti", field_photo_credit: "Credito foto", video_label_short: "Video",
     field_concentration: "Concentrazione",
     picker_add_new_concentration: "＋ Aggiungi nuova...", prompt_new_concentration: "Nuova concentrazione",
     btn_edit: "Modifica",
     edit_title_new: "Nuovo profumo", edit_title_edit: "Modifica profumo",
     label_photos: "FOTO (fino a 6)", photo_word: "FOTO",
-    comments_placeholder: "Aggiungi un commento...",
+    comments_placeholder: "Aggiungi un commento...", photo_credit_placeholder: "Autore e licenza della foto...",
     field_video: "VIDEO PREFERITO", video_url_placeholder: "Incolla qui il link di YouTube...", video_found: "Video trovato ✓",
     field_rating: "VALUTAZIONE", field_category: "CATEGORIA",
     field_barcode: "CODICE A BARRE", title_scan_barcode: "Scansiona con la fotocamera",
@@ -4052,13 +4061,13 @@ const I18N = {
     add_photo_line1: "ADICIONAR", add_photo_line2: "IMAGEM", add_image_alt: "Adicionar imagem",
     title_back: "Voltar",
     video_thumbnail_alt: "Miniatura do vídeo",
-    field_notes: "Notas olfativas", field_comments: "Comentários", video_label_short: "Vídeo",
+    field_notes: "Notas olfativas", field_comments: "Comentários", field_photo_credit: "Créditos da foto", video_label_short: "Vídeo",
     field_concentration: "Concentração",
     picker_add_new_concentration: "＋ Adicionar nova...", prompt_new_concentration: "Nova concentração",
     btn_edit: "Editar",
     edit_title_new: "Novo perfume", edit_title_edit: "Editar perfume",
     label_photos: "FOTOS (até 6)", photo_word: "FOTO",
-    comments_placeholder: "Adicionar comentários...",
+    comments_placeholder: "Adicionar comentários...", photo_credit_placeholder: "Autor e licença da foto...",
     field_video: "VÍDEO FAVORITO", video_url_placeholder: "Cole aqui o link do YouTube...", video_found: "Vídeo encontrado ✓",
     field_rating: "AVALIAÇÃO", field_category: "CATEGORIA",
     field_barcode: "CÓDIGO DE BARRAS", title_scan_barcode: "Ler com a câmara",
