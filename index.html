@@ -1672,6 +1672,17 @@ async function initState() {
         p.coverIndex = allPhotos[key].coverIndex || 0;
       }
     });
+  } else {
+    // First-ever run: state.perfumes still has the demo photos written
+    // inline (e.g. "sample-chanel5-v1.jpg"). Those never get saved by
+    // save() (it strips photos on purpose), so without this they'd
+    // vanish the moment the state is saved and reloaded. Persist them
+    // to IndexedDB now, the same place real user photos live.
+    await Promise.all(state.perfumes.map(function(p) {
+      if (Array.isArray(p.photos) && p.photos.some(function(x){ return !!x; })) {
+        return savePhotos(p.id, p.photos, p.coverIndex || 0);
+      }
+    }));
   }
   normalizePickerCollections();
   if (!Array.isArray(state.notes)) state.notes = [];
