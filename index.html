@@ -194,12 +194,71 @@
     font-size:17px; line-height:1.3; font-family:'Jost',sans-serif; font-weight:400; color:var(--text);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;
   }
+  /* ── New big-card layout: brand / perfumer / meta / rating+offers ── */
+  .row-brand-plain {
+    font-size:19px; line-height:1.3; font-family:'Jost',sans-serif; font-weight:400; color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .row-perfumer-line {
+    margin-top:4px; font-size:17px; line-height:1.3; font-family:'Jost',sans-serif; font-weight:400; color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .row-meta-row {
+    margin-top:10px; display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+  }
+  .row-meta-row .row-year, .row-meta-row .row-specs { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  .row-meta-row .row-specs { text-align:right; }
+  .row-sep { border-top:1px solid #ededec; margin-top:14px; }
+  .row-rating-row {
+    padding-top:14px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .row-rating-row-left { display:flex; align-items:center; gap:10px; min-width:0; flex-shrink:1; }
+  .offer-btn-main {
+    flex-shrink:0; appearance:none; border:none; cursor:pointer;
+    background:var(--accent-yellow); color:#1a1a18; border-radius:999px;
+    padding:9px 18px; font-family:'Jost',sans-serif; font-size:14px; font-weight:500;
+  }
+  .offer-btn-main:active { opacity:.8; }
   .row-comments {
-    flex:1; min-height:0; margin-top:26px; padding-top:14px; padding-right:2px;
-    border-top:1px solid #ededec;
+    flex:1; min-height:0; padding-top:14px; padding-right:2px;
     font-size:15px; font-family:'Jost',sans-serif; font-style:italic; color:var(--text-muted);
     line-height:1.5; overflow:hidden; white-space:pre-wrap; word-break:break-word;
   }
+  /* ── Offers modal ── */
+  .offers-modal-list { display:flex; flex-direction:column; gap:10px; }
+  .offers-store-btn {
+    display:block; width:100%; box-sizing:border-box; text-align:center; text-decoration:none;
+    padding:13px 16px; border-radius:14px; background:var(--surface-alt); border:1px solid var(--border);
+    color:var(--text); font-family:'Jost',sans-serif; font-size:16px; font-weight:500; cursor:pointer;
+  }
+  .offers-store-btn:active { opacity:.75; }
+  .offers-edit-toggle {
+    background:none; border:none; cursor:pointer; color:var(--text-muted);
+    font-family:'Jost',sans-serif; font-size:13px; padding:4px 6px; display:flex; align-items:center; gap:5px;
+  }
+  .offers-edit-row {
+    display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px; background:var(--surface-alt);
+  }
+  .offers-edit-row-fields { flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
+  .offers-edit-row input {
+    width:100%; box-sizing:border-box; border:none; border-bottom:1px solid var(--border); background:none;
+    font-family:'Jost',sans-serif; font-size:14px; color:var(--text); padding:4px 2px; outline:none;
+  }
+  .offers-edit-row input:focus { border-bottom-color:var(--text); }
+  .offers-edit-row input::placeholder { color:var(--text-light); }
+  .offers-edit-row-del {
+    flex-shrink:0; background:none; border:none; cursor:pointer; color:var(--text-light);
+    font-size:20px; line-height:1; padding:4px;
+  }
+  .offers-edit-row-del:active { color:var(--danger); }
+  .offers-add-store-btn {
+    display:flex; align-items:center; justify-content:center; gap:6px; width:100%; box-sizing:border-box;
+    padding:12px; border-radius:12px; border:1px dashed var(--border); background:none;
+    color:var(--text-muted); font-family:'Jost',sans-serif; font-size:14px; cursor:pointer;
+  }
+  .offers-add-store-btn:active { opacity:.7; }
+  .offers-edit-hint { font-size:12px; color:var(--text-light); font-family:'Jost',sans-serif; margin-top:2px; line-height:1.4; }
+  .offers-locked-note { font-size:12px; color:var(--text-light); font-family:'Jost',sans-serif; margin:2px 0 4px; }
   .row-more-wrap {
     flex-shrink:0; display:grid; grid-template-columns:1fr auto 1fr;
     align-items:center; padding-top:10px;
@@ -1327,6 +1386,16 @@
 </div>
 
 <!-- ══ FIELD MANAGER MODAL ══ -->
+<div class="modal-overlay" id="modal-offers">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" data-i18n="title_offers">Buscar ofertas</span>
+      <button class="modal-close" onclick="closeModal('modal-offers')">✕</button>
+    </div>
+    <div class="modal-body" id="offers-modal-body"></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-category">
   <div class="modal" style="max-width:340px">
     <div class="modal-header">
@@ -1491,7 +1560,8 @@ let state = {
   nextId: 10,
   sort: 'date',
   view: 'card',
-  theme: {}
+  theme: {},
+  customStores: []
 };
 
 let editPhotos=[null,null,null,null,null,null];
@@ -1643,6 +1713,7 @@ async function initState() {
     }
     if (!Array.isArray(state.concentrations) || !state.concentrations.length) state.concentrations = [...CONCENTRATIONS];
     else CONCENTRATIONS.forEach(c => { if (!state.concentrations.some(x=>x.toLowerCase()===c.toLowerCase())) state.concentrations.push(c); });
+    if (!Array.isArray(state.customStores)) state.customStores = [];
     const REQUIRED_CARD_FIELDS = ["name","brand","concentration","capacity","launch","perfumer","notes","comments","rating"];
     if (Array.isArray(state.fields)) {
       state.fields.forEach(f => { if (REQUIRED_CARD_FIELDS.includes(f.key)) f.required = true; });
@@ -2391,24 +2462,21 @@ function render() {
             <span class="row-cat-label">${catLabel(state.category||'perfumes')}</span>
           </button>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          ${starsHTML(p.rating||0)}
-          <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
-        </div>
-        <div class="row-offers-mini" onclick="event.stopPropagation()">
-          ${(()=>{ const links = getOfferLinks(p); return `
-          <a class="offer-link-btn offer-link-btn--sm" href="${links[0].url}" target="_blank" rel="noopener">${links[0].label}</a>
-          <a class="offer-link-btn offer-link-btn--sm" href="${links[1].url}" target="_blank" rel="noopener">${links[1].label}</a>
-          <button class="offer-link-btn offer-link-btn--sm" onclick="openDetail(${p.id})">${t('title_other_stores')}</button>`; })()}
-        </div>
-        <div class="row-cols">
-          <div class="row-brand-badge">${p.brand||''}</div>
-          <div class="row-perfumer">${p.perfumer||''}</div>
+        <div class="row-brand-plain">${p.brand||''}</div>
+        <div class="row-perfumer-line">${p.perfumer||''}</div>
+        <div class="row-meta-row">
           <div class="row-year">${p.launch||''}</div>
           <div class="row-specs">${[p.concentration?concentrationLabel(p.concentration):'',p.capacity].filter(Boolean).join('  -  ')}</div>
-          <div class="row-family">${Array.isArray(p.family)?p.family.map(v=>classLabel('family',v)).join(', '):(p.family?classLabel('family',p.family):'')}</div>
-          <div class="row-notes">${Array.isArray(p.notes)?p.notes.map(v=>classLabel('notes',v)).join(', '):(p.notes?classLabel('notes',p.notes):'')}</div>
         </div>
+        <div class="row-sep"></div>
+        <div class="row-rating-row">
+          <div class="row-rating-row-left">
+            ${starsHTML(p.rating||0)}
+            <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
+          </div>
+          <button class="offer-btn-main" onclick="event.stopPropagation();openOffersModal(${p.id})">${t('title_offers')}</button>
+        </div>
+        <div class="row-sep"></div>
         <div class="row-comments"></div>
         <div class="row-more-wrap">
           <div class="row-bottom-icons">
@@ -2520,8 +2588,82 @@ function getOfferLinks(p) {
     links.push({ label: domain==='amazon.es' ? 'Amazon.es' : 'Amazon', url:`https://www.${domain}/s?k=${q}` });
   }
   links.push({ label:'Google Shopping', url:`https://www.google.com/search?tbm=shop&q=${q}` });
+  (state.customStores||[]).forEach(s => {
+    if (!s || !s.name || !s.url) return;
+    const storeUrl = s.url.includes('{q}') ? s.url.replace(/\{q\}/g, q) : (s.url + (s.url.includes('?') ? '&' : '?') + 'q=' + q);
+    links.push({ label: s.name, url: storeUrl, custom:true });
+  });
   return links;
 }
+// ══ OFERTAS: ventana flotante (botón "Buscar ofertas") ═════════════
+var currentOffersPerfumeId = null;
+var offersEditMode = false;
+
+function openOffersModal(id) {
+  currentOffersPerfumeId = id;
+  offersEditMode = false;
+  renderOffersModal();
+  openModal('modal-offers');
+}
+
+function renderOffersModal() {
+  const p = state.perfumes.find(x=>x.id===currentOffersPerfumeId);
+  const body = document.getElementById('offers-modal-body');
+  if (!p || !body) return;
+  const links = getOfferLinks(p);
+  const editBtn = `<button class="offers-edit-toggle" onclick="toggleOffersEditMode()">${offersEditMode ? t('btn_offers_done') : '✎ ' + t('btn_offers_edit_stores')}</button>`;
+  if (!offersEditMode) {
+    body.innerHTML = `
+      <div class="offers-modal-list">
+        ${links.map(l => `<a class="offers-store-btn" href="${l.url}" target="_blank" rel="noopener">${escapeHtml(l.label)}</a>`).join('')}
+      </div>
+      <div style="text-align:right;margin-top:14px">${editBtn}</div>`;
+    return;
+  }
+  const custom = state.customStores || [];
+  body.innerHTML = `
+    <div class="offers-locked-note">${t('offers_locked_note')}</div>
+    <div class="offers-modal-list">
+      ${links.filter(l=>!l.custom).map(l => `<div class="offers-store-btn" style="opacity:.55;cursor:default">${escapeHtml(l.label)}</div>`).join('')}
+      ${custom.map((s,i) => `
+        <div class="offers-edit-row">
+          <div class="offers-edit-row-fields">
+            <input type="text" value="${escapeHtml(s.name||'')}" placeholder="${t('placeholder_store_name')}" oninput="updateCustomStore(${i},'name',this.value)"/>
+            <input type="text" value="${escapeHtml(s.url||'')}" placeholder="${t('placeholder_store_url')}" oninput="updateCustomStore(${i},'url',this.value)"/>
+          </div>
+          <button class="offers-edit-row-del" onclick="deleteCustomStore(${i})" title="${t('title_delete')}">✕</button>
+        </div>`).join('')}
+    </div>
+    <button class="offers-add-store-btn" onclick="addCustomStore()">＋ ${t('btn_add_store')}</button>
+    <div class="offers-edit-hint">${t('offers_edit_hint')}</div>
+    <div style="text-align:right;margin-top:14px">${editBtn}</div>`;
+}
+
+function toggleOffersEditMode() {
+  offersEditMode = !offersEditMode;
+  renderOffersModal();
+}
+
+function addCustomStore() {
+  if (!Array.isArray(state.customStores)) state.customStores = [];
+  state.customStores.push({name:'', url:''});
+  save();
+  renderOffersModal();
+}
+
+function updateCustomStore(index, field, value) {
+  if (!state.customStores || !state.customStores[index]) return;
+  state.customStores[index][field] = value;
+  save();
+}
+
+function deleteCustomStore(index) {
+  if (!state.customStores) return;
+  state.customStores.splice(index, 1);
+  save();
+  renderOffersModal();
+}
+
 function openDetail(id) {
   const p = state.perfumes.find(x=>x.id===id);
   if(!p) return;
@@ -3585,6 +3727,11 @@ const I18N = {
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Ficha completa",
     title_offers: "Buscar ofertas", title_other_stores: "otras tiendas",
+    btn_offers_edit_stores: "Editar tiendas", btn_offers_done: "Listo",
+    offers_locked_note: "Amazon y Google Shopping son automáticos y no se pueden editar.",
+    placeholder_store_name: "Nombre de la tienda", placeholder_store_url: "URL de búsqueda (usa {q} donde iría el perfume)",
+    btn_add_store: "Añadir tienda",
+    offers_edit_hint: "Ejemplo: https://mitienda.com/buscar?q={q}",
     add_photo_line1: "AÑADIR", add_photo_line2: "IMAGEN", add_image_alt: "Añadir imagen",
     title_back: "Volver",
     video_thumbnail_alt: "Miniatura del vídeo",
