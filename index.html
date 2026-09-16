@@ -520,7 +520,6 @@
   .detail-fields { display:grid; grid-template-columns:1fr 1fr; grid-auto-flow:row; column-gap:16px; row-gap:16px; align-items:baseline; margin:22px 0; }
   .detail-field-label { font-size:11px; color:var(--text-light); letter-spacing:1.5px; font-family:'Jost',sans-serif; font-weight:500; margin-bottom:3px; text-transform:uppercase; }
   .detail-field-value { font-size:17px; color:var(--text); font-family:'Jost',sans-serif; }
-  .detail-field-value.brand-badge { display:inline-block; background:var(--accent-yellow); padding:2px 8px; }
   .detail-offers { padding-top:16px; margin-top:16px; border-top:1px solid #ededec; }
   .detail-offers-label { font-size:11px; color:var(--text-light); letter-spacing:1.5px; font-family:'Jost',sans-serif; font-weight:500; margin-bottom:8px; text-transform:uppercase; }
   .detail-offers-links { display:flex; gap:8px; flex-wrap:wrap; }
@@ -862,6 +861,7 @@
 
   /* ── BARCODE SCANNER ── */
   #modal-barcode { z-index:1300; }
+  #modal-offers { z-index:950; }
   #modal-barcode .modal { max-width:380px; }
   #barcode-video-wrap {
     position:relative; background:#000; border-radius:12px;
@@ -2761,18 +2761,18 @@ function openDetail(id) {
     </div>
     <div class="detail-body">
       <div class="detail-name">${p.name}</div>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        ${starsHTML(p.rating||0,'lg')}
-        <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
-      </div>
-      <div class="detail-offers">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          ${starsHTML(p.rating||0,'lg')}
+          <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
+        </div>
         <button class="offer-btn-main" onclick="openOffersModal(${p.id})">${t('title_offers')}</button>
       </div>
       <div class="detail-fields">
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
           <div>
             <div class="detail-field-label">${fieldLabel(f)}</div>
-            <div class="detail-field-value${f.key==='brand'?' brand-badge':''}">${f.key==='family'?(Array.isArray(p.family)?p.family.map(v=>classLabel('family',v)).join(' · '):(p.family?classLabel('family',p.family):'')):f.key==='concentration'?concentrationLabel(p[f.key]):f.key==='gender'?genderLabel(p[f.key]):p[f.key]}</div>
+            <div class="detail-field-value">${f.key==='family'?(Array.isArray(p.family)?p.family.map(v=>classLabel('family',v)).join(' · '):(p.family?classLabel('family',p.family):'')):f.key==='concentration'?concentrationLabel(p[f.key]):f.key==='gender'?genderLabel(p[f.key]):p[f.key]}</div>
           </div>`).join('')}
       </div>
       ${renderBottlesDetailHtml(p)}
