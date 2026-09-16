@@ -225,20 +225,23 @@
     line-height:1.5; overflow:hidden; white-space:pre-wrap; word-break:break-word;
   }
   /* ── Offers modal ── */
-  .offers-modal-list { display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
+  .offers-modal-list { display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
   .offers-store-btn {
-    display:flex; align-items:center; justify-content:center; width:100%; height:64px; box-sizing:border-box;
-    text-align:center; text-decoration:none; padding:8px 10px; border-radius:14px; background:var(--surface-alt);
-    border:1px solid var(--border); color:var(--text); font-family:'Jost',sans-serif; font-size:14px;
-    font-weight:500; cursor:pointer; line-height:1.25; word-break:break-word;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    width:100%; aspect-ratio:1/1; box-sizing:border-box; text-align:center; text-decoration:none;
+    padding:14px 8px; border-radius:18px; border:none; cursor:pointer;
+    box-shadow:0 3px 0 rgba(0,0,0,.12);
   }
-  .offers-store-btn:active { opacity:.75; }
-  .offers-open-all-btn {
-    display:flex; align-items:center; justify-content:center; gap:8px; width:100%; box-sizing:border-box;
-    padding:13px 16px; border-radius:14px; background:var(--text); color:var(--surface); border:none;
-    font-family:'Jost',sans-serif; font-size:15px; font-weight:500; cursor:pointer; margin-bottom:14px;
+  .offers-store-btn:active { transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,.12); }
+  .offers-store-icon-wrap {
+    width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,.85);
+    display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;
   }
-  .offers-open-all-btn:active { opacity:.8; }
+  .offers-store-icon-wrap img { width:24px; height:24px; object-fit:contain; }
+  .offers-store-btn-label {
+    font-family:'Jost',sans-serif; font-size:13px; font-weight:600; line-height:1.2;
+    word-break:break-word; color:var(--text);
+  }
   .offers-edit-toggle {
     background:none; border:none; cursor:pointer; color:var(--text-muted);
     font-family:'Jost',sans-serif; font-size:13px; padding:4px 6px; display:flex; align-items:center; gap:5px;
@@ -2583,6 +2586,12 @@ function getOfferCountry() {
   if (navBase === currentLang && navRegion && knownRegions.includes(navRegion)) return navRegion;
   return langDefault;
 }
+// Paleta de colores para los botones de tiendas del mosaico de ofertas (se van repitiendo por orden)
+const OFFER_TILE_COLORS = ['#3299cd', '#ffe184', '#2b2b28', '#a7d7ef', '#f5c15c', '#5a8a6a'];
+function getStoreFavicon(url) {
+  try { return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`; }
+  catch(e) { return ''; }
+}
 function getOfferLinks(p) {
   const country = getOfferCountry();
   const query = [p.brand, p.name].filter(Boolean).join(' ').trim() || (p.name||'');
@@ -2600,6 +2609,10 @@ function getOfferLinks(p) {
     const storeUrl = s.url.includes('{q}') ? s.url.replace(/\{q\}/g, q) : (s.url + (s.url.includes('?') ? '&' : '?') + 'q=' + q);
     links.push({ label: s.name, url: storeUrl, custom:true });
   });
+  links.forEach((l,i) => {
+    l.icon = getStoreFavicon(l.url);
+    l.color = OFFER_TILE_COLORS[i % OFFER_TILE_COLORS.length];
+  });
   return links;
 }
 // ══ OFERTAS: ventana flotante (botón "Buscar ofertas") ═════════════
@@ -2613,6 +2626,18 @@ function openOffersModal(id) {
   openModal('modal-offers');
 }
 
+// Icono genérico de tienda (bolsa) usado como respaldo si el favicon no carga
+const OFFER_FALLBACK_ICON = "data:image/svg+xml;utf8," + encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#1a1a18" stroke-width="1.8">
+  <path d="M6 8h12l-1 12H7L6 8z" stroke-linejoin="round"/>
+  <path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-linecap="round"/>
+</svg>`);
+
+function offerTileTextColor(hex) {
+  // Texto oscuro sobre colores claros de la paleta, blanco sobre los oscuros
+  return (hex === '#2b2b28') ? '#ffffff' : '#1a1a18';
+}
+
 function renderOffersModal() {
   const p = state.perfumes.find(x=>x.id===currentOffersPerfumeId);
   const body = document.getElementById('offers-modal-body');
@@ -2621,9 +2646,15 @@ function renderOffersModal() {
   const editBtn = `<button class="offers-edit-toggle" onclick="toggleOffersEditMode()">${offersEditMode ? t('btn_offers_done') : '✎ ' + t('btn_offers_edit_stores')}</button>`;
   if (!offersEditMode) {
     body.innerHTML = `
-      <button class="offers-open-all-btn" onclick="openAllOffers()">⇱ ${t('btn_offers_open_all')}</button>
       <div class="offers-modal-list">
-        ${links.map(l => `<a class="offers-store-btn" href="${l.url}" target="_blank" rel="noopener">${escapeHtml(l.label)}</a>`).join('')}
+        ${links.map(l => `
+          <a class="offers-store-btn" href="${l.url}" target="_blank" rel="noopener"
+             style="background:${l.color};color:${offerTileTextColor(l.color)}">
+            <span class="offers-store-icon-wrap">
+              <img src="${l.icon}" alt="" onerror="this.onerror=null;this.src='${OFFER_FALLBACK_ICON}'"/>
+            </span>
+            <span class="offers-store-btn-label" style="color:${offerTileTextColor(l.color)}">${escapeHtml(l.label)}</span>
+          </a>`).join('')}
       </div>
       <div style="text-align:right;margin-top:14px">${editBtn}</div>`;
     return;
@@ -2631,8 +2662,8 @@ function renderOffersModal() {
   const custom = state.customStores || [];
   body.innerHTML = `
     <div class="offers-locked-note">${t('offers_locked_note')}</div>
-    <div class="offers-modal-list">
-      ${links.filter(l=>!l.custom).map(l => `<div class="offers-store-btn" style="opacity:.55;cursor:default">${escapeHtml(l.label)}</div>`).join('')}
+    <div class="offers-modal-list" style="grid-template-columns:1fr">
+      ${links.filter(l=>!l.custom).map(l => `<div class="offers-store-btn" style="aspect-ratio:auto;flex-direction:row;gap:10px;padding:10px 14px;opacity:.55;cursor:default;background:${l.color}"><span class="offers-store-icon-wrap" style="width:28px;height:28px"><img src="${l.icon}" alt="" style="width:18px;height:18px" onerror="this.onerror=null;this.src='${OFFER_FALLBACK_ICON}'"/></span><span class="offers-store-btn-label" style="color:${offerTileTextColor(l.color)}">${escapeHtml(l.label)}</span></div>`).join('')}
       ${custom.map((s,i) => `
         <div class="offers-edit-row">
           <div class="offers-edit-row-fields">
@@ -2645,12 +2676,6 @@ function renderOffersModal() {
     <button class="offers-add-store-btn" onclick="addCustomStore()">＋ ${t('btn_add_store')}</button>
     <div class="offers-edit-hint">${t('offers_edit_hint')}</div>
     <div style="text-align:right;margin-top:14px">${editBtn}</div>`;
-}
-
-function openAllOffers() {
-  const p = state.perfumes.find(x=>x.id===currentOffersPerfumeId);
-  if (!p) return;
-  getOfferLinks(p).forEach(l => window.open(l.url, '_blank', 'noopener'));
 }
 
 function toggleOffersEditMode() {
@@ -3740,7 +3765,7 @@ const I18N = {
     title_view_list: "Ver en lista", title_view_card: "Ver ficha completa", btn_view_card: "ficha completa", title_sort_alpha: "Orden alfabético",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Ficha completa",
-    title_offers: "Buscar ofertas", title_other_stores: "otras tiendas", btn_offers_open_all: "Abrir todas",
+    title_offers: "Buscar ofertas", title_other_stores: "otras tiendas",
     btn_offers_edit_stores: "Editar tiendas", btn_offers_done: "Listo",
     offers_locked_note: "Amazon y Google Shopping son automáticos y no se pueden editar.",
     placeholder_store_name: "Nombre de la tienda", placeholder_store_url: "URL de búsqueda (usa {q} donde iría el perfume)",
@@ -3825,7 +3850,7 @@ const I18N = {
     title_view_list: "List view", title_view_card: "Full card view", btn_view_card: "full profile", title_sort_alpha: "Alphabetical order",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Full profile",
-    title_offers: "Search offers", title_other_stores: "other stores", btn_offers_open_all: "Open all",
+    title_offers: "Search offers", title_other_stores: "other stores",
     add_photo_line1: "ADD", add_photo_line2: "PHOTO", add_image_alt: "Add image",
     title_back: "Back",
     video_thumbnail_alt: "Video thumbnail",
@@ -3905,7 +3930,7 @@ const I18N = {
     title_view_list: "リスト表示", title_view_card: "詳細表示", btn_view_card: "詳細プロフィール", title_sort_alpha: "アルファベット順",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "詳細プロフィール",
-    title_offers: "オファーを検索", title_other_stores: "その他の店舗", btn_offers_open_all: "すべて開く",
+    title_offers: "オファーを検索", title_other_stores: "その他の店舗",
     add_photo_line1: "写真を", add_photo_line2: "追加", add_image_alt: "画像を追加",
     title_back: "戻る",
     video_thumbnail_alt: "動画のサムネイル",
@@ -3986,7 +4011,7 @@ const I18N = {
     title_view_list: "Listenansicht", title_view_card: "Vollständige Karte", btn_view_card: "vollständiges Profil", title_sort_alpha: "Alphabetische Reihenfolge",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Vollständiges Profil",
-    title_offers: "Angebote suchen", title_other_stores: "weitere Shops", btn_offers_open_all: "Alle öffnen",
+    title_offers: "Angebote suchen", title_other_stores: "weitere Shops",
     add_photo_line1: "FOTO", add_photo_line2: "HINZUFÜGEN", add_image_alt: "Bild hinzufügen",
     title_back: "Zurück",
     video_thumbnail_alt: "Video-Miniaturansicht",
@@ -4067,7 +4092,7 @@ const I18N = {
     title_view_list: "Vue en liste", title_view_card: "Fiche complète", btn_view_card: "fiche complète", title_sort_alpha: "Ordre alphabétique",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Fiche complète",
-    title_offers: "Rechercher des offres", title_other_stores: "autres boutiques", btn_offers_open_all: "Tout ouvrir",
+    title_offers: "Rechercher des offres", title_other_stores: "autres boutiques",
     add_photo_line1: "AJOUTER", add_photo_line2: "PHOTO", add_image_alt: "Ajouter une image",
     title_back: "Retour",
     video_thumbnail_alt: "Miniature de la vidéo",
@@ -4148,7 +4173,7 @@ const I18N = {
     title_view_list: "Vista elenco", title_view_card: "Scheda completa", btn_view_card: "scheda completa", title_sort_alpha: "Ordine alfabetico",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Scheda completa",
-    title_offers: "Cerca offerte", title_other_stores: "altri negozi", btn_offers_open_all: "Apri tutte",
+    title_offers: "Cerca offerte", title_other_stores: "altri negozi",
     add_photo_line1: "AGGIUNGI", add_photo_line2: "IMMAGINE", add_image_alt: "Aggiungi immagine",
     title_back: "Indietro",
     video_thumbnail_alt: "Miniatura del video",
@@ -4229,7 +4254,7 @@ const I18N = {
     title_view_list: "Ver em lista", title_view_card: "Ficha completa", btn_view_card: "ficha completa", title_sort_alpha: "Ordem alfabética",
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Ficha completa",
-    title_offers: "Procurar ofertas", title_other_stores: "outras lojas", btn_offers_open_all: "Abrir todas",
+    title_offers: "Procurar ofertas", title_other_stores: "outras lojas",
     add_photo_line1: "ADICIONAR", add_photo_line2: "IMAGEM", add_image_alt: "Adicionar imagem",
     title_back: "Voltar",
     video_thumbnail_alt: "Miniatura do vídeo",
