@@ -272,6 +272,13 @@
     font-size:14px; color:var(--text); font-family:'Jost',sans-serif; margin-top:10px; line-height:1.55;
     background:var(--surface-alt); border-radius:14px; padding:14px 16px;
   }
+  .offers-edit-hint-title { color:var(--star); font-weight:700; margin-bottom:6px; }
+  .q-chip {
+    display:inline-block; background:var(--star); color:#ffffff; font-family:monospace; font-weight:700;
+    padding:2px 8px; border-radius:8px; cursor:pointer; user-select:none;
+  }
+  .q-chip:active { opacity:.75; }
+  .offers-edit-hint-done { margin-top:8px; font-weight:600; }
   .offers-locked-note { font-size:13px; color:var(--text-light); font-family:'Jost',sans-serif; margin:2px 0 10px; line-height:1.4; }
   .row-more-wrap {
     flex-shrink:0; display:grid; grid-template-columns:1fr auto 1fr;
@@ -2699,7 +2706,11 @@ function renderOffersModal() {
         </div>`).join('')}
     </div>
     <button class="offers-add-store-btn" onclick="addCustomStore()">＋ ${t('btn_add_store')}</button>
-    <div class="offers-edit-hint">${t('offers_edit_hint')}</div>
+    <div class="offers-edit-hint">
+      <div class="offers-edit-hint-title">${t('offers_edit_hint_title')}</div>
+      <div>${t('offers_edit_hint_body').replace('{q}', '<span class="q-chip" onclick="copyQPlaceholder(event)" title="'+t('title_copy')+'">{q}</span>')}</div>
+      <div class="offers-edit-hint-done">${t('offers_edit_hint_done')}</div>
+    </div>
     <div style="text-align:right;margin-top:14px">${editBtn}</div>`;
 }
 
@@ -2718,6 +2729,16 @@ function resetPrimaryStore() {
   state.primaryStoreUrl = '';
   save();
   renderOffersModal();
+}
+function copyQPlaceholder(ev) {
+  ev.stopPropagation();
+  const txt = '{q}';
+  const done = () => showToast('✓ ' + t('toast_copied'), 1800);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(done).catch(done);
+  } else {
+    done();
+  }
 }
 function addCustomStore() {
   if (!Array.isArray(state.customStores)) state.customStores = [];
@@ -2763,7 +2784,7 @@ function openDetail(id) {
       <div class="detail-name">${p.name}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          ${starsHTML(p.rating||0,'lg')}
+          ${starsHTML(p.rating||0)}
           <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
         </div>
         <button class="offer-btn-main" onclick="openOffersModal(${p.id})">${t('title_offers')}</button>
@@ -3803,7 +3824,9 @@ const I18N = {
     offers_locked_note: "Google Shopping es automático y no se puede editar. Amazon sí puedes cambiarlo si quieres usar otra versión.", title_offers_reset_default: "Restaurar el predeterminado",
     placeholder_store_name: "Nombre de la tienda", placeholder_store_url: "URL de búsqueda (usa {q} donde iría el perfume)",
     btn_add_store: "Añadir tienda",
-    offers_edit_hint: "¿Cómo saber la URL correcta? Ve a la web de la tienda, busca cualquier producto a mano (por ejemplo \"Dior\"), y copia aquí la URL de esa búsqueda. Después sustituye la palabra que buscaste por {q}. Ejemplo: si al buscar \"Dior\" te lleva a mitienda.com/buscar?texto=Dior, aquí debes poner mitienda.com/buscar?texto={q}",
+    offers_edit_hint_title: "Cómo configurar la URL de una tienda nueva:",
+    offers_edit_hint_body: "Ve a la web de la tienda. Busca un perfume. Copia la URL de ese perfume y pégala aquí. Sustituye el nombre del perfume por este código {q}",
+    offers_edit_hint_done: "¡Listo!", toast_copied: "Copiado", title_copy: "Copiar",
     add_photo_line1: "AÑADIR", add_photo_line2: "IMAGEN", add_image_alt: "Añadir imagen",
     title_back: "Volver",
     video_thumbnail_alt: "Miniatura del vídeo",
@@ -3884,6 +3907,12 @@ const I18N = {
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Full profile",
     title_offers: "Search offers", title_other_stores: "other stores",
+    btn_offers_edit_stores: "Add / Edit stores", btn_offers_done: "Done",
+    offers_locked_note: "Google Shopping is automatic and can't be edited. You can change Amazon if you want to use a different version.", title_offers_reset_default: "Restore default",
+    placeholder_store_name: "Store name", placeholder_store_url: "Search URL (use {q} where the perfume name goes)",
+    offers_edit_hint_title: "How to set up a new store's URL:",
+    offers_edit_hint_body: "Go to the store's website. Search for a perfume. Copy that perfume's URL and paste it here. Replace the perfume's name with this code {q}",
+    offers_edit_hint_done: "Done!", toast_copied: "Copied", title_copy: "Copy",
     add_photo_line1: "ADD", add_photo_line2: "PHOTO", add_image_alt: "Add image",
     title_back: "Back",
     video_thumbnail_alt: "Video thumbnail",
