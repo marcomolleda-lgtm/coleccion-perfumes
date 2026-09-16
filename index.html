@@ -244,27 +244,28 @@
   }
   .offers-edit-toggle {
     background:none; border:none; cursor:pointer; color:var(--text-muted);
-    font-family:'Jost',sans-serif; font-size:13px; padding:4px 6px; display:flex; align-items:center; gap:5px;
+    font-family:'Jost',sans-serif; font-size:15px; padding:4px 6px; display:flex; align-items:center; gap:5px;
   }
   .offers-edit-row {
-    display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px; background:var(--surface-alt);
+    display:flex; align-items:center; gap:10px; padding:14px 16px; border-radius:14px;
+    background:#ffffff; box-shadow:0 2px 10px rgba(0,0,0,.12);
   }
-  .offers-edit-row-fields { flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
+  .offers-edit-row-fields { flex:1; min-width:0; display:flex; flex-direction:column; gap:10px; }
   .offers-edit-row input {
     width:100%; box-sizing:border-box; border:none; border-bottom:1px solid var(--border); background:none;
-    font-family:'Jost',sans-serif; font-size:14px; color:var(--text); padding:4px 2px; outline:none;
+    font-family:'Jost',sans-serif; font-size:16px; color:var(--text); padding:6px 2px; outline:none;
   }
   .offers-edit-row input:focus { border-bottom-color:var(--text); }
   .offers-edit-row input::placeholder { color:var(--text-light); }
   .offers-edit-row-del {
     flex-shrink:0; background:none; border:none; cursor:pointer; color:var(--text-light);
-    font-size:20px; line-height:1; padding:4px;
+    font-size:24px; line-height:1; padding:4px;
   }
   .offers-edit-row-del:active { color:var(--danger); }
   .offers-add-store-btn {
     display:flex; align-items:center; justify-content:center; gap:6px; width:100%; box-sizing:border-box;
-    padding:12px; border-radius:12px; border:1px dashed var(--border); background:none;
-    color:var(--text-muted); font-family:'Jost',sans-serif; font-size:14px; cursor:pointer;
+    padding:16px; border-radius:14px; border:1px dashed var(--border); background:none;
+    color:var(--text-muted); font-family:'Jost',sans-serif; font-size:16px; cursor:pointer;
   }
   .offers-add-store-btn:active { opacity:.7; }
   .offers-edit-hint { font-size:12px; color:var(--text-light); font-family:'Jost',sans-serif; margin-top:2px; line-height:1.4; }
@@ -3766,7 +3767,7 @@ const I18N = {
     // ── Part 2: cards, detail, edit ──
     card_full_profile: "Ficha completa",
     title_offers: "Buscar ofertas", title_other_stores: "otras tiendas",
-    btn_offers_edit_stores: "Editar tiendas", btn_offers_done: "Listo",
+    btn_offers_edit_stores: "Añadir / Editar tiendas", btn_offers_done: "Listo",
     offers_locked_note: "Amazon y Google Shopping son automáticos y no se pueden editar.",
     placeholder_store_name: "Nombre de la tienda", placeholder_store_url: "URL de búsqueda (usa {q} donde iría el perfume)",
     btn_add_store: "Añadir tienda",
