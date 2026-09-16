@@ -268,8 +268,11 @@
     color:var(--text-muted); font-family:'Jost',sans-serif; font-size:16px; cursor:pointer;
   }
   .offers-add-store-btn:active { opacity:.7; }
-  .offers-edit-hint { font-size:12px; color:var(--text-light); font-family:'Jost',sans-serif; margin-top:2px; line-height:1.4; }
-  .offers-locked-note { font-size:12px; color:var(--text-light); font-family:'Jost',sans-serif; margin:2px 0 4px; }
+  .offers-edit-hint {
+    font-size:14px; color:var(--text); font-family:'Jost',sans-serif; margin-top:10px; line-height:1.55;
+    background:var(--surface-alt); border-radius:14px; padding:14px 16px;
+  }
+  .offers-locked-note { font-size:13px; color:var(--text-light); font-family:'Jost',sans-serif; margin:2px 0 10px; line-height:1.4; }
   .row-more-wrap {
     flex-shrink:0; display:grid; grid-template-columns:1fr auto 1fr;
     align-items:center; padding-top:10px;
@@ -340,6 +343,7 @@
     box-shadow:0 30px 80px rgba(0,0,0,.2); max-height:92vh; overflow-y:auto;
     position:relative;
   }
+  #modal-offers .modal { max-width:640px; max-height:94vh; }
   .modal-header {
     padding:22px 22px 0; display:flex; align-items:center; justify-content:space-between;
     position:sticky; top:0; background:var(--surface); z-index:10; padding-bottom:16px;
@@ -1572,7 +1576,8 @@ let state = {
   sort: 'date',
   view: 'card',
   theme: {},
-  customStores: []
+  customStores: [],
+  primaryStoreUrl: ''
 };
 
 let editPhotos=[null,null,null,null,null,null];
@@ -2598,11 +2603,21 @@ function getOfferLinks(p) {
   const query = [p.brand, p.name].filter(Boolean).join(' ').trim() || (p.name||'');
   const q = encodeURIComponent(query);
   const links = [];
+  let defaultLabel, defaultUrl;
   if (OFFER_MERCADOLIBRE_DOMAIN[country]) {
-    links.push({ label:'Mercado Libre', url:`https://listado.${OFFER_MERCADOLIBRE_DOMAIN[country]}/${q}` });
+    defaultLabel = 'Mercado Libre';
+    defaultUrl = `https://listado.${OFFER_MERCADOLIBRE_DOMAIN[country]}/${q}`;
   } else {
     const domain = OFFER_AMAZON_DOMAIN[country] || 'amazon.com';
-    links.push({ label: domain==='amazon.es' ? 'Amazon.es' : 'Amazon', url:`https://www.${domain}/s?k=${q}` });
+    defaultLabel = domain==='amazon.es' ? 'Amazon.es' : 'Amazon';
+    defaultUrl = `https://www.${domain}/s?k=${q}`;
+  }
+  if (state.primaryStoreUrl) {
+    const tpl = state.primaryStoreUrl;
+    const overrideUrl = tpl.includes('{q}') ? tpl.replace(/\{q\}/g, q) : (tpl + (tpl.includes('?') ? '&' : '?') + 'q=' + q);
+    links.push({ label: state.primaryStoreName || defaultLabel, url: overrideUrl, primary:true });
+  } else {
+    links.push({ label: defaultLabel, url: defaultUrl, primary:true, defaultLabel, defaultUrl });
   }
   links.push({ label:'Google Shopping', url:`https://www.google.com/search?tbm=shop&q=${q}` });
   (state.customStores||[]).forEach(s => {
@@ -2661,10 +2676,19 @@ function renderOffersModal() {
     return;
   }
   const custom = state.customStores || [];
+  const primaryLink = links.find(l=>l.primary);
+  const googleLink = links.find(l=>!l.primary && !l.custom);
   body.innerHTML = `
     <div class="offers-locked-note">${t('offers_locked_note')}</div>
     <div class="offers-modal-list" style="grid-template-columns:1fr">
-      ${links.filter(l=>!l.custom).map(l => `<div class="offers-store-btn" style="aspect-ratio:auto;flex-direction:row;gap:10px;padding:10px 14px;opacity:.55;cursor:default;background:${l.color}"><span class="offers-store-icon-wrap" style="width:28px;height:28px"><img src="${l.icon}" alt="" style="width:18px;height:18px" onerror="this.onerror=null;this.src='${OFFER_FALLBACK_ICON}'"/></span><span class="offers-store-btn-label" style="color:${offerTileTextColor(l.color)}">${escapeHtml(l.label)}</span></div>`).join('')}
+      <div class="offers-edit-row">
+        <div class="offers-edit-row-fields">
+          <input type="text" value="${escapeHtml(state.primaryStoreName||'')}" placeholder="${escapeHtml(primaryLink.defaultLabel||primaryLink.label)}" oninput="updatePrimaryStore('name',this.value)"/>
+          <input type="text" value="${escapeHtml(state.primaryStoreUrl||'')}" placeholder="${escapeHtml(primaryLink.defaultUrl||'')||t('placeholder_store_url')}" oninput="updatePrimaryStore('url',this.value)"/>
+        </div>
+        ${(state.primaryStoreUrl||state.primaryStoreName) ? `<button class="offers-edit-row-del" onclick="resetPrimaryStore()" title="${t('title_offers_reset_default')}">↺</button>` : ''}
+      </div>
+      <div class="offers-store-btn" style="aspect-ratio:auto;flex-direction:row;gap:10px;padding:10px 14px;opacity:.55;cursor:default;background:${googleLink.color}"><span class="offers-store-icon-wrap" style="width:28px;height:28px"><img src="${googleLink.icon}" alt="" style="width:18px;height:18px" onerror="this.onerror=null;this.src='${OFFER_FALLBACK_ICON}'"/></span><span class="offers-store-btn-label" style="color:${offerTileTextColor(googleLink.color)}">${escapeHtml(googleLink.label)}</span></div>
       ${custom.map((s,i) => `
         <div class="offers-edit-row">
           <div class="offers-edit-row-fields">
@@ -2684,6 +2708,17 @@ function toggleOffersEditMode() {
   renderOffersModal();
 }
 
+function updatePrimaryStore(field, value) {
+  if (field === 'name') state.primaryStoreName = value;
+  if (field === 'url') state.primaryStoreUrl = value;
+  save();
+}
+function resetPrimaryStore() {
+  state.primaryStoreName = '';
+  state.primaryStoreUrl = '';
+  save();
+  renderOffersModal();
+}
 function addCustomStore() {
   if (!Array.isArray(state.customStores)) state.customStores = [];
   state.customStores.push({name:'', url:''});
@@ -2731,10 +2766,7 @@ function openDetail(id) {
         <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
       </div>
       <div class="detail-offers">
-        <div class="detail-offers-label">${t('title_offers')}</div>
-        <div class="detail-offers-links">
-          ${getOfferLinks(p).map(l=>`<a class="offer-link-btn" href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join('')}
-        </div>
+        <button class="offer-btn-main" onclick="openOffersModal(${p.id})">${t('title_offers')}</button>
       </div>
       <div class="detail-fields">
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
@@ -3768,10 +3800,10 @@ const I18N = {
     card_full_profile: "Ficha completa",
     title_offers: "Buscar ofertas", title_other_stores: "otras tiendas",
     btn_offers_edit_stores: "Añadir / Editar tiendas", btn_offers_done: "Listo",
-    offers_locked_note: "Amazon y Google Shopping son automáticos y no se pueden editar.",
+    offers_locked_note: "Google Shopping es automático y no se puede editar. Amazon sí puedes cambiarlo si quieres usar otra versión.", title_offers_reset_default: "Restaurar el predeterminado",
     placeholder_store_name: "Nombre de la tienda", placeholder_store_url: "URL de búsqueda (usa {q} donde iría el perfume)",
     btn_add_store: "Añadir tienda",
-    offers_edit_hint: "Ejemplo: https://mitienda.com/buscar?q={q}",
+    offers_edit_hint: "¿Cómo saber la URL correcta? Ve a la web de la tienda, busca cualquier producto a mano (por ejemplo \"Dior\"), y copia aquí la URL de esa búsqueda. Después sustituye la palabra que buscaste por {q}. Ejemplo: si al buscar \"Dior\" te lleva a mitienda.com/buscar?texto=Dior, aquí debes poner mitienda.com/buscar?texto={q}",
     add_photo_line1: "AÑADIR", add_photo_line2: "IMAGEN", add_image_alt: "Añadir imagen",
     title_back: "Volver",
     video_thumbnail_alt: "Miniatura del vídeo",
