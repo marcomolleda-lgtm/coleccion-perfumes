@@ -224,62 +224,6 @@
     font-size:15px; font-family:'Jost',sans-serif; font-style:italic; color:var(--text-muted);
     line-height:1.5; overflow:hidden; white-space:pre-wrap; word-break:break-word;
   }
-  /* ── Offers modal ── */
-  .offers-modal-list { display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
-  .offers-store-btn {
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
-    width:100%; aspect-ratio:1/1; box-sizing:border-box; text-align:center; text-decoration:none;
-    padding:14px 8px; border-radius:18px; border:none; cursor:pointer;
-    box-shadow:0 3px 0 rgba(0,0,0,.12);
-  }
-  .offers-store-btn:active { transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,.12); }
-  .offers-store-icon-wrap {
-    width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,.85);
-    display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;
-  }
-  .offers-store-icon-wrap img { width:24px; height:24px; object-fit:contain; }
-  .offers-store-btn-label {
-    font-family:'Jost',sans-serif; font-size:13px; font-weight:600; line-height:1.2;
-    word-break:break-word; color:var(--text);
-  }
-  .offers-edit-toggle {
-    background:none; border:none; cursor:pointer; color:var(--text-muted);
-    font-family:'Jost',sans-serif; font-size:15px; padding:4px 6px; display:flex; align-items:center; gap:5px;
-  }
-  .offers-edit-row {
-    display:flex; align-items:center; gap:10px; padding:14px 16px; border-radius:14px;
-    background:#ffffff; box-shadow:0 2px 10px rgba(0,0,0,.12);
-  }
-  .offers-edit-row-fields { flex:1; min-width:0; display:flex; flex-direction:column; gap:10px; }
-  .offers-edit-row input {
-    width:100%; box-sizing:border-box; border:none; border-bottom:1px solid var(--border); background:none;
-    font-family:'Jost',sans-serif; font-size:16px; color:var(--text); padding:6px 2px; outline:none;
-  }
-  .offers-edit-row input:focus { border-bottom-color:var(--text); }
-  .offers-edit-row input::placeholder { color:var(--text-light); }
-  .offers-edit-row-del {
-    flex-shrink:0; background:none; border:none; cursor:pointer; color:var(--text-light);
-    font-size:24px; line-height:1; padding:4px;
-  }
-  .offers-edit-row-del:active { color:var(--danger); }
-  .offers-add-store-btn {
-    display:flex; align-items:center; justify-content:center; gap:6px; width:100%; box-sizing:border-box;
-    padding:16px; border-radius:14px; border:1px dashed var(--border); background:none;
-    color:var(--text-muted); font-family:'Jost',sans-serif; font-size:16px; cursor:pointer;
-  }
-  .offers-add-store-btn:active { opacity:.7; }
-  .offers-edit-hint {
-    font-size:14px; color:var(--text); font-family:'Jost',sans-serif; margin-top:10px; line-height:1.55;
-    background:var(--surface-alt); border-radius:14px; padding:14px 16px;
-  }
-  .offers-edit-hint-title { color:var(--star); font-weight:700; margin-bottom:6px; }
-  .q-chip {
-    display:inline-block; background:var(--star); color:#ffffff; font-family:monospace; font-weight:700;
-    padding:2px 8px; border-radius:8px; cursor:pointer; user-select:none;
-  }
-  .q-chip:active { opacity:.75; }
-  .offers-edit-hint-done { margin-top:8px; font-weight:600; }
-  .offers-locked-note { font-size:13px; color:var(--text-light); font-family:'Jost',sans-serif; margin:2px 0 10px; line-height:1.4; }
   .row-more-wrap {
     flex-shrink:0; display:grid; grid-template-columns:1fr auto 1fr;
     align-items:center; padding-top:10px;
@@ -350,7 +294,6 @@
     box-shadow:0 30px 80px rgba(0,0,0,.2); max-height:92vh; overflow-y:auto;
     position:relative;
   }
-  #modal-offers .modal { max-width:640px; max-height:94vh; }
   .modal-header {
     padding:22px 22px 0; display:flex; align-items:center; justify-content:space-between;
     position:sticky; top:0; background:var(--surface); z-index:10; padding-bottom:16px;
@@ -868,7 +811,6 @@
 
   /* ── BARCODE SCANNER ── */
   #modal-barcode { z-index:1300; }
-  #modal-offers { z-index:950; }
   #modal-barcode .modal { max-width:380px; }
   #barcode-video-wrap {
     position:relative; background:#000; border-radius:12px;
@@ -1407,17 +1349,6 @@
   <button class="detail-edit-btn" onclick="savePerfume()" data-i18n="btn_save">Guardar</button>
 </div>
 
-<!-- ══ FIELD MANAGER MODAL ══ -->
-<div class="modal-overlay" id="modal-offers">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title" data-i18n="title_offers">Buscar ofertas</span>
-      <button class="modal-close" onclick="closeModal('modal-offers')">✕</button>
-    </div>
-    <div class="modal-body" id="offers-modal-body"></div>
-  </div>
-</div>
-
 <div class="modal-overlay" id="modal-category">
   <div class="modal" style="max-width:340px">
     <div class="modal-header">
@@ -1582,9 +1513,7 @@ let state = {
   nextId: 10,
   sort: 'date',
   view: 'card',
-  theme: {},
-  customStores: [],
-  primaryStoreUrl: ''
+  theme: {}
 };
 
 let editPhotos=[null,null,null,null,null,null];
@@ -1736,7 +1665,6 @@ async function initState() {
     }
     if (!Array.isArray(state.concentrations) || !state.concentrations.length) state.concentrations = [...CONCENTRATIONS];
     else CONCENTRATIONS.forEach(c => { if (!state.concentrations.some(x=>x.toLowerCase()===c.toLowerCase())) state.concentrations.push(c); });
-    if (!Array.isArray(state.customStores)) state.customStores = [];
     const REQUIRED_CARD_FIELDS = ["name","brand","concentration","capacity","launch","perfumer","notes","comments","rating"];
     if (Array.isArray(state.fields)) {
       state.fields.forEach(f => { if (REQUIRED_CARD_FIELDS.includes(f.key)) f.required = true; });
@@ -2497,7 +2425,7 @@ function render() {
             ${starsHTML(p.rating||0)}
             <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
           </div>
-          <button class="offer-btn-main" onclick="event.stopPropagation();openOffersModal(${p.id})">${t('title_offers')}</button>
+          <button class="offer-btn-main" onclick="event.stopPropagation();openOffersSearch(${p.id})">${t('title_offers')}</button>
         </div>
         <div class="row-sep"></div>
         <div class="row-comments"></div>
@@ -2579,210 +2507,16 @@ function renderBottlesDetailHtml(p) {
     </div>`).join('');
 }
 
-// ══ OFERTAS: detección de país y enlaces de búsqueda ═══════════
-// Amazon regional por país. Portugal usa Amazon.es (versión traducida al portugués).
-const OFFER_AMAZON_DOMAIN = {
-  ES:'amazon.es', PT:'amazon.es', MX:'amazon.com.mx', DE:'amazon.de',
-  US:'amazon.com', FR:'amazon.fr', IT:'amazon.it', GB:'amazon.co.uk', JP:'amazon.co.jp'
-};
-// Argentina, Colombia y Chile usan Mercado Libre como tienda global por defecto.
-const OFFER_MERCADOLIBRE_DOMAIN = { AR:'mercadolibre.com.ar', CO:'mercadolibre.com.co', CL:'mercadolibre.cl' };
-const OFFER_LANG_DEFAULT_COUNTRY = { es:'ES', en:'US', de:'DE', fr:'FR', it:'IT', ja:'JP', pt:'PT' };
-function getOfferCountry() {
-  const langDefault = OFFER_LANG_DEFAULT_COUNTRY[currentLang] || 'US';
-  const knownRegions = Object.keys(OFFER_AMAZON_DOMAIN).concat(Object.keys(OFFER_MERCADOLIBRE_DOMAIN));
-  const navParts = (navigator.language || '').split('-');
-  const navBase = (navParts[0] || '').toLowerCase();
-  const navRegion = navParts[1] ? navParts[1].toUpperCase() : null;
-  // El idioma elegido en la app manda; el país del dispositivo solo afina
-  // la región cuando coincide con ese mismo idioma (p.ej. es-AR con app en español).
-  if (navBase === currentLang && navRegion && knownRegions.includes(navRegion)) return navRegion;
-  return langDefault;
-}
-// Paleta de colores para los botones de tiendas del mosaico de ofertas (se van repitiendo por orden)
-const OFFER_TILE_COLORS = ['#3299cd', '#ffe184', '#2b2b28', '#a7d7ef', '#f5c15c', '#5a8a6a'];
-// Tiendas locales predeterminadas por país (curadas a mano). Se abren vía una búsqueda de Google
-// restringida a ese dominio (site:tienda.com {q}) en vez de intentar adivinar la URL de búsqueda
-// propia de cada tienda: muchas tiendas modernas usan un buscador con JavaScript sin una URL de
-// resultados real y verificable, así que esta vía es la única que podemos garantizar que siempre
-// funcione para las 11 tiendas de golpe, sin arriesgarnos a otro caso como el de Notino.
-const OFFER_COUNTRY_STORES = {
-  ES: [
-    {name:'Perfumerías Primor', domain:'primor.eu'},
-    {name:'Druni', domain:'druni.es'},
-    {name:"Perfume's Club", domain:'perfumesclub.com'},
-    {name:'Notino', domain:'notino.es'},
-    {name:'Douglas', domain:'douglas.es'},
-    {name:'Sephora', domain:'sephora.es'},
-    {name:'Paco Perfumerías', domain:'pacoperfumerias.com'},
-    {name:'Perfumes 24 Horas', domain:'perfumes24horas.com'},
-    {name:'Sabina Store', domain:'sabina.com'},
-    {name:'Arenal Perfumerías', domain:'arenal.com'},
-    {name:'El Corte Inglés', domain:'elcorteingles.es'},
-  ]
-};
-function getStoreFavicon(url) {
-  try { return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`; }
-  catch(e) { return ''; }
-}
-function getOfferLinks(p) {
-  const country = getOfferCountry();
+// ══ OFERTAS: búsqueda directa en Google Shopping ═══════════
+function getGoogleShoppingUrl(p) {
   const query = [p.brand, p.name].filter(Boolean).join(' ').trim() || (p.name||'');
   const q = encodeURIComponent(query).replace(/%20/g, '+');
-  const links = [];
-  let defaultLabel, defaultUrl;
-  if (OFFER_MERCADOLIBRE_DOMAIN[country]) {
-    defaultLabel = 'Mercado Libre';
-    defaultUrl = `https://listado.${OFFER_MERCADOLIBRE_DOMAIN[country]}/${q}`;
-  } else {
-    const domain = OFFER_AMAZON_DOMAIN[country] || 'amazon.com';
-    defaultLabel = domain==='amazon.es' ? 'Amazon.es' : 'Amazon';
-    defaultUrl = `https://www.${domain}/s?k=${q}`;
-  }
-  if (state.primaryStoreUrl) {
-    const tpl = state.primaryStoreUrl;
-    const overrideUrl = tpl.includes('{q}') ? tpl.replace(/\{q\}/g, q) : (tpl + (tpl.includes('?') ? '&' : '?') + 'q=' + q);
-    links.push({ label: state.primaryStoreName || defaultLabel, url: overrideUrl, primary:true });
-  } else {
-    links.push({ label: defaultLabel, url: defaultUrl, primary:true, defaultLabel, defaultUrl });
-  }
-  links.push({ label:'Google Shopping', url:`https://www.google.com/search?tbm=shop&q=${q}`, google:true });
-  (OFFER_COUNTRY_STORES[country]||[]).forEach(s => {
-    links.push({ label: s.name, url: `https://www.google.com/search?q=site:${s.domain}+${q}`, iconDomain: s.domain, countryStore:true });
-  });
-  (state.customStores||[]).forEach(s => {
-    if (!s || !s.name || !s.url) return;
-    const storeUrl = s.url.includes('{q}') ? s.url.replace(/\{q\}/g, q) : (s.url + (s.url.includes('?') ? '&' : '?') + 'q=' + q);
-    links.push({ label: s.name, url: storeUrl, custom:true });
-  });
-  links.forEach((l,i) => {
-    l.icon = getStoreFavicon(l.iconDomain ? ('https://'+l.iconDomain) : l.url);
-    l.color = OFFER_TILE_COLORS[i % OFFER_TILE_COLORS.length];
-  });
-  return links;
+  return `https://www.google.com/search?tbm=shop&q=${q}`;
 }
-// ══ OFERTAS: ventana flotante (botón "Buscar ofertas") ═════════════
-var currentOffersPerfumeId = null;
-var offersEditMode = false;
-
-function openOffersModal(id) {
-  currentOffersPerfumeId = id;
-  renderOffersModal();
-  openModal('modal-offers');
-}
-
-// Icono genérico de tienda (bolsa) usado como respaldo si el favicon no carga
-const OFFER_FALLBACK_ICON = "data:image/svg+xml;utf8," + encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#1a1a18" stroke-width="1.8">
-  <path d="M6 8h12l-1 12H7L6 8z" stroke-linejoin="round"/>
-  <path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-linecap="round"/>
-</svg>`);
-
-function offerTileTextColor(hex) {
-  // Texto oscuro sobre colores claros de la paleta, blanco sobre los oscuros
-  return (hex === '#2b2b28') ? '#ffffff' : '#1a1a18';
-}
-
-function renderOffersModal() {
-  const p = state.perfumes.find(x=>x.id===currentOffersPerfumeId);
-  const body = document.getElementById('offers-modal-body');
-  if (!p || !body) return;
-  const links = getOfferLinks(p);
-  const editBtn = `<button class="offers-edit-toggle" onclick="toggleOffersEditMode()">${offersEditMode ? t('btn_offers_done') : '✎ ' + t('btn_offers_edit_stores')}</button>`;
-  if (!offersEditMode) {
-    body.innerHTML = `
-      <div class="offers-modal-list">
-        ${links.map(l => `
-          <a class="offers-store-btn" href="${l.url}" target="_blank" rel="noopener"
-             style="background:${l.color};color:${offerTileTextColor(l.color)}">
-            <span class="offers-store-icon-wrap">
-              <img src="${l.icon}" alt="" onerror="this.onerror=null;this.src='${OFFER_FALLBACK_ICON}'"/>
-            </span>
-            <span class="offers-store-btn-label" style="color:${offerTileTextColor(l.color)}">${escapeHtml(l.label)}</span>
-          </a>`).join('')}
-      </div>
-      <div style="text-align:right;margin-top:14px">${editBtn}</div>`;
-    return;
-  }
-  const custom = state.customStores || [];
-  const primaryLink = links.find(l=>l.primary);
-  const googleLink = links.find(l=>l.google);
-  const countryLinks = links.filter(l=>l.countryStore);
-  const lockedRow = l => `<div class="offers-store-btn" style="aspect-ratio:auto;flex-direction:row;gap:10px;padding:10px 14px;opacity:.55;cursor:default;background:${l.color}"><span class="offers-store-icon-wrap" style="width:28px;height:28px"><img src="${l.icon}" alt="" style="width:18px;height:18px" onerror="this.onerror=null;this.src='${OFFER_FALLBACK_ICON}'"/></span><span class="offers-store-btn-label" style="color:${offerTileTextColor(l.color)}">${escapeHtml(l.label)}</span></div>`;
-  body.innerHTML = `
-    <div class="offers-locked-note">${t('offers_locked_note')}</div>
-    <div class="offers-modal-list" style="grid-template-columns:1fr">
-      <div class="offers-edit-row">
-        <div class="offers-edit-row-fields">
-          <input type="text" value="${escapeHtml(state.primaryStoreName||'')}" placeholder="${escapeHtml(primaryLink.defaultLabel||primaryLink.label)}" oninput="updatePrimaryStore('name',this.value)"/>
-          <input type="text" value="${escapeHtml(state.primaryStoreUrl||'')}" placeholder="${escapeHtml(primaryLink.defaultUrl||'')||t('placeholder_store_url')}" oninput="updatePrimaryStore('url',this.value)"/>
-        </div>
-        ${(state.primaryStoreUrl||state.primaryStoreName) ? `<button class="offers-edit-row-del" onclick="resetPrimaryStore()" title="${t('title_offers_reset_default')}">↺</button>` : ''}
-      </div>
-      ${lockedRow(googleLink)}
-      ${countryLinks.map(lockedRow).join('')}
-      ${custom.map((s,i) => `
-        <div class="offers-edit-row">
-          <div class="offers-edit-row-fields">
-            <input type="text" value="${escapeHtml(s.name||'')}" placeholder="${t('placeholder_store_name')}" oninput="updateCustomStore(${i},'name',this.value)"/>
-            <input type="text" value="${escapeHtml(s.url||'')}" placeholder="${t('placeholder_store_url')}" oninput="updateCustomStore(${i},'url',this.value)"/>
-          </div>
-          <button class="offers-edit-row-del" onclick="deleteCustomStore(${i})" title="${t('title_delete')}">✕</button>
-        </div>`).join('')}
-    </div>
-    <button class="offers-add-store-btn" onclick="addCustomStore()">＋ ${t('btn_add_store')}</button>
-    <div class="offers-edit-hint">
-      <div class="offers-edit-hint-title">${t('offers_edit_hint_title')}</div>
-      <div>${t('offers_edit_hint_body').replace('{q}', '<span class="q-chip" onclick="copyQPlaceholder(event)" title="'+t('title_copy')+'">{q}</span>')}</div>
-      <div class="offers-edit-hint-done">${t('offers_edit_hint_done')}</div>
-    </div>
-    <div style="text-align:right;margin-top:14px">${editBtn}</div>`;
-}
-
-function toggleOffersEditMode() {
-  offersEditMode = !offersEditMode;
-  renderOffersModal();
-}
-
-function updatePrimaryStore(field, value) {
-  if (field === 'name') state.primaryStoreName = value;
-  if (field === 'url') state.primaryStoreUrl = value;
-  save();
-}
-function resetPrimaryStore() {
-  state.primaryStoreName = '';
-  state.primaryStoreUrl = '';
-  save();
-  renderOffersModal();
-}
-function copyQPlaceholder(ev) {
-  ev.stopPropagation();
-  const txt = '{q}';
-  const done = () => showToast('✓ ' + t('toast_copied'), 1800);
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(txt).then(done).catch(done);
-  } else {
-    done();
-  }
-}
-function addCustomStore() {
-  if (!Array.isArray(state.customStores)) state.customStores = [];
-  state.customStores.push({name:'', url:''});
-  save();
-  renderOffersModal();
-}
-
-function updateCustomStore(index, field, value) {
-  if (!state.customStores || !state.customStores[index]) return;
-  state.customStores[index][field] = value;
-  save();
-}
-
-function deleteCustomStore(index) {
-  if (!state.customStores) return;
-  state.customStores.splice(index, 1);
-  save();
-  renderOffersModal();
+function openOffersSearch(id) {
+  const p = state.perfumes.find(x=>x.id===id);
+  if (!p) return;
+  window.open(getGoogleShoppingUrl(p), '_blank', 'noopener');
 }
 
 function openDetail(id) {
@@ -2812,7 +2546,7 @@ function openDetail(id) {
           ${starsHTML(p.rating||0)}
           <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
         </div>
-        <button class="offer-btn-main" onclick="openOffersModal(${p.id})">${t('title_offers')}</button>
+        <button class="offer-btn-main" onclick="openOffersSearch(${p.id})">${t('title_offers')}</button>
       </div>
       <div class="detail-fields">
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
