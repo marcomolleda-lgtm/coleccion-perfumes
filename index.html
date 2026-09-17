@@ -2608,7 +2608,7 @@ function getStoreFavicon(url) {
 function getOfferLinks(p) {
   const country = getOfferCountry();
   const query = [p.brand, p.name].filter(Boolean).join(' ').trim() || (p.name||'');
-  const q = encodeURIComponent(query);
+  const q = encodeURIComponent(query).replace(/%20/g, '+');
   const links = [];
   let defaultLabel, defaultUrl;
   if (OFFER_MERCADOLIBRE_DOMAIN[country]) {
