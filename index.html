@@ -2601,6 +2601,26 @@ function getOfferCountry() {
 }
 // Paleta de colores para los botones de tiendas del mosaico de ofertas (se van repitiendo por orden)
 const OFFER_TILE_COLORS = ['#3299cd', '#ffe184', '#2b2b28', '#a7d7ef', '#f5c15c', '#5a8a6a'];
+// Tiendas locales predeterminadas por país (curadas a mano). Se abren vía una búsqueda de Google
+// restringida a ese dominio (site:tienda.com {q}) en vez de intentar adivinar la URL de búsqueda
+// propia de cada tienda: muchas tiendas modernas usan un buscador con JavaScript sin una URL de
+// resultados real y verificable, así que esta vía es la única que podemos garantizar que siempre
+// funcione para las 11 tiendas de golpe, sin arriesgarnos a otro caso como el de Notino.
+const OFFER_COUNTRY_STORES = {
+  ES: [
+    {name:'Perfumerías Primor', domain:'primor.eu'},
+    {name:'Druni', domain:'druni.es'},
+    {name:"Perfume's Club", domain:'perfumesclub.com'},
+    {name:'Notino', domain:'notino.es'},
+    {name:'Douglas', domain:'douglas.es'},
+    {name:'Sephora', domain:'sephora.es'},
+    {name:'Paco Perfumerías', domain:'pacoperfumerias.com'},
+    {name:'Perfumes 24 Horas', domain:'perfumes24horas.com'},
+    {name:'Sabina Store', domain:'sabina.com'},
+    {name:'Arenal Perfumerías', domain:'arenal.com'},
+    {name:'El Corte Inglés', domain:'elcorteingles.es'},
+  ]
+};
 function getStoreFavicon(url) {
   try { return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`; }
   catch(e) { return ''; }
@@ -2626,14 +2646,17 @@ function getOfferLinks(p) {
   } else {
     links.push({ label: defaultLabel, url: defaultUrl, primary:true, defaultLabel, defaultUrl });
   }
-  links.push({ label:'Google Shopping', url:`https://www.google.com/search?tbm=shop&q=${q}` });
+  links.push({ label:'Google Shopping', url:`https://www.google.com/search?tbm=shop&q=${q}`, google:true });
+  (OFFER_COUNTRY_STORES[country]||[]).forEach(s => {
+    links.push({ label: s.name, url: `https://www.google.com/search?q=site:${s.domain}+${q}`, iconDomain: s.domain, countryStore:true });
+  });
   (state.customStores||[]).forEach(s => {
     if (!s || !s.name || !s.url) return;
     const storeUrl = s.url.includes('{q}') ? s.url.replace(/\{q\}/g, q) : (s.url + (s.url.includes('?') ? '&' : '?') + 'q=' + q);
     links.push({ label: s.name, url: storeUrl, custom:true });
   });
   links.forEach((l,i) => {
-    l.icon = getStoreFavicon(l.url);
+    l.icon = getStoreFavicon(l.iconDomain ? ('https://'+l.iconDomain) : l.url);
     l.color = OFFER_TILE_COLORS[i % OFFER_TILE_COLORS.length];
   });
   return links;
@@ -2683,7 +2706,9 @@ function renderOffersModal() {
   }
   const custom = state.customStores || [];
   const primaryLink = links.find(l=>l.primary);
-  const googleLink = links.find(l=>!l.primary && !l.custom);
+  const googleLink = links.find(l=>l.google);
+  const countryLinks = links.filter(l=>l.countryStore);
+  const lockedRow = l => `<div class="offers-store-btn" style="aspect-ratio:auto;flex-direction:row;gap:10px;padding:10px 14px;opacity:.55;cursor:default;background:${l.color}"><span class="offers-store-icon-wrap" style="width:28px;height:28px"><img src="${l.icon}" alt="" style="width:18px;height:18px" onerror="this.onerror=null;this.src='${OFFER_FALLBACK_ICON}'"/></span><span class="offers-store-btn-label" style="color:${offerTileTextColor(l.color)}">${escapeHtml(l.label)}</span></div>`;
   body.innerHTML = `
     <div class="offers-locked-note">${t('offers_locked_note')}</div>
     <div class="offers-modal-list" style="grid-template-columns:1fr">
@@ -2694,7 +2719,8 @@ function renderOffersModal() {
         </div>
         ${(state.primaryStoreUrl||state.primaryStoreName) ? `<button class="offers-edit-row-del" onclick="resetPrimaryStore()" title="${t('title_offers_reset_default')}">↺</button>` : ''}
       </div>
-      <div class="offers-store-btn" style="aspect-ratio:auto;flex-direction:row;gap:10px;padding:10px 14px;opacity:.55;cursor:default;background:${googleLink.color}"><span class="offers-store-icon-wrap" style="width:28px;height:28px"><img src="${googleLink.icon}" alt="" style="width:18px;height:18px" onerror="this.onerror=null;this.src='${OFFER_FALLBACK_ICON}'"/></span><span class="offers-store-btn-label" style="color:${offerTileTextColor(googleLink.color)}">${escapeHtml(googleLink.label)}</span></div>
+      ${lockedRow(googleLink)}
+      ${countryLinks.map(lockedRow).join('')}
       ${custom.map((s,i) => `
         <div class="offers-edit-row">
           <div class="offers-edit-row-fields">
@@ -3820,7 +3846,7 @@ const I18N = {
     card_full_profile: "Ficha completa",
     title_offers: "Buscar ofertas", title_other_stores: "otras tiendas",
     btn_offers_edit_stores: "Añadir / Editar tiendas", btn_offers_done: "Listo",
-    offers_locked_note: "Google Shopping es automático y no se puede editar. Amazon sí puedes cambiarlo si quieres usar otra versión.", title_offers_reset_default: "Restaurar el predeterminado",
+    offers_locked_note: "Google Shopping y las tiendas de tu país son automáticas y no se pueden editar. Amazon sí puedes cambiarlo si quieres usar otra versión.", title_offers_reset_default: "Restaurar el predeterminado",
     placeholder_store_name: "Nombre de la tienda", placeholder_store_url: "URL de búsqueda (usa {q} donde iría el perfume)",
     btn_add_store: "Añadir tienda",
     offers_edit_hint_title: "Cómo configurar la URL de una tienda nueva:",
@@ -3907,7 +3933,7 @@ const I18N = {
     card_full_profile: "Full profile",
     title_offers: "Search offers", title_other_stores: "other stores",
     btn_offers_edit_stores: "Add / Edit stores", btn_offers_done: "Done",
-    offers_locked_note: "Google Shopping is automatic and can't be edited. You can change Amazon if you want to use a different version.", title_offers_reset_default: "Restore default",
+    offers_locked_note: "Google Shopping and your country's stores are automatic and can't be edited. You can change Amazon if you want to use a different version.", title_offers_reset_default: "Restore default",
     placeholder_store_name: "Store name", placeholder_store_url: "Search URL (use {q} where the perfume name goes)",
     offers_edit_hint_title: "How to set up a new store's URL:",
     offers_edit_hint_body: "Go to the store's website. Search for a perfume. Copy that perfume's URL and paste it here. Replace the perfume's name with this code {q}",
