@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.marcomolleda_lgtm.twa",
+    "sha256_cert_fingerprints": [
+      "27:A9:71:86:5C:9B:AD:E7:CA:9A:9C:35:17:0A:EA:F8:E6:ED:4D:7F:5B:2F:32:A6:46:3F:76:41:D2:74:E8:D8"
+    ]
+  }
+}]
