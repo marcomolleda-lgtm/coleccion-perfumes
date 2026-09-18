@@ -2,7 +2,7 @@
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "io.github.marcomolleda_lgtm.twa",
+    "package_name": "o.github.marcomolleda_lgtm.twa",
     "sha256_cert_fingerprints": [
       "27:A9:71:86:5C:9B:AD:E7:CA:9A:9C:35:17:0A:EA:F8:E6:ED:4D:7F:5B:2F:32:A6:46:3F:76:41:D2:74:E8:D8",
       "E4:0E:65:3B:CE:27:C1:47:C5:33:E5:4D:8C:2F:20:C8:AB:2F:F9:27:35:D2:89:A6:A9:F9:A3:00:4B:42:21:A3"
