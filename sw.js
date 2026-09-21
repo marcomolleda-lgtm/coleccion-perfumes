@@ -1,4 +1,4 @@
-const CACHE = 'perfumes-v37';
+const CACHE = 'perfumes-v38';
 const ASSETS = ['./index.html', './manifest.json', './icon-192-v7.png', './icon-512-v7.png', './icon-192-maskable-v7.png', './icon-512-maskable-v7.png', './sample-chanel5-v1.jpg', './sample-shalimar-v1.jpg', './sample-acquadigio-v1.jpg', './sample-chanel5-2-v1.jpg', './sample-acquadigio-2-v1.jpg', './sample-shalimar-2-v1.jpg', './sample-chanel5-3-v1.jpg'];
 
 self.addEventListener('install', function(e) {
