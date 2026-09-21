@@ -492,8 +492,10 @@
   .detail-back-btn {
     position:absolute; top:18px; left:16px; z-index:6;
     background:rgba(255,255,255,.85); border:none; border-radius:50%;
-    width:34px; height:34px; font-size:18px; color:var(--text); cursor:pointer;
+    width:34px; height:34px; color:var(--text); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; padding:0;
   }
+  .detail-back-btn svg { display:block; }
   .badge-in { display:inline-block; padding:3px 12px; border-radius:20px; font-size:12px; background:#e8f4ed; color:#4a8a5a; border:1px solid #c0ddc8; }
   .badge-out { display:inline-block; padding:3px 12px; border-radius:20px; font-size:12px; font-family:'Jost',sans-serif; cursor:pointer; }
   .badge-out.cat-coleccion { background:#eaf6e8; color:#3d7a37; border:1px solid #bde3b5; }
@@ -638,11 +640,6 @@
   .row-small-brand { font-size:14px; font-family:'Jost',sans-serif; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .row-small .stars .star { font-size:13px; }
   .row-small-status { flex-shrink:0; cursor:pointer; }
-  .row-offer-btn {
-    flex-shrink:0; width:30px; height:30px; border-radius:50%;
-    background:var(--surface-alt); border:1px solid var(--border); color:var(--text);
-    display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;
-  }
   .row-offers-mini { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; padding-top:14px; border-top:1px solid #ededec; }
   .offer-link-btn--sm { padding:5px 14px; font-size:12px; }
   #list-back-bar {
@@ -2378,9 +2375,6 @@ function render() {
           ${starsHTML(p.rating||0)}
         </div>
         <span class="badge-out row-small-status cat-${p.status||'coleccion'}" onclick="event.stopPropagation();openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
-        <button class="row-offer-btn" onclick="event.stopPropagation();openDetail(${p.id})" title="${t('title_offers')}" aria-label="${t('title_offers')}">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </button>
       </div>`;
     }).join('');
     _setMainHeight();
@@ -2537,7 +2531,7 @@ function openDetail(id) {
         </div>
         ${currentDetailPhotos.length>1?`<div class="hero-dots" id="hero-dots">${currentDetailPhotos.map((_,i)=>`<span class="hero-dot${i===0?' active':''}"></span>`).join('')}</div>`:''}
       ` : `<button type="button" class="no-photo-add" onclick="openEdit(${p.id})" aria-label="${t('add_image_alt')}">${t('add_photo_line1')}<br>${t('add_photo_line2')}</button>`}
-      <button class="detail-back-btn" onclick="closeModal('modal-detail')" title="${t('title_back')}">&#8592;</button>
+      <button class="detail-back-btn" onclick="closeModal('modal-detail')" title="${t('title_back')}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
     </div>
     <div class="detail-body">
       <div class="detail-name">${p.name}</div>
