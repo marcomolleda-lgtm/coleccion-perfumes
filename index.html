@@ -893,6 +893,12 @@
     color:var(--text); padding:0;
   }
   .note-editor-title::placeholder { color:var(--text-light); }
+  .note-editor-date {
+    margin-top:-16px;
+    font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:500;
+    letter-spacing:.5px; color:var(--star);
+  }
+  .note-editor-date:empty { display:none; }
   .note-editor-body {
     flex:1; border:none; outline:none; resize:none; background:none;
     font-family:'Jost',sans-serif; font-size:16px; line-height:1.7; color:var(--text);
@@ -3415,10 +3421,15 @@ function renderNotes() {
   container.scrollTop = 0;
 }
 
+function noteDateStr() {
+  return new Date().toLocaleDateString(({en:'en-GB',ja:'ja-JP',de:'de-DE',fr:'fr-FR',it:'it-IT',pt:'pt-PT'})[currentLang] || 'es-ES', {day:'2-digit', month:'short', year:'numeric'});
+}
+
 function toggleNoteForm() {
   document.getElementById('modal-note-editor').dataset.editIndex = '';
   document.getElementById('nf-title').value = '';
   document.getElementById('nf-body').value = '';
+  document.getElementById('nf-date').textContent = noteDateStr();
   openModal('modal-note-editor');
   history.replaceState({view:'perfumes', modal:'modal-note-editor', noteIndex:null}, '');
   setTimeout(()=>document.getElementById('nf-title').focus(), 60);
@@ -3437,7 +3448,7 @@ function saveNote() {
   const noteData = {
     title,
     body,
-    date: new Date().toLocaleDateString(({en:'en-GB',ja:'ja-JP',de:'de-DE',fr:'fr-FR',it:'it-IT',pt:'pt-PT'})[currentLang] || 'es-ES', {day:'2-digit', month:'short', year:'numeric'})
+    date: noteDateStr()
   };
   if (editIndex !== '' && editIndex !== undefined) {
     notes[parseInt(editIndex)] = noteData;
@@ -3456,6 +3467,7 @@ function editNote(i) {
   document.getElementById('modal-note-editor').dataset.editIndex = i;
   document.getElementById('nf-title').value = note.title || '';
   document.getElementById('nf-body').value = note.body || '';
+  document.getElementById('nf-date').textContent = note.date || '';
   openModal('modal-note-editor');
   history.replaceState({view:'perfumes', modal:'modal-note-editor', noteIndex:i}, '');
 }
@@ -4388,6 +4400,7 @@ if('serviceWorker' in navigator) {
   <div class="note-editor-inner" onclick="if(event.target===this) document.activeElement.blur()">
     <button class="note-editor-back" onclick="closeNoteEditor()" title="Volver" data-i18n-title="title_back">&#8592;</button>
     <input id="nf-title" class="note-editor-title" placeholder="Título" data-i18n-placeholder="placeholder_note_title"/>
+    <div id="nf-date" class="note-editor-date"></div>
     <textarea id="nf-body" class="note-editor-body" placeholder="Escribe tu nota aquí..." data-i18n-placeholder="placeholder_note_body"></textarea>
     <div class="note-editor-actions">
       <button class="note-editor-cancel" onclick="closeNoteEditor()" data-i18n="btn_cancel">Cancelar</button>
