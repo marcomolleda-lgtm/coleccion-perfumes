@@ -855,10 +855,10 @@
   .barcode-lookup-status.not-found { color:var(--text-light); }
 
   .note-card {
-    background:var(--surface); border:1px solid var(--border);
-    border-radius:12px; padding:14px 16px; margin-bottom:10px;
-    box-shadow:var(--shadow); position:relative; cursor:pointer;
+    padding:20px 2px; border-bottom:1px solid var(--border);
+    position:relative; cursor:pointer;
   }
+  .note-card:last-child { border-bottom:none; }
   .note-card:active { background:var(--surface-alt); }
   #note-add-fab {
     display:none; position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
@@ -870,7 +870,7 @@
   #note-add-fab.visible { display:flex; }
   #note-add-fab:active { opacity:.8; }
 
-  /* ── NOTE EDITOR (full page, minimalist) ── */
+  /* ── NOTE EDITOR (full page, minimalist; estructura como Notematic) ── */
   .note-editor-overlay {
     display:none; position:fixed; inset:0; z-index:1200; background:#ffffff;
     backdrop-filter:none;
@@ -879,61 +879,73 @@
   .note-editor-inner {
     position:relative;
     display:flex; flex-direction:column; width:100%; height:100%;
-    padding:56px 26px 26px; box-sizing:border-box; gap:22px;
+    padding:calc(14px + env(safe-area-inset-top,0px)) 26px calc(20px + env(safe-area-inset-bottom,0px));
+    box-sizing:border-box; overflow:hidden;
   }
-  .note-editor-back {
-    position:absolute; top:18px; left:20px;
+  .note-editor-header {
+    display:flex; justify-content:space-between; align-items:center;
+    flex-shrink:0; margin:0 -8px 14px;
+  }
+  .note-editor-back, .note-editor-menu {
     background:none; border:none; cursor:pointer;
-    font-size:22px; color:var(--text); padding:6px; line-height:1;
+    color:var(--text); padding:6px 8px; line-height:1;
+    display:flex; align-items:center;
   }
-  .note-editor-back:active { opacity:.6; }
+  .note-editor-back { font-size:26px; }
+  .note-editor-back:active, .note-editor-menu:active { opacity:.6; }
   .note-editor-title {
-    border:none; outline:none; background:none;
+    width:100%; flex-shrink:0; outline:none; background:none;
     font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:700;
-    color:var(--text); padding:0;
+    color:var(--text); padding:0; margin-bottom:6px; line-height:1.2;
+    word-wrap:break-word; -webkit-user-select:text; user-select:text;
   }
-  .note-editor-title::placeholder { color:var(--text-light); }
+  .note-editor-title:empty:before { content:attr(data-placeholder); color:var(--text-light); }
   .note-editor-date {
-    margin-top:-16px;
+    display:block; flex-shrink:0; margin-bottom:20px;
     font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:500;
     letter-spacing:.5px; color:var(--star);
   }
   .note-editor-date:empty { display:none; }
   .note-editor-body {
-    flex:1; border:none; outline:none; resize:none; background:none;
-    font-family:'Jost',sans-serif; font-size:16px; line-height:1.7; color:var(--text);
-    padding:0;
+    width:100%; flex:1; min-height:0; overflow-y:auto; outline:none;
+    white-space:pre-wrap; word-wrap:break-word;
+    font-family:'Jost',sans-serif; font-size:18px; line-height:1.55; color:var(--text);
+    padding:0 0 160px; -webkit-user-select:text; user-select:text;
   }
-  .note-editor-body::placeholder { color:var(--text-light); }
-  .note-editor-actions { display:flex; justify-content:space-between; align-items:center; }
-  .note-editor-cancel {
-    background:none; border:none; cursor:pointer;
-    font-family:'Jost',sans-serif; font-size:15px; color:var(--text-light);
-  }
-  .note-editor-save {
-    background:none; border:none; cursor:pointer;
-    font-family:'Jost',sans-serif; font-size:15px; font-weight:500; color:var(--star);
-  }
+  .note-editor-body:empty:before { content:attr(data-placeholder); color:var(--text-light); }
+  .note-editor-body a { color:var(--star); text-decoration:underline; }
   .note-card-title {
-    font-size:14px; font-weight:700; color:var(--text);
-    margin-bottom:6px; padding-right:60px; line-height:1.3;
-    min-height:1.3em;
+    font-size:17px; font-weight:700; color:var(--text);
+    margin-bottom:8px; line-height:1.3; min-height:1.3em;
   }
   .note-card-body {
-    font-size:13px; color:var(--text-light); line-height:1.6;
-    white-space:pre-wrap; word-break:break-word;
+    font-size:16px; line-height:1.5; color:var(--text);
+    white-space:pre-wrap; word-break:break-word; overflow:hidden;
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+    margin-bottom:10px;
   }
-  .note-card-date {
-    font-size:10px; color:var(--star); letter-spacing:1px;
-    margin-top:8px;
+  .note-card-date { font-size:13px; color:var(--star); }
+  .note-read-more { color:var(--text-muted); font-weight:600; }
+  /* Ventanas flotantes del cuaderno (menú y aviso de guardar) */
+  .nn-overlay {
+    display:none; position:fixed; inset:0; z-index:1500;
+    background:rgba(30,28,22,.28); align-items:center; justify-content:center; padding:24px;
   }
-  .note-card-x {
-    position:absolute; top:10px; right:10px;
-    background:none; border:none; cursor:pointer;
-    color:var(--text-light); font-size:15px; padding:4px 6px;
-    line-height:1;
+  .nn-overlay.open { display:flex; }
+  .nn-box {
+    background:#fff; border-radius:14px; box-shadow:5px 6px 0 rgba(0,0,0,.10);
+    width:100%; max-width:340px; padding:14px 20px; box-sizing:border-box;
   }
-  .note-card-x:active { color:var(--danger); }
+  .nn-option {
+    padding:14px 6px; font-size:17px; color:var(--text);
+    border-bottom:1px solid var(--border); cursor:pointer; text-align:left;
+  }
+  .nn-option:last-child { border-bottom:none; }
+  .nn-option.danger { color:var(--danger); }
+  .nn-title { font-family:'Cormorant Garamond',serif; font-size:23px; font-weight:700; color:var(--text); padding:6px 0 14px; }
+  .nn-actions { display:flex; justify-content:space-between; gap:16px; padding:2px 0 6px; }
+  .nn-btn { background:none; border:none; font-family:'Jost',sans-serif; font-size:17px; padding:8px 4px; cursor:pointer; color:var(--text-light); }
+  .nn-btn.primary { color:var(--star); font-weight:600; }
   .note-add-form {
     background:var(--surface); border:1px solid var(--border);
     border-radius:14px; padding:16px; margin-bottom:14px;
@@ -3392,93 +3404,245 @@ async function lookupBarcodeProduct(code) {
 }
 
 // ══ NOTAS GLOBALES ══════════════════════════════════════════════
+const NOTE_LINK_RE = /((?:https?:\/\/|www\.)[^\s<]+[^\s<.,;:!?)\]]|[\w.+-]+@[\w-]+\.[\w.-]+)/g;
+let noteEditId = null;            // id de la nota abierta (null = nota nueva)
+let _noteOrig = {title:'', body:''};
+let _noteForceClose = false;      // evita el aviso de guardar al cerrar por código
+
+function _noteUid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function _noteEsc(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function _ne(id) { return document.getElementById(id); }
+
 function loadNotes() {
-  try { return JSON.parse(localStorage.getItem('parfumerie_notes') || '[]'); }
-  catch(e) { return []; }
+  let arr;
+  try { arr = JSON.parse(localStorage.getItem('parfumerie_notes') || '[]'); }
+  catch(e) { arr = []; }
+  if (!Array.isArray(arr)) arr = [];
+  // Las notas antiguas no tenían id: se les asigna uno (sin tocar nada más)
+  let changed = false;
+  arr.forEach(n => { if (!n.id) { n.id = _noteUid(); changed = true; } });
+  if (changed) saveNotes(arr);
+  return arr;
 }
 
 function saveNotes(notes) {
   localStorage.setItem('parfumerie_notes', JSON.stringify(notes));
 }
 
+function noteDateStr(ts) {
+  const d = ts ? new Date(ts) : new Date();
+  return d.toLocaleDateString(({en:'en-GB',ja:'ja-JP',de:'de-DE',fr:'fr-FR',it:'it-IT',pt:'pt-PT'})[currentLang] || 'es-ES', {day:'2-digit', month:'short', year:'numeric'});
+}
+function noteDateOf(n) { return n.updatedAt ? noteDateStr(n.updatedAt) : (n.date || ''); }
+
 function renderNotes() {
   const notes = loadNotes();
-  const container = document.getElementById('notes-list');
+  const container = _ne('notes-list');
   if (!container) return;
-  const fab = document.getElementById('note-add-fab');
+  const fab = _ne('note-add-fab');
   if (fab) fab.classList.add('visible');
+  _ne('nf-title').setAttribute('data-placeholder', t('placeholder_note_title'));
+  _ne('nf-body').setAttribute('data-placeholder', t('placeholder_note_body'));
   if (notes.length === 0) {
     container.innerHTML = `<div style="text-align:center;padding:24px 0;color:var(--text-light)"><div style="font-size:36px;margin-bottom:8px">📝</div><div style="font-size:12px;letter-spacing:1px">${t('empty_notes')}</div></div>`;
     return;
   }
-  container.innerHTML = notes.map((n, i) => `
-    <div class="note-card" onclick="editNote(${i})">
-      <button class="note-card-x" onclick="event.stopPropagation();deleteNote(${i})" title="${t('title_delete_note')}">✕</button>
-      <div class="note-card-title">${n.title || ''}</div>
-      <div class="note-card-body">${n.body || ''}</div>
-      <div class="note-card-date">${n.date || ''}</div>
-    </div>`).join('');
+  const CHAR_LIMIT = 118;
+  container.innerHTML = notes.map(n => {
+    const title = (n.title || '').trim() || t('note_untitled');
+    const flat = (n.body || '').trim().replace(/\s+/g, ' ');
+    let preview;
+    if (flat.length > CHAR_LIMIT) {
+      let cut = flat.slice(0, CHAR_LIMIT);
+      const sp = cut.lastIndexOf(' ');
+      if (sp > 60) cut = cut.slice(0, sp);
+      preview = _noteEsc(cut) + '… <span class="note-read-more">' + _noteEsc(t('note_read_more')) + '</span>';
+    } else {
+      preview = _noteEsc(flat);
+    }
+    return `
+    <div class="note-card" onclick="openNoteEditor('${n.id}')">
+      <div class="note-card-title">${_noteEsc(title)}</div>
+      <div class="note-card-body">${preview}</div>
+      <div class="note-card-date">${_noteEsc(noteDateOf(n))}</div>
+    </div>`;
+  }).join('');
   container.scrollTop = 0;
 }
 
-function noteDateStr() {
-  return new Date().toLocaleDateString(({en:'en-GB',ja:'ja-JP',de:'de-DE',fr:'fr-FR',it:'it-IT',pt:'pt-PT'})[currentLang] || 'es-ES', {day:'2-digit', month:'short', year:'numeric'});
+// ── Enlaces automáticos (URLs y correos) ──
+function _noteLinkify(escapedText) {
+  return escapedText.replace(NOTE_LINK_RE, function(m) {
+    if (m.indexOf('@') !== -1 && m.indexOf('http') !== 0 && m.indexOf('www.') !== 0) {
+      return '<a href="mailto:' + m + '" contenteditable="false">' + m + '</a>';
+    }
+    const href = m.indexOf('http') === 0 ? m : 'https://' + m;
+    return '<a href="' + href + '" target="_blank" rel="noopener" contenteditable="false">' + m + '</a>';
+  });
+}
+function _noteRelinkify() {
+  const box = _ne('nf-body');
+  const walker = document.createTreeWalker(box, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node) {
+      let p = node.parentNode;
+      while (p && p !== box) { if (p.nodeName === 'A') return NodeFilter.FILTER_REJECT; p = p.parentNode; }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes = []; let n;
+  while ((n = walker.nextNode())) nodes.push(n);
+  nodes.forEach(function(node) {
+    const text = node.nodeValue;
+    NOTE_LINK_RE.lastIndex = 0;
+    if (!NOTE_LINK_RE.test(text)) return;
+    NOTE_LINK_RE.lastIndex = 0;
+    const frag = document.createDocumentFragment();
+    let last = 0, m;
+    while ((m = NOTE_LINK_RE.exec(text))) {
+      if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const str = m[0];
+      const a = document.createElement('a');
+      a.setAttribute('contenteditable', 'false');
+      if (str.indexOf('@') !== -1 && str.indexOf('http') !== 0 && str.indexOf('www.') !== 0) {
+        a.href = 'mailto:' + str;
+      } else {
+        a.href = str.indexOf('http') === 0 ? str : 'https://' + str;
+        a.target = '_blank'; a.rel = 'noopener';
+      }
+      a.textContent = str;
+      frag.appendChild(a);
+      last = m.index + str.length;
+    }
+    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    node.parentNode.replaceChild(frag, node);
+  });
 }
 
-function toggleNoteForm() {
-  document.getElementById('modal-note-editor').dataset.editIndex = '';
-  document.getElementById('nf-title').value = '';
-  document.getElementById('nf-body').value = '';
-  document.getElementById('nf-date').textContent = noteDateStr();
+// ── Lectura del editor ──
+function noteTitleText() { return _ne('nf-title').textContent.replace(/\u200B/g, '').replace(/\s+/g, ' ').trim(); }
+function noteBodyText() { return (_ne('nf-body').innerText || '').replace(/\u200B/g, '').trim(); }
+function noteHasContent() { return !!(noteTitleText() || noteBodyText()); }
+function noteHasChanges() { return noteTitleText() !== _noteOrig.title || noteBodyText() !== _noteOrig.body; }
+
+// ── Abrir / crear ──
+function openNoteEditor(id) {
+  const n = id ? loadNotes().find(x => x.id === id) : null;
+  if (id && !n) return;
+  noteEditId = n ? n.id : null;
+  _ne('nf-title').setAttribute('data-placeholder', t('placeholder_note_title'));
+  _ne('nf-body').setAttribute('data-placeholder', t('placeholder_note_body'));
+  _ne('nf-title').textContent = n ? (n.title || '') : '';
+  const body = n ? (n.body || '') : '';
+  _ne('nf-body').innerHTML = body ? _noteLinkify(_noteEsc(body)) : '';
+  _ne('nf-date').textContent = n ? noteDateOf(n) : noteDateStr();
+  _noteOrig = {title: noteTitleText(), body: noteBodyText()};
   openModal('modal-note-editor');
-  history.replaceState({view:'perfumes', modal:'modal-note-editor', noteIndex:null}, '');
-  setTimeout(()=>document.getElementById('nf-title').focus(), 60);
+  _ne('nf-body').scrollTop = 0;
+  // Nota nueva: cursor en el cuerpo (teclado abierto). Nota existente: sin teclado.
+  if (!n) setTimeout(() => _ne('nf-body').focus(), 60);
 }
+function toggleNoteForm() { openNoteEditor(null); }
 
-function closeNoteEditor() {
+// ── Guardar / salir ──
+function _noteExit() {
+  _noteForceClose = true;
+  setTimeout(() => { _noteForceClose = false; }, 600);
+  try { document.activeElement && document.activeElement.blur(); } catch(_) {}
   closeModal('modal-note-editor');
+  renderNotes();
 }
-
-function saveNote() {
-  const title = document.getElementById('nf-title').value.trim();
-  const body  = document.getElementById('nf-body').value.trim();
-  if (!title && !body) { alert(t('alert_note_required')); return; }
+function _noteCommit() {
+  const now = Date.now();
   const notes = loadNotes();
-  const editIndex = document.getElementById('modal-note-editor').dataset.editIndex;
-  const noteData = {
-    title,
-    body,
-    date: noteDateStr()
-  };
-  if (editIndex !== '' && editIndex !== undefined) {
-    notes[parseInt(editIndex)] = noteData;
+  const title = noteTitleText();
+  const body = noteBodyText();
+  let idx = noteEditId ? notes.findIndex(x => x.id === noteEditId) : -1;
+  if (idx > -1) {
+    const n = notes.splice(idx, 1)[0];
+    n.title = title; n.body = body; n.updatedAt = now; n.date = noteDateStr(now);
+    notes.unshift(n);
   } else {
-    notes.unshift(noteData); // Las nuevas notas van arriba
+    notes.unshift({id: _noteUid(), title, body, createdAt: now, updatedAt: now, date: noteDateStr(now)});
   }
   saveNotes(notes);
-  closeModal('modal-note-editor');
-  renderNotes();
 }
-
-function editNote(i) {
-  const notes = loadNotes();
-  const note = notes[i];
-  if (!note) return;
-  document.getElementById('modal-note-editor').dataset.editIndex = i;
-  document.getElementById('nf-title').value = note.title || '';
-  document.getElementById('nf-body').value = note.body || '';
-  document.getElementById('nf-date').textContent = note.date || '';
-  openModal('modal-note-editor');
-  history.replaceState({view:'perfumes', modal:'modal-note-editor', noteIndex:i}, '');
+function saveNoteDirect() {
+  if (noteHasContent()) _noteCommit();
+  _noteExit();
 }
+function requestNoteExit() {
+  if (noteHasChanges() && noteHasContent()) showNoteSavePick();
+  else _noteExit();
+}
+function closeNoteEditor() { requestNoteExit(); }
+function showNoteSavePick() { _ne('note-savepick-overlay').classList.add('open'); }
+function noteSavePickSave() { _ne('note-savepick-overlay').classList.remove('open'); saveNoteDirect(); }
+function noteSavePickDiscard() { _ne('note-savepick-overlay').classList.remove('open'); _noteExit(); }
 
-function deleteNote(i) {
+// ── Menú del editor ──
+function closeNoteMenu() { _ne('note-menu-overlay').classList.remove('open'); }
+function openNoteMenu() {
+  const box = _ne('note-menu-options');
+  box.innerHTML = '';
+  const add = (label, fn, danger) => {
+    const o = document.createElement('div');
+    o.className = 'nn-option' + (danger ? ' danger' : '');
+    o.textContent = label;
+    o.addEventListener('click', () => { closeNoteMenu(); fn(); });
+    box.appendChild(o);
+  };
+  add(t('btn_save'), saveNoteDirect);
+  add(t('note_discard_changes'), _noteExit);
+  add(t('note_share'), shareCurrentNote);
+  add(t('title_delete_note'), deleteCurrentNote, true);
+  document.activeElement && document.activeElement.blur();
+  _ne('note-menu-overlay').classList.add('open');
+}
+function shareCurrentNote() {
+  const title = noteTitleText() || t('note_untitled');
+  const text = title + '\n\n' + noteBodyText();
+  if (navigator.share) {
+    navigator.share({title: title, text: text}).catch(function(){});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function(){ alert(t('note_copied')); })
+      .catch(function(){ alert(t('note_share_fail')); });
+  } else {
+    alert(t('note_share_fail'));
+  }
+}
+function deleteCurrentNote() {
+  if (!noteEditId) { _noteExit(); return; }
   if (!confirm(t('confirm_delete_note'))) return;
-  const notes = loadNotes();
-  notes.splice(i, 1);
-  saveNotes(notes);
-  renderNotes();
+  saveNotes(loadNotes().filter(x => x.id !== noteEditId));
+  _noteExit();
 }
+
+// ── Comportamiento del editor (los elementos están más abajo en el HTML: se engancha al cargar) ──
+document.addEventListener('DOMContentLoaded', function() {
+  const title = _ne('nf-title'), body = _ne('nf-body');
+  // Enter en el título pasa el cursor al cuerpo
+  title.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); body.focus(); }
+  });
+  // Pegar siempre como texto plano
+  [title, body].forEach(function(el) {
+    el.addEventListener('paste', function(e) {
+      e.preventDefault();
+      const txt = (e.clipboardData || window.clipboardData).getData('text/plain');
+      document.execCommand('insertText', false, el === title ? txt.replace(/\s+/g, ' ') : txt);
+    });
+  });
+  // Si se borra todo, algunos navegadores dejan un <br> suelto: limpiarlo para ver el placeholder
+  body.addEventListener('input', function() {
+    if (body.innerHTML === '<br>' || body.innerHTML === '<div><br></div>') body.innerHTML = '';
+  });
+  title.addEventListener('input', function() {
+    if (title.innerHTML === '<br>') title.innerHTML = '';
+  });
+  body.addEventListener('blur', _noteRelinkify);
+});
 
 // ══ INIT ═══════════════════════════════════════════════════════
 function applyViewSort() {
@@ -3549,6 +3713,20 @@ function showPerfumes() {
 }
 window.addEventListener('popstate', function(e) {
   const st = e.state || {view:'home', modal:null};
+  document.querySelectorAll('.nn-overlay.open').forEach(function(o){ o.classList.remove('open'); });
+  const _edEl = document.getElementById('modal-note-editor');
+  if (_edEl && _edEl.classList.contains('open') && st.modal !== 'modal-note-editor') {
+    if (_noteForceClose) {
+      _noteForceClose = false;
+    } else if (noteHasChanges() && noteHasContent()) {
+      // Retroceso con cambios sin guardar: se repone la entrada y se pregunta
+      history.pushState({view:_currentBaseView(), modal:'modal-note-editor'}, '');
+      showNoteSavePick();
+      return;
+    } else {
+      try { document.activeElement && document.activeElement.blur(); } catch(_) {}
+    }
+  }
   _suppressHistory = true;
   const barcodeModal = document.getElementById('modal-barcode');
   if (barcodeModal && barcodeModal.classList.contains('open') && st.modal !== 'modal-barcode') {
@@ -3565,24 +3743,11 @@ window.addEventListener('popstate', function(e) {
     if (st.modal === 'modal-detail' && st.detailId != null) {
       openDetail(st.detailId);
     }
-    if (st.modal === 'modal-note-editor') {
-      if (typeof st.noteIndex === 'number') {
-        const notes = loadNotes();
-        const note = notes[st.noteIndex];
-        document.getElementById('modal-note-editor').dataset.editIndex = st.noteIndex;
-        document.getElementById('nf-title').value = note ? (note.title||'') : '';
-        document.getElementById('nf-body').value = note ? (note.body||'') : '';
-      } else {
-        document.getElementById('modal-note-editor').dataset.editIndex = '';
-        document.getElementById('nf-title').value = '';
-        document.getElementById('nf-body').value = '';
-      }
-    }
     if (st.modal === 'modal-notes' || st.modal === 'modal-note-editor') {
       renderNotes();
       document.getElementById('note-add-fab').classList.add('visible');
     }
-    document.getElementById(st.modal).classList.add('open');
+    document.getElementById((st.modal === 'modal-note-editor' && !(_edEl && _edEl.classList.contains('open'))) ? 'modal-notes' : st.modal).classList.add('open');
   }
   _renderView(st.view);
   _suppressHistory = false;
@@ -3700,6 +3865,7 @@ const I18N = {
     alert_import_error: "Error al leer el archivo. Asegúrate de que es un archivo JSON exportado desde perfumes.",
     empty_notes: "Aún no hay notas", title_new_note: "Nueva nota", title_delete_note: "Eliminar",
     confirm_delete_note: "¿Eliminar esta nota?",
+    note_untitled: "Sin título", note_read_more: "Leer más", note_menu_aria: "Menú", note_discard_changes: "No guardar cambios", note_share: "Compartir", note_save_prompt: "¿Guardar los cambios?", note_discard: "Descartar", note_copied: "Nota copiada al portapapeles.", note_share_fail: "No se ha podido compartir ni copiar la nota.",
     alert_note_required: "Escribe al menos un título o el texto de la nota.",
     placeholder_note_title: "Título", placeholder_note_body: "Escribe tu nota aquí...",
     btn_cancel: "Cancelar",
@@ -3786,6 +3952,7 @@ const I18N = {
     alert_import_error: "Error reading the file. Make sure it's a JSON file exported from perfumes.",
     empty_notes: "No notes yet", title_new_note: "New note", title_delete_note: "Delete",
     confirm_delete_note: "Delete this note?",
+    note_untitled: "Untitled", note_read_more: "Read more", note_menu_aria: "Menu", note_discard_changes: "Don't save changes", note_share: "Share", note_save_prompt: "Save changes?", note_discard: "Discard", note_copied: "Note copied to clipboard.", note_share_fail: "Couldn't share or copy the note.",
     alert_note_required: "Write at least a title or the note text.",
     placeholder_note_title: "Title", placeholder_note_body: "Write your note here...",
     btn_cancel: "Cancel",
@@ -3866,6 +4033,7 @@ const I18N = {
     alert_import_error: "ファイルの読み込みエラー。perfumesからエクスポートしたJSONファイルか確認してください。",
     empty_notes: "まだメモがありません", title_new_note: "新しいメモ", title_delete_note: "削除",
     confirm_delete_note: "このメモを削除しますか？",
+    note_untitled: "無題", note_read_more: "続きを読む", note_menu_aria: "メニュー", note_discard_changes: "変更を保存しない", note_share: "共有", note_save_prompt: "変更を保存しますか？", note_discard: "破棄", note_copied: "メモをクリップボードにコピーしました。", note_share_fail: "メモを共有またはコピーできませんでした。",
     alert_note_required: "タイトルか本文の少なくとも一方を入力してください。",
     placeholder_note_title: "タイトル", placeholder_note_body: "ここにメモを書く...",
     btn_cancel: "キャンセル",
@@ -3947,6 +4115,7 @@ const I18N = {
     alert_import_error: "Fehler beim Lesen der Datei. Stelle sicher, dass es sich um eine aus Parfums exportierte JSON-Datei handelt.",
     empty_notes: "Noch keine Notizen", title_new_note: "Neue Notiz", title_delete_note: "Löschen",
     confirm_delete_note: "Diese Notiz löschen?",
+    note_untitled: "Ohne Titel", note_read_more: "Mehr lesen", note_menu_aria: "Menü", note_discard_changes: "Änderungen nicht speichern", note_share: "Teilen", note_save_prompt: "Änderungen speichern?", note_discard: "Verwerfen", note_copied: "Notiz in die Zwischenablage kopiert.", note_share_fail: "Die Notiz konnte nicht geteilt oder kopiert werden.",
     alert_note_required: "Schreibe mindestens einen Titel oder den Text der Notiz.",
     placeholder_note_title: "Titel", placeholder_note_body: "Schreibe hier deine Notiz...",
     btn_cancel: "Abbrechen",
@@ -4028,6 +4197,7 @@ const I18N = {
     alert_import_error: "Erreur lors de la lecture du fichier. Assurez-vous qu'il s'agit d'un fichier JSON exporté depuis parfums.",
     empty_notes: "Pas encore de notes", title_new_note: "Nouvelle note", title_delete_note: "Supprimer",
     confirm_delete_note: "Supprimer cette note ?",
+    note_untitled: "Sans titre", note_read_more: "Lire la suite", note_menu_aria: "Menu", note_discard_changes: "Ne pas enregistrer les modifications", note_share: "Partager", note_save_prompt: "Enregistrer les modifications ?", note_discard: "Abandonner", note_copied: "Note copiée dans le presse-papiers.", note_share_fail: "Impossible de partager ou de copier la note.",
     alert_note_required: "Écrivez au moins un titre ou le texte de la note.",
     placeholder_note_title: "Titre", placeholder_note_body: "Écrivez votre note ici...",
     btn_cancel: "Annuler",
@@ -4109,6 +4279,7 @@ const I18N = {
     alert_import_error: "Errore durante la lettura del file. Assicurati che sia un file JSON esportato da profumi.",
     empty_notes: "Ancora nessuna nota", title_new_note: "Nuova nota", title_delete_note: "Elimina",
     confirm_delete_note: "Eliminare questa nota?",
+    note_untitled: "Senza titolo", note_read_more: "Leggi tutto", note_menu_aria: "Menu", note_discard_changes: "Non salvare le modifiche", note_share: "Condividi", note_save_prompt: "Salvare le modifiche?", note_discard: "Scarta", note_copied: "Nota copiata negli appunti.", note_share_fail: "Impossibile condividere o copiare la nota.",
     alert_note_required: "Scrivi almeno un titolo o il testo della nota.",
     placeholder_note_title: "Titolo", placeholder_note_body: "Scrivi qui la tua nota...",
     btn_cancel: "Annulla",
@@ -4190,6 +4361,7 @@ const I18N = {
     alert_import_error: "Erro ao ler o ficheiro. Certifica-te de que é um ficheiro JSON exportado a partir de perfumes.",
     empty_notes: "Ainda não há notas", title_new_note: "Nova nota", title_delete_note: "Eliminar",
     confirm_delete_note: "Eliminar esta nota?",
+    note_untitled: "Sem título", note_read_more: "Ler mais", note_menu_aria: "Menu", note_discard_changes: "Não guardar as alterações", note_share: "Partilhar", note_save_prompt: "Guardar as alterações?", note_discard: "Descartar", note_copied: "Nota copiada para a área de transferência.", note_share_fail: "Não foi possível partilhar ou copiar a nota.",
     alert_note_required: "Escreve pelo menos um título ou o texto da nota.",
     placeholder_note_title: "Título", placeholder_note_body: "Escreve a tua nota aqui...",
     btn_cancel: "Cancelar",
@@ -4398,13 +4570,30 @@ if('serviceWorker' in navigator) {
 <!-- ══ NOTE EDITOR (full page) ══ -->
 <div class="modal-overlay note-editor-overlay" id="modal-note-editor">
   <div class="note-editor-inner" onclick="if(event.target===this) document.activeElement.blur()">
-    <button class="note-editor-back" onclick="closeNoteEditor()" title="Volver" data-i18n-title="title_back">&#8592;</button>
-    <input id="nf-title" class="note-editor-title" placeholder="Título" data-i18n-placeholder="placeholder_note_title"/>
+    <div class="note-editor-header">
+      <button class="note-editor-back" onclick="requestNoteExit()" title="Volver" data-i18n-title="title_back">&#8592;</button>
+      <button class="note-editor-menu" onclick="openNoteMenu()" title="Menú" data-i18n-title="note_menu_aria">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+      </button>
+    </div>
+    <div id="nf-title" class="note-editor-title" contenteditable="true" data-placeholder="Título"></div>
     <div id="nf-date" class="note-editor-date"></div>
-    <textarea id="nf-body" class="note-editor-body" placeholder="Escribe tu nota aquí..." data-i18n-placeholder="placeholder_note_body"></textarea>
-    <div class="note-editor-actions">
-      <button class="note-editor-cancel" onclick="closeNoteEditor()" data-i18n="btn_cancel">Cancelar</button>
-      <button class="note-editor-save" id="nf-save-btn" onclick="saveNote()" data-i18n="btn_save">Guardar</button>
+    <div id="nf-body" class="note-editor-body" contenteditable="true" data-placeholder="Escribe tu nota aquí..." autocomplete="off" autocorrect="off"></div>
+  </div>
+</div>
+
+<!-- Menú del editor de notas (tocar fuera para cerrar) -->
+<div class="nn-overlay" id="note-menu-overlay" onclick="if(event.target===this) closeNoteMenu()">
+  <div class="nn-box" id="note-menu-options"></div>
+</div>
+
+<!-- Aviso al salir con cambios sin guardar -->
+<div class="nn-overlay" id="note-savepick-overlay">
+  <div class="nn-box">
+    <div class="nn-title" data-i18n="note_save_prompt">¿Guardar los cambios?</div>
+    <div class="nn-actions">
+      <button class="nn-btn" onclick="noteSavePickDiscard()" data-i18n="note_discard">Descartar</button>
+      <button class="nn-btn primary" onclick="noteSavePickSave()" data-i18n="btn_save">Guardar</button>
     </div>
   </div>
 </div>
