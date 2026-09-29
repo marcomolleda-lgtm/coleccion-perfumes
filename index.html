@@ -970,12 +970,25 @@
     display:flex; align-items:center; justify-content:flex-start; gap:26px; padding:0 26px 0 34px;
   }
   #nt-actions button { background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; color:var(--text); }
+  #nt-menu-btn { margin-left:auto; }
   #nt-plus { font-size:28px; line-height:1; width:30px; height:30px; font-family:'Jost',sans-serif; }
   #nt-folder-btn img { height:26px; width:auto; display:block;
     filter:drop-shadow(2px 3px 2px var(--nt-tab-shadow)) drop-shadow(2px 3px 2px var(--nt-tab-shadow)); }
   #modal-notes #notes-list {
     position:relative; z-index:3; background:#fff; flex:1; overflow-y:auto; padding:38px 20px 30px;
   }
+  /* Buscar */
+  .nn-search-input {
+    width:100%; box-sizing:border-box; padding:11px 14px; border:1px solid var(--border); border-radius:12px;
+    font-family:'Jost',sans-serif; font-size:16px; outline:none; color:var(--text); margin-bottom:10px; flex-shrink:0;
+  }
+  .nn-search-input:focus { border-color:var(--star); }
+  #note-search-results { overflow-y:auto; max-height:50vh; }
+  .nn-result { padding:12px 4px; border-bottom:1px solid var(--border); cursor:pointer; }
+  .nn-result:last-child { border-bottom:none; }
+  .nn-result-title { font-weight:700; font-size:16px; color:var(--text); }
+  .nn-result-folder { font-size:13px; color:var(--text-muted); margin-top:2px; }
+  .nn-empty { padding:12px 4px; color:var(--text-muted); font-size:15px; }
   /* Chips de carpetas (ventanas flotantes) */
   .nn-box.tall { max-height:80vh; display:flex; flex-direction:column; padding:22px 20px; }
   .nn-chips { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; overflow-y:auto; }
@@ -3707,6 +3720,7 @@ function openNoteMenu() {
   add(t('note_move_to'), openNoteMove);
   add(t('note_discard_changes'), _noteExit);
   add(t('note_share'), shareCurrentNote);
+  add(t('note_export'), exportCurrentNote);
   add(t('title_delete_note'), deleteCurrentNote, true);
   document.activeElement && document.activeElement.blur();
   _ne('note-menu-overlay').classList.add('open');
@@ -3901,6 +3915,152 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!spacer) return;
       const rect = spacer.getBoundingClientRect(), box = body.getBoundingClientRect();
       if (rect.bottom > box.bottom - 4) body.scrollTop += (rect.bottom - box.bottom) + 40;
+    });
+  });
+});
+
+// ── Menú de la lista (icono de tres puntos) ──
+function openNotesListMenu() {
+  const box = _ne('note-menu-options');
+  box.innerHTML = '';
+  const add = (label, fn) => {
+    const o = document.createElement('div');
+    o.className = 'nn-option';
+    o.textContent = label;
+    o.addEventListener('click', () => { closeNoteMenu(); fn(); });
+    box.appendChild(o);
+  };
+  add(t('note_search'), openNoteSearch);
+  add(t('note_export_all'), exportAllNotes);
+  add(t('note_import_backup'), () => _ne('note-import-full').click());
+  add(t('note_import_note'), () => _ne('note-import-txt').click());
+  _ne('note-menu-overlay').classList.add('open');
+}
+
+// ── Buscar (título y contenido; varias palabras en cualquier orden) ──
+function openNoteSearch() {
+  _ne('note-search-input').value = '';
+  renderNoteSearch('');
+  _ne('note-search-overlay').classList.add('open');
+  setTimeout(() => _ne('note-search-input').focus(), 50);
+}
+function closeNoteSearch() { _ne('note-search-overlay').classList.remove('open'); }
+function renderNoteSearch(q) {
+  const box = _ne('note-search-results');
+  const norm = x => _stripAccents(String(x || '').toLowerCase());
+  const words = norm(q).trim().split(/\s+/).filter(Boolean);
+  if (!words.length) { box.innerHTML = '<div class="nn-empty">' + _noteEsc(t('note_search_hint')) + '</div>'; return; }
+  const matches = loadNotes().filter(n => {
+    const hay = norm((n.title || '') + ' ' + (n.body || ''));
+    return words.every(w => hay.indexOf(w) !== -1);
+  });
+  if (!matches.length) { box.innerHTML = '<div class="nn-empty">' + _noteEsc(t('note_no_results')) + '</div>'; return; }
+  box.innerHTML = '';
+  const folders = loadNoteFolders().folders;
+  matches.forEach(n => {
+    const f = folders.find(x => x.id === n.folderId);
+    const row = document.createElement('div');
+    row.className = 'nn-result';
+    row.innerHTML = '<div class="nn-result-title">' + _noteEsc((n.title || '').trim() || t('note_untitled')) + '</div><div class="nn-result-folder">' + _noteEsc(f ? noteFolderName(f) : '') + '</div>';
+    row.addEventListener('click', () => {
+      closeNoteSearch();
+      if (f) setCurrentNoteFolder(f.id);
+      renderNotes();
+      openNoteEditor(n.id);
+    });
+    box.appendChild(row);
+  });
+}
+
+// ── Exportar / importar ──
+function _noteDownload(filename, content, mime) {
+  const blob = new Blob([content], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+function _noteSafeName(s) { return (s || 'note').trim().replace(/[\\/:*?"<>|]+/g, '-').slice(0, 60) || 'note'; }
+function exportAllNotes() {
+  const payload = {app: 'scentic-notes', version: 1, exportedAt: new Date().toISOString(), folders: loadNoteFolders().folders, notes: loadNotes()};
+  _noteDownload('scentic-notes-backup.json', JSON.stringify(payload, null, 2), 'application/json');
+}
+function exportCurrentNote() {
+  const title = noteTitleText() || t('note_untitled');
+  _noteDownload(_noteSafeName(title) + '.txt', title + '\n\n' + noteBodyText(), 'text/plain');
+}
+function _noteFinite(x, fb) { return (typeof x === 'number' && isFinite(x)) ? x : fb; }
+function importNotesBackup(text) {
+  let parsed;
+  try { parsed = JSON.parse(text); } catch(e) { parsed = null; }
+  if (!parsed || !Array.isArray(parsed.folders) || !Array.isArray(parsed.notes)) { alert(t('note_import_invalid')); return; }
+  const fd = loadNoteFolders();
+  const allId = noteAllFolder().id;
+  const norm = x => String(x || '').trim().toLowerCase();
+  // Carpetas: se reutiliza la que ya tenga el mismo nombre; "Todas" se une con "Todas"
+  const idMap = {}; const toCreate = [];
+  parsed.folders.forEach(f => {
+    if (!f || typeof f.id !== 'string') return;
+    if (f.isAll) { idMap[f.id] = allId; return; }
+    const name = String(f.name || '').trim();
+    const shown = name || t('folder_default');
+    const ex = fd.folders.find(x => !x.isAll && norm(noteFolderName(x)) === norm(shown));
+    if (ex) { idMap[f.id] = ex.id; return; }
+    const nf = {id: _noteUid(), name: name || null};
+    toCreate.push(nf); idMap[f.id] = nf.id;
+  });
+  const cur = loadNotes();
+  const sig = n => (n.title || '') + '\u0001' + (n.body || '') + '\u0001' + (n.createdAt || '');
+  const seen = {}; cur.forEach(n => { seen[sig(n)] = true; });
+  const fresh = [];
+  parsed.notes.forEach(n => {
+    if (!n || typeof n !== 'object') return;
+    const rec = {
+      title: String(n.title || '').slice(0, 500),
+      body: String(n.body || ''),
+      createdAt: _noteFinite(n.createdAt, undefined),
+      updatedAt: _noteFinite(n.updatedAt, undefined)
+    };
+    if (!rec.title && !rec.body.trim()) return;
+    if (seen[sig(rec)]) return;
+    seen[sig(rec)] = true;
+    rec.id = _noteUid();
+    rec.folderId = idMap[n.folderId] || allId;
+    if (typeof n.bodyHtml === 'string' && n.bodyHtml) rec.bodyHtml = _noteSanitize(n.bodyHtml);
+    rec.date = noteDateStr(rec.updatedAt || rec.createdAt);
+    fresh.push(rec);
+  });
+  if (!fresh.length) { alert(t('note_import_nothing')); return; }
+  const usedNew = toCreate.filter(nf => fresh.some(n => n.folderId === nf.id));
+  if (!confirm(t('note_import_confirm').replace('{n}', fresh.length).replace('{f}', usedNew.length))) return;
+  usedNew.forEach(nf => fd.folders.push(nf));
+  fresh.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  saveNoteFolders();
+  saveNotes(cur.concat(fresh));
+  renderNotes();
+  alert(t('note_import_done'));
+}
+function importNoteText(file, text) {
+  const lines = String(text).split(/\r?\n/);
+  const title = (lines[0] || file.name.replace(/\.[^.]+$/, '')).replace(/^#+\s*/, '').trim().slice(0, 500);
+  const body = lines.slice(1).join('\n').replace(/^\s*\n/, '');
+  if (!title && !body.trim()) return;
+  const now = Date.now();
+  const notes = loadNotes();
+  notes.unshift({id: _noteUid(), folderId: currentNoteFolder().id, title, body, createdAt: now, updatedAt: now, date: noteDateStr(now)});
+  saveNotes(notes);
+  renderNotes();
+}
+document.addEventListener('DOMContentLoaded', function() {
+  _ne('note-search-input').addEventListener('input', function() { renderNoteSearch(this.value); });
+  [['note-import-full', importNotesBackup], ['note-import-txt', null]].forEach(function(p) {
+    _ne(p[0]).addEventListener('change', function(e) {
+      const file = e.target.files[0]; if (!file) return;
+      const r = new FileReader();
+      r.onload = function() { if (p[1]) p[1](String(r.result)); else importNoteText(file, String(r.result)); };
+      r.readAsText(file);
+      e.target.value = '';
     });
   });
 });
@@ -4147,6 +4307,7 @@ const I18N = {
     confirm_delete_note: "¿Eliminar esta nota?",
     folder_all: "Todas", folder_default: "Carpeta 1", folders_title: "Carpetas", folder_new_placeholder: "Nueva carpeta...", folder_create: "Crear", folder_rename_prompt: "Nuevo nombre de la carpeta:", folder_delete_confirm: "¿Eliminar la carpeta \"{name}\" y todas sus notas?", note_move_to: "Mover a...",
     fmt_bold: "Negrita", fmt_italic: "Cursiva", fmt_underline: "Subrayado",
+    note_search: "Buscar", note_export_all: "Exportar todo (copia de seguridad)", note_import_backup: "Importar copia de seguridad", note_import_note: "Importar nota (.txt / .md)", note_export: "Exportar", note_search_hint: "Escribe para buscar en todas las notas.", note_no_results: "Sin resultados.", note_search_ph: "Escribe una o varias palabras...", note_close: "Cerrar", note_import_confirm: "Se añadirán {n} nota(s) y {f} carpeta(s) nueva(s). ¿Continuar?", note_import_nothing: "No hay notas nuevas que importar.", note_import_done: "Importación completada.", note_import_invalid: "El archivo no es una copia de seguridad válida de notas.",
     note_untitled: "Sin título", note_read_more: "Leer más", note_menu_aria: "Menú", note_discard_changes: "No guardar cambios", note_share: "Compartir", note_save_prompt: "¿Guardar los cambios?", note_discard: "Descartar", note_copied: "Nota copiada al portapapeles.", note_share_fail: "No se ha podido compartir ni copiar la nota.",
     alert_note_required: "Escribe al menos un título o el texto de la nota.",
     placeholder_note_title: "Título", placeholder_note_body: "Escribe tu nota aquí...",
@@ -4236,6 +4397,7 @@ const I18N = {
     confirm_delete_note: "Delete this note?",
     folder_all: "All", folder_default: "Folder 1", folders_title: "Folders", folder_new_placeholder: "New folder...", folder_create: "Create", folder_rename_prompt: "New folder name:", folder_delete_confirm: "Delete the folder \"{name}\" and all its notes?", note_move_to: "Move to...",
     fmt_bold: "Bold", fmt_italic: "Italic", fmt_underline: "Underline",
+    note_search: "Search", note_export_all: "Export all (backup)", note_import_backup: "Import backup", note_import_note: "Import note (.txt / .md)", note_export: "Export", note_search_hint: "Type to search all notes.", note_no_results: "No results.", note_search_ph: "Type one or more words...", note_close: "Close", note_import_confirm: "{n} note(s) and {f} new folder(s) will be added. Continue?", note_import_nothing: "There are no new notes to import.", note_import_done: "Import complete.", note_import_invalid: "This file is not a valid notes backup.",
     note_untitled: "Untitled", note_read_more: "Read more", note_menu_aria: "Menu", note_discard_changes: "Don't save changes", note_share: "Share", note_save_prompt: "Save changes?", note_discard: "Discard", note_copied: "Note copied to clipboard.", note_share_fail: "Couldn't share or copy the note.",
     alert_note_required: "Write at least a title or the note text.",
     placeholder_note_title: "Title", placeholder_note_body: "Write your note here...",
@@ -4319,6 +4481,7 @@ const I18N = {
     confirm_delete_note: "このメモを削除しますか？",
     folder_all: "すべて", folder_default: "フォルダ 1", folders_title: "フォルダ", folder_new_placeholder: "新しいフォルダ...", folder_create: "作成", folder_rename_prompt: "フォルダの新しい名前：", folder_delete_confirm: "フォルダ「{name}」とそのメモをすべて削除しますか？", note_move_to: "移動先...",
     fmt_bold: "太字", fmt_italic: "斜体", fmt_underline: "下線",
+    note_search: "検索", note_export_all: "すべてエクスポート（バックアップ）", note_import_backup: "バックアップを読み込む", note_import_note: "メモを読み込む（.txt / .md）", note_export: "エクスポート", note_search_hint: "入力してすべてのメモを検索します。", note_no_results: "見つかりません。", note_search_ph: "1つ以上の単語を入力...", note_close: "閉じる", note_import_confirm: "メモ{n}件と新しいフォルダ{f}件が追加されます。続行しますか？", note_import_nothing: "インポートする新しいメモはありません。", note_import_done: "インポートが完了しました。", note_import_invalid: "このファイルは有効なメモのバックアップではありません。",
     note_untitled: "無題", note_read_more: "続きを読む", note_menu_aria: "メニュー", note_discard_changes: "変更を保存しない", note_share: "共有", note_save_prompt: "変更を保存しますか？", note_discard: "破棄", note_copied: "メモをクリップボードにコピーしました。", note_share_fail: "メモを共有またはコピーできませんでした。",
     alert_note_required: "タイトルか本文の少なくとも一方を入力してください。",
     placeholder_note_title: "タイトル", placeholder_note_body: "ここにメモを書く...",
@@ -4403,6 +4566,7 @@ const I18N = {
     confirm_delete_note: "Diese Notiz löschen?",
     folder_all: "Alle", folder_default: "Ordner 1", folders_title: "Ordner", folder_new_placeholder: "Neuer Ordner...", folder_create: "Erstellen", folder_rename_prompt: "Neuer Ordnername:", folder_delete_confirm: "Ordner „{name}“ und alle seine Notizen löschen?", note_move_to: "Verschieben nach...",
     fmt_bold: "Fett", fmt_italic: "Kursiv", fmt_underline: "Unterstrichen",
+    note_search: "Suchen", note_export_all: "Alles exportieren (Sicherung)", note_import_backup: "Sicherung importieren", note_import_note: "Notiz importieren (.txt / .md)", note_export: "Exportieren", note_search_hint: "Tippe, um in allen Notizen zu suchen.", note_no_results: "Keine Ergebnisse.", note_search_ph: "Ein oder mehrere Wörter eingeben...", note_close: "Schließen", note_import_confirm: "{n} Notiz(en) und {f} neue(r) Ordner werden hinzugefügt. Fortfahren?", note_import_nothing: "Keine neuen Notizen zum Importieren.", note_import_done: "Import abgeschlossen.", note_import_invalid: "Diese Datei ist keine gültige Notizen-Sicherung.",
     note_untitled: "Ohne Titel", note_read_more: "Mehr lesen", note_menu_aria: "Menü", note_discard_changes: "Änderungen nicht speichern", note_share: "Teilen", note_save_prompt: "Änderungen speichern?", note_discard: "Verwerfen", note_copied: "Notiz in die Zwischenablage kopiert.", note_share_fail: "Die Notiz konnte nicht geteilt oder kopiert werden.",
     alert_note_required: "Schreibe mindestens einen Titel oder den Text der Notiz.",
     placeholder_note_title: "Titel", placeholder_note_body: "Schreibe hier deine Notiz...",
@@ -4487,6 +4651,7 @@ const I18N = {
     confirm_delete_note: "Supprimer cette note ?",
     folder_all: "Toutes", folder_default: "Dossier 1", folders_title: "Dossiers", folder_new_placeholder: "Nouveau dossier...", folder_create: "Créer", folder_rename_prompt: "Nouveau nom du dossier :", folder_delete_confirm: "Supprimer le dossier « {name} » et toutes ses notes ?", note_move_to: "Déplacer vers...",
     fmt_bold: "Gras", fmt_italic: "Italique", fmt_underline: "Souligné",
+    note_search: "Rechercher", note_export_all: "Tout exporter (sauvegarde)", note_import_backup: "Importer une sauvegarde", note_import_note: "Importer une note (.txt / .md)", note_export: "Exporter", note_search_hint: "Saisissez du texte pour chercher dans toutes les notes.", note_no_results: "Aucun résultat.", note_search_ph: "Saisissez un ou plusieurs mots...", note_close: "Fermer", note_import_confirm: "{n} note(s) et {f} nouveau(x) dossier(s) seront ajoutés. Continuer ?", note_import_nothing: "Aucune nouvelle note à importer.", note_import_done: "Importation terminée.", note_import_invalid: "Ce fichier n'est pas une sauvegarde de notes valide.",
     note_untitled: "Sans titre", note_read_more: "Lire la suite", note_menu_aria: "Menu", note_discard_changes: "Ne pas enregistrer les modifications", note_share: "Partager", note_save_prompt: "Enregistrer les modifications ?", note_discard: "Abandonner", note_copied: "Note copiée dans le presse-papiers.", note_share_fail: "Impossible de partager ou de copier la note.",
     alert_note_required: "Écrivez au moins un titre ou le texte de la note.",
     placeholder_note_title: "Titre", placeholder_note_body: "Écrivez votre note ici...",
@@ -4571,6 +4736,7 @@ const I18N = {
     confirm_delete_note: "Eliminare questa nota?",
     folder_all: "Tutte", folder_default: "Cartella 1", folders_title: "Cartelle", folder_new_placeholder: "Nuova cartella...", folder_create: "Crea", folder_rename_prompt: "Nuovo nome della cartella:", folder_delete_confirm: "Eliminare la cartella \"{name}\" e tutte le sue note?", note_move_to: "Sposta in...",
     fmt_bold: "Grassetto", fmt_italic: "Corsivo", fmt_underline: "Sottolineato",
+    note_search: "Cerca", note_export_all: "Esporta tutto (backup)", note_import_backup: "Importa backup", note_import_note: "Importa nota (.txt / .md)", note_export: "Esporta", note_search_hint: "Scrivi per cercare in tutte le note.", note_no_results: "Nessun risultato.", note_search_ph: "Scrivi una o più parole...", note_close: "Chiudi", note_import_confirm: "Verranno aggiunte {n} nota/e e {f} nuova/e cartella/e. Continuare?", note_import_nothing: "Nessuna nuova nota da importare.", note_import_done: "Importazione completata.", note_import_invalid: "Questo file non è un backup di note valido.",
     note_untitled: "Senza titolo", note_read_more: "Leggi tutto", note_menu_aria: "Menu", note_discard_changes: "Non salvare le modifiche", note_share: "Condividi", note_save_prompt: "Salvare le modifiche?", note_discard: "Scarta", note_copied: "Nota copiata negli appunti.", note_share_fail: "Impossibile condividere o copiare la nota.",
     alert_note_required: "Scrivi almeno un titolo o il testo della nota.",
     placeholder_note_title: "Titolo", placeholder_note_body: "Scrivi qui la tua nota...",
@@ -4655,6 +4821,7 @@ const I18N = {
     confirm_delete_note: "Eliminar esta nota?",
     folder_all: "Todas", folder_default: "Pasta 1", folders_title: "Pastas", folder_new_placeholder: "Nova pasta...", folder_create: "Criar", folder_rename_prompt: "Novo nome da pasta:", folder_delete_confirm: "Eliminar a pasta \"{name}\" e todas as suas notas?", note_move_to: "Mover para...",
     fmt_bold: "Negrito", fmt_italic: "Itálico", fmt_underline: "Sublinhado",
+    note_search: "Pesquisar", note_export_all: "Exportar tudo (cópia de segurança)", note_import_backup: "Importar cópia de segurança", note_import_note: "Importar nota (.txt / .md)", note_export: "Exportar", note_search_hint: "Escreve para pesquisar em todas as notas.", note_no_results: "Sem resultados.", note_search_ph: "Escreve uma ou mais palavras...", note_close: "Fechar", note_import_confirm: "Serão adicionadas {n} nota(s) e {f} pasta(s) nova(s). Continuar?", note_import_nothing: "Não há notas novas para importar.", note_import_done: "Importação concluída.", note_import_invalid: "Este ficheiro não é uma cópia de segurança de notas válida.",
     note_untitled: "Sem título", note_read_more: "Ler mais", note_menu_aria: "Menu", note_discard_changes: "Não guardar as alterações", note_share: "Partilhar", note_save_prompt: "Guardar as alterações?", note_discard: "Descartar", note_copied: "Nota copiada para a área de transferência.", note_share_fail: "Não foi possível partilhar ou copiar a nota.",
     alert_note_required: "Escreve pelo menos um título ou o texto da nota.",
     placeholder_note_title: "Título", placeholder_note_body: "Escreve a tua nota aqui...",
@@ -4859,6 +5026,9 @@ if('serviceWorker' in navigator) {
         <div id="nt-actions">
           <button id="nt-plus" onclick="toggleNoteForm()" title="Nueva nota" data-i18n-title="title_new_note">+</button>
           <button id="nt-folder-btn" onclick="openFolderModal()" title="Carpetas" data-i18n-title="folders_title"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAACfCAYAAAC805bRAAAEYElEQVR42u3cv2tdZRjA8e9zzrlJ2oSmCB3cJRQR0zai4CK6Voq/qIv+AU66d+hWBUH/BqfaBBG1g3TSScGGtGlQRAdBtFOFWkhy7z3nPA65t01T0SHNNdd8P0uWTO/L9zzvublvgoFcpIyzNHmVWSZ4E3iJluPANC1QoL00XOOkR8EvlFyhy0exwM+ZBEAE6UKNVtwXxzVeocO7VMyRQD3YOI12RyqgBPr8QcP78STvGcl/tB3bJsc7zPIhNbBJM9iq2NoWjUwCQZIkFSWzwC0ucoI3hr9hJKOeICucZobLbNAMJkbp0uyLWJKg5hE63OJCnOTc8IHm4oxqgqwxQ59lDjHHBg1hHPsukpKWAmg4GfPcyKSI8PA7CgU9Xh3E0RrHvpzxQUNymJKWtwD4yo9MRqUiOEOQeK7d3w+yLgm8kEkVQZ0QgXu29wsPczQE6VNpX8+RmiB4lB84BsB5Pz4ZVSBTPofG4l0Ekg5dJl2M0QYiyUAkA5EMRDIQyUAkA5EMRDIQ6YCpXIIx0yUyCZYGP7Ur/3a3xkDGTYc2gkxo/bLiw5F591vs7c5gDGTcTFBlUrJEmce8E7LrCfI8dcS9C2g779oYyFjsIsMtm6LhS67TY87j1e5HB+R17hB8D3zOJ3wRQb391mbkCj8xwWP0SG+gj8UEwV16iIrBmGiAPt+xyduxwDfDSAxk/LS+eezFLAGmKenTpcvrcYrPMik8Yo3jM8/H2N5Yp6Zikkk+zlWeiWDVv4NI91T0qZliioYP8jyFRyzpwQPX1ge/yXNOEGmnoGWKoOVMAXR86ZPumyAx+A+XjxcEHVdEeiASgMMesaR/YCCSgUgGIhmIZCCSgUgGIhmIZCCSgUgyEMlAJAORDEQyEMlAJAORDEQyEMlAJBmIZCCSgUgGIhmIZCCSgUgGIhmIJAORDEQyEMlAJAORDEQyEMlAJAORDESSgUgGIhmIZCCSgUgGIhmIZCCSgUgaBtLSJVwI6e8DCRqXQfKIJRmIZCCSgUgGIhmIZCCSgUgGIslAJAORDEQyEMlAJAORDEQyEMlAJAORZCCSgUgGIhmIZCCSgUgGIhmIZCCSDEQyEMlAJAORDEQyEMlAJAORDEQyEEkGIhmIZCCSgUgGIhmIZCCSgUgGIslAJAORDEQyEMlAJAORDEQyEMlAJAORZCCSgUgGIhmIZCCSgUgGIhmIZCCSgUgyEMlAJAORRhvIHQII0uWQBi0EALcLYJWKBAORtkUCsFJQcIn+tmYkz1XBBj0aPi34kSv0+JojFCS1q6MDLelzhIKGpVhgNQDyGk/Q4VuCabrUBJUrpQOXRlIzTYdNbtLnKU5xs8pFyjjBWi7zGoe4yCxH+ROAxmOXDtCxquAoHdb5lT4vxwK/Z1JsTZBFyjhLk1c5zhQXSF5kko6v7joQL+MBdFkHlrjDuXiW3zIpImjvTohhJAC5xtMkp2mYJ5lxFfU/jSMJbhMsk1yOeW4ADOMA+As3iB87GmM1bAAAAABJRU5ErkJggg==" alt=""/></button>
+          <button id="nt-menu-btn" onclick="openNotesListMenu()" title="Menú" data-i18n-title="note_menu_aria">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+          </button>
         </div>
       </div>
       <div id="nt-seam"></div>
@@ -4903,6 +5073,19 @@ if('serviceWorker' in navigator) {
   </div>
 </div>
 
+
+<input type="file" id="note-import-full" accept="application/json,.json" style="display:none"/>
+<input type="file" id="note-import-txt" accept=".txt,.md,text/plain,text/markdown" style="display:none"/>
+
+<!-- Buscar en las notas -->
+<div class="nn-overlay" id="note-search-overlay" onclick="if(event.target===this) closeNoteSearch()">
+  <div class="nn-box tall">
+    <div class="nn-title" data-i18n="note_search">Buscar</div>
+    <input class="nn-search-input" id="note-search-input" type="text" placeholder="Escribe una o varias palabras..." data-i18n-placeholder="note_search_ph" autocomplete="off"/>
+    <div id="note-search-results"></div>
+    <div class="nn-actions" style="margin-top:12px"><button class="nn-btn" onclick="closeNoteSearch()" data-i18n="note_close">Cerrar</button></div>
+  </div>
+</div>
 
 <!-- Carpetas (desde la carpeta amarilla) -->
 <div class="nn-overlay" id="note-folders-overlay" onclick="if(event.target===this) closeFolderModal()">
