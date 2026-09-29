@@ -864,13 +864,13 @@
   /* ── NOTE EDITOR (full page, minimalist; estructura como Notematic) ── */
   .note-editor-overlay {
     display:none; position:fixed; inset:0; z-index:1200; background:#ffffff;
-    backdrop-filter:none;
+    backdrop-filter:none; padding:0; overflow:hidden;
   }
   .note-editor-overlay.open { display:flex; }
   .note-editor-inner {
     position:relative;
     display:flex; flex-direction:column; width:100%; height:100%;
-    padding:calc(14px + env(safe-area-inset-top,0px)) 26px calc(20px + env(safe-area-inset-bottom,0px));
+    padding:calc(30px + env(safe-area-inset-top,0px)) 28px calc(20px + env(safe-area-inset-bottom,0px));
     box-sizing:border-box; overflow:hidden;
   }
   .note-editor-header {
@@ -909,15 +909,15 @@
   /* Barra de formato sobre el teclado */
   #note-toolbar {
     display:none; flex-shrink:0; align-items:center; gap:4px;
-    margin:0 -26px calc(-20px - env(safe-area-inset-bottom,0px));
-    padding:6px 20px calc(6px + env(safe-area-inset-bottom,0px));
+    margin:0 -28px calc(-20px - env(safe-area-inset-bottom,0px));
+    padding:4px 22px calc(4px + env(safe-area-inset-bottom,0px));
     border-top:1px solid var(--border); background:#fff;
   }
   #note-toolbar.show { display:flex; }
   #note-toolbar .fmt-btn {
-    width:44px; height:44px; display:flex; align-items:center; justify-content:center;
+    width:40px; height:40px; display:flex; align-items:center; justify-content:center;
     background:none; border:none; border-radius:10px; cursor:pointer;
-    font-family:'Jost',sans-serif; font-size:19px; color:var(--text);
+    font-family:'Jost',sans-serif; font-size:18px; color:var(--text);
   }
   #note-toolbar .fmt-btn.active { background:var(--surface-alt); color:var(--star); }
   .note-card-title {
