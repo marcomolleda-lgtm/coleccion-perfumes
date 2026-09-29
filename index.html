@@ -905,6 +905,21 @@
   }
   .note-editor-body:empty:before { content:attr(data-placeholder); color:var(--text-light); }
   .note-editor-body a { color:var(--star); text-decoration:underline; }
+  .note-editor-body .p-break-spacer { display:block; height:10px; }
+  /* Barra de formato sobre el teclado */
+  #note-toolbar {
+    display:none; flex-shrink:0; align-items:center; gap:4px;
+    margin:0 -26px calc(-20px - env(safe-area-inset-bottom,0px));
+    padding:6px 20px calc(6px + env(safe-area-inset-bottom,0px));
+    border-top:1px solid var(--border); background:#fff;
+  }
+  #note-toolbar.show { display:flex; }
+  #note-toolbar .fmt-btn {
+    width:44px; height:44px; display:flex; align-items:center; justify-content:center;
+    background:none; border:none; border-radius:10px; cursor:pointer;
+    font-family:'Jost',sans-serif; font-size:19px; color:var(--text);
+  }
+  #note-toolbar .fmt-btn.active { background:var(--surface-alt); color:var(--star); }
   .note-card-title {
     font-size:17px; font-weight:700; color:var(--text);
     margin-bottom:8px; line-height:1.3; min-height:1.3em;
@@ -3615,7 +3630,7 @@ function _noteRelinkify() {
 function noteTitleText() { return _ne('nf-title').textContent.replace(/\u200B/g, '').replace(/\s+/g, ' ').trim(); }
 function noteBodyText() { return (_ne('nf-body').innerText || '').replace(/\u200B/g, '').trim(); }
 function noteHasContent() { return !!(noteTitleText() || noteBodyText()); }
-function noteHasChanges() { return noteTitleText() !== _noteOrig.title || noteBodyText() !== _noteOrig.body; }
+function noteHasChanges() { return noteTitleText() !== _noteOrig.title || noteBodyText() !== _noteOrig.body || _ne('nf-body').innerHTML !== _noteOrig.html; }
 
 // ── Abrir / crear ──
 function openNoteEditor(id) {
@@ -3628,9 +3643,9 @@ function openNoteEditor(id) {
   _ne('nf-body').setAttribute('data-placeholder', t('placeholder_note_body'));
   _ne('nf-title').textContent = n ? (n.title || '') : '';
   const body = n ? (n.body || '') : '';
-  _ne('nf-body').innerHTML = body ? _noteLinkify(_noteEsc(body)) : '';
+  _ne('nf-body').innerHTML = (n && n.bodyHtml) ? _noteSanitize(n.bodyHtml) : (body ? _noteLinkify(_noteEsc(body)) : '');
   _ne('nf-date').textContent = n ? noteDateOf(n) : noteDateStr();
-  _noteOrig = {title: noteTitleText(), body: noteBodyText()};
+  _noteOrig = {title: noteTitleText(), body: noteBodyText(), html: _ne('nf-body').innerHTML};
   openModal('modal-note-editor');
   _ne('nf-body').scrollTop = 0;
   // Nota nueva: cursor en el cuerpo (teclado abierto). Nota existente: sin teclado.
@@ -3647,17 +3662,19 @@ function _noteExit() {
   renderNotes();
 }
 function _noteCommit(folderId) {
+  _noteRelinkify();
   const now = Date.now();
   const notes = loadNotes();
   const title = noteTitleText();
   const body = noteBodyText();
+  const html = _ne('nf-body').innerHTML;
   let idx = noteEditId ? notes.findIndex(x => x.id === noteEditId) : -1;
   if (idx > -1) {
     const n = notes.splice(idx, 1)[0];
-    n.title = title; n.body = body; n.updatedAt = now; n.date = noteDateStr(now); n.folderId = folderId;
+    n.title = title; n.body = body; n.updatedAt = now; n.date = noteDateStr(now); n.folderId = folderId; n.bodyHtml = html;
     notes.unshift(n);
   } else {
-    notes.unshift({id: _noteUid(), folderId, title, body, createdAt: now, updatedAt: now, date: noteDateStr(now)});
+    notes.unshift({id: _noteUid(), folderId, title, body, bodyHtml: html, createdAt: now, updatedAt: now, date: noteDateStr(now)});
   }
   saveNotes(notes);
 }
@@ -3792,6 +3809,99 @@ document.addEventListener('DOMContentLoaded', function() {
       setCurrentNoteFolder(fl[(i + (dx < 0 ? 1 : -1) + fl.length) % fl.length].id);
       renderNotes();
     }
+  });
+});
+
+// ── Limpieza del HTML guardado (solo se permite negrita/cursiva/subrayado, saltos y enlaces) ──
+function _noteSanitize(html) {
+  const doc = new DOMParser().parseFromString('<body>' + html + '</body>', 'text/html');
+  const ALLOWED = {B:1, STRONG:1, I:1, EM:1, U:1, DIV:1, BR:1, SPAN:1, A:1, P:1};
+  const DROP = {SCRIPT:1, STYLE:1, IFRAME:1, OBJECT:1, EMBED:1, IMG:1, SVG:1, LINK:1, META:1, FORM:1, INPUT:1, BUTTON:1, TEXTAREA:1, SELECT:1};
+  function unwrap(node, ch) { while (ch.firstChild) node.insertBefore(ch.firstChild, ch); node.removeChild(ch); }
+  (function walk(node) {
+    Array.from(node.childNodes).forEach(ch => {
+      if (ch.nodeType === 3) return;
+      if (ch.nodeType !== 1) { node.removeChild(ch); return; }
+      if (DROP[ch.nodeName]) { node.removeChild(ch); return; }
+      if (!ALLOWED[ch.nodeName]) { walk(ch); unwrap(node, ch); return; }
+      const spacer = ch.nodeName === 'DIV' && ch.classList.contains('p-break-spacer');
+      const href = ch.nodeName === 'A' ? ch.getAttribute('href') : null;
+      Array.from(ch.attributes).forEach(a => ch.removeAttribute(a.name));
+      if (spacer) { ch.className = 'p-break-spacer'; ch.setAttribute('contenteditable', 'false'); }
+      walk(ch);
+      if (ch.nodeName === 'A') {
+        if (href && /^(https?:|mailto:)/i.test(href)) {
+          ch.setAttribute('href', href); ch.setAttribute('contenteditable', 'false');
+          if (href.indexOf('mailto:') !== 0) { ch.setAttribute('target', '_blank'); ch.setAttribute('rel', 'noopener'); }
+        } else { unwrap(node, ch); }
+      }
+    });
+  })(doc.body);
+  return doc.body.innerHTML;
+}
+
+// ── Barra de formato sobre el teclado + ajuste al teclado + punto y aparte ──
+document.addEventListener('DOMContentLoaded', function() {
+  const body = _ne('nf-body'), title = _ne('nf-title'), tb = _ne('note-toolbar'), ed = _ne('modal-note-editor');
+  const bB = _ne('fmt-bold'), bI = _ne('fmt-italic'), bU = _ne('fmt-underline');
+  const vv = window.visualViewport;
+  let maxVH = Math.max(window.innerHeight, vv ? vv.height : 0);
+  function kbOpen() {
+    const vh = vv ? vv.height : window.innerHeight;
+    if (vh > maxVH) maxVH = vh;
+    return vh < maxVH - 2;
+  }
+  // El editor ocupa solo la parte visible sobre el teclado, para que la barra quede pegada a él
+  function syncEditorViewport() {
+    const open = kbOpen();
+    if (vv && open && ed.classList.contains('open')) {
+      ed.style.top = vv.offsetTop + 'px'; ed.style.height = vv.height + 'px'; ed.style.bottom = 'auto';
+    } else { ed.style.top = ''; ed.style.height = ''; ed.style.bottom = ''; }
+    tb.classList.toggle('show', open && document.activeElement === body);
+  }
+  window.addEventListener('resize', syncEditorViewport);
+  if (vv) { vv.addEventListener('resize', syncEditorViewport); vv.addEventListener('scroll', syncEditorViewport); }
+  body.addEventListener('focus', syncEditorViewport);
+  body.addEventListener('blur', function() { setTimeout(syncEditorViewport, 0); });
+  title.addEventListener('focus', syncEditorViewport);
+
+  function updateState() {
+    try {
+      bB.classList.toggle('active', document.queryCommandState('bold'));
+      bI.classList.toggle('active', document.queryCommandState('italic'));
+      bU.classList.toggle('active', document.queryCommandState('underline'));
+    } catch(e) {}
+  }
+  document.addEventListener('selectionchange', function() { if (document.activeElement === body) updateState(); });
+  [[bB, 'bold'], [bI, 'italic'], [bU, 'underline']].forEach(function(p) {
+    // pointerdown sin foco: así el teclado no se cierra al tocar el botón
+    p[0].addEventListener('pointerdown', function(e) { e.preventDefault(); });
+    p[0].addEventListener('click', function() { document.execCommand(p[1], false, null); updateState(); });
+  });
+
+  // Enter = punto y aparte: un bloque separador de altura fija (no depende de la fuente)
+  body.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const sel = window.getSelection();
+    let spacer = null;
+    if (sel && sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      spacer = document.createElement('div');
+      spacer.className = 'p-break-spacer';
+      spacer.setAttribute('contenteditable', 'false');
+      range.insertNode(spacer);
+      range.setStartAfter(spacer); range.setEndAfter(spacer);
+      sel.removeAllRanges(); sel.addRange(range);
+    }
+    // Al insertar el salto nosotros, el navegador no lleva el cursor a la vista: se hace a mano
+    // midiendo el separador (no el cursor, que junto a un bloque no editable no se puede medir)
+    requestAnimationFrame(function() {
+      if (!spacer) return;
+      const rect = spacer.getBoundingClientRect(), box = body.getBoundingClientRect();
+      if (rect.bottom > box.bottom - 4) body.scrollTop += (rect.bottom - box.bottom) + 40;
+    });
   });
 });
 
@@ -4036,6 +4146,7 @@ const I18N = {
     empty_notes: "Aún no hay notas", title_new_note: "Nueva nota", title_delete_note: "Eliminar",
     confirm_delete_note: "¿Eliminar esta nota?",
     folder_all: "Todas", folder_default: "Carpeta 1", folders_title: "Carpetas", folder_new_placeholder: "Nueva carpeta...", folder_create: "Crear", folder_rename_prompt: "Nuevo nombre de la carpeta:", folder_delete_confirm: "¿Eliminar la carpeta \"{name}\" y todas sus notas?", note_move_to: "Mover a...",
+    fmt_bold: "Negrita", fmt_italic: "Cursiva", fmt_underline: "Subrayado",
     note_untitled: "Sin título", note_read_more: "Leer más", note_menu_aria: "Menú", note_discard_changes: "No guardar cambios", note_share: "Compartir", note_save_prompt: "¿Guardar los cambios?", note_discard: "Descartar", note_copied: "Nota copiada al portapapeles.", note_share_fail: "No se ha podido compartir ni copiar la nota.",
     alert_note_required: "Escribe al menos un título o el texto de la nota.",
     placeholder_note_title: "Título", placeholder_note_body: "Escribe tu nota aquí...",
@@ -4124,6 +4235,7 @@ const I18N = {
     empty_notes: "No notes yet", title_new_note: "New note", title_delete_note: "Delete",
     confirm_delete_note: "Delete this note?",
     folder_all: "All", folder_default: "Folder 1", folders_title: "Folders", folder_new_placeholder: "New folder...", folder_create: "Create", folder_rename_prompt: "New folder name:", folder_delete_confirm: "Delete the folder \"{name}\" and all its notes?", note_move_to: "Move to...",
+    fmt_bold: "Bold", fmt_italic: "Italic", fmt_underline: "Underline",
     note_untitled: "Untitled", note_read_more: "Read more", note_menu_aria: "Menu", note_discard_changes: "Don't save changes", note_share: "Share", note_save_prompt: "Save changes?", note_discard: "Discard", note_copied: "Note copied to clipboard.", note_share_fail: "Couldn't share or copy the note.",
     alert_note_required: "Write at least a title or the note text.",
     placeholder_note_title: "Title", placeholder_note_body: "Write your note here...",
@@ -4206,6 +4318,7 @@ const I18N = {
     empty_notes: "まだメモがありません", title_new_note: "新しいメモ", title_delete_note: "削除",
     confirm_delete_note: "このメモを削除しますか？",
     folder_all: "すべて", folder_default: "フォルダ 1", folders_title: "フォルダ", folder_new_placeholder: "新しいフォルダ...", folder_create: "作成", folder_rename_prompt: "フォルダの新しい名前：", folder_delete_confirm: "フォルダ「{name}」とそのメモをすべて削除しますか？", note_move_to: "移動先...",
+    fmt_bold: "太字", fmt_italic: "斜体", fmt_underline: "下線",
     note_untitled: "無題", note_read_more: "続きを読む", note_menu_aria: "メニュー", note_discard_changes: "変更を保存しない", note_share: "共有", note_save_prompt: "変更を保存しますか？", note_discard: "破棄", note_copied: "メモをクリップボードにコピーしました。", note_share_fail: "メモを共有またはコピーできませんでした。",
     alert_note_required: "タイトルか本文の少なくとも一方を入力してください。",
     placeholder_note_title: "タイトル", placeholder_note_body: "ここにメモを書く...",
@@ -4289,6 +4402,7 @@ const I18N = {
     empty_notes: "Noch keine Notizen", title_new_note: "Neue Notiz", title_delete_note: "Löschen",
     confirm_delete_note: "Diese Notiz löschen?",
     folder_all: "Alle", folder_default: "Ordner 1", folders_title: "Ordner", folder_new_placeholder: "Neuer Ordner...", folder_create: "Erstellen", folder_rename_prompt: "Neuer Ordnername:", folder_delete_confirm: "Ordner „{name}“ und alle seine Notizen löschen?", note_move_to: "Verschieben nach...",
+    fmt_bold: "Fett", fmt_italic: "Kursiv", fmt_underline: "Unterstrichen",
     note_untitled: "Ohne Titel", note_read_more: "Mehr lesen", note_menu_aria: "Menü", note_discard_changes: "Änderungen nicht speichern", note_share: "Teilen", note_save_prompt: "Änderungen speichern?", note_discard: "Verwerfen", note_copied: "Notiz in die Zwischenablage kopiert.", note_share_fail: "Die Notiz konnte nicht geteilt oder kopiert werden.",
     alert_note_required: "Schreibe mindestens einen Titel oder den Text der Notiz.",
     placeholder_note_title: "Titel", placeholder_note_body: "Schreibe hier deine Notiz...",
@@ -4372,6 +4486,7 @@ const I18N = {
     empty_notes: "Pas encore de notes", title_new_note: "Nouvelle note", title_delete_note: "Supprimer",
     confirm_delete_note: "Supprimer cette note ?",
     folder_all: "Toutes", folder_default: "Dossier 1", folders_title: "Dossiers", folder_new_placeholder: "Nouveau dossier...", folder_create: "Créer", folder_rename_prompt: "Nouveau nom du dossier :", folder_delete_confirm: "Supprimer le dossier « {name} » et toutes ses notes ?", note_move_to: "Déplacer vers...",
+    fmt_bold: "Gras", fmt_italic: "Italique", fmt_underline: "Souligné",
     note_untitled: "Sans titre", note_read_more: "Lire la suite", note_menu_aria: "Menu", note_discard_changes: "Ne pas enregistrer les modifications", note_share: "Partager", note_save_prompt: "Enregistrer les modifications ?", note_discard: "Abandonner", note_copied: "Note copiée dans le presse-papiers.", note_share_fail: "Impossible de partager ou de copier la note.",
     alert_note_required: "Écrivez au moins un titre ou le texte de la note.",
     placeholder_note_title: "Titre", placeholder_note_body: "Écrivez votre note ici...",
@@ -4455,6 +4570,7 @@ const I18N = {
     empty_notes: "Ancora nessuna nota", title_new_note: "Nuova nota", title_delete_note: "Elimina",
     confirm_delete_note: "Eliminare questa nota?",
     folder_all: "Tutte", folder_default: "Cartella 1", folders_title: "Cartelle", folder_new_placeholder: "Nuova cartella...", folder_create: "Crea", folder_rename_prompt: "Nuovo nome della cartella:", folder_delete_confirm: "Eliminare la cartella \"{name}\" e tutte le sue note?", note_move_to: "Sposta in...",
+    fmt_bold: "Grassetto", fmt_italic: "Corsivo", fmt_underline: "Sottolineato",
     note_untitled: "Senza titolo", note_read_more: "Leggi tutto", note_menu_aria: "Menu", note_discard_changes: "Non salvare le modifiche", note_share: "Condividi", note_save_prompt: "Salvare le modifiche?", note_discard: "Scarta", note_copied: "Nota copiata negli appunti.", note_share_fail: "Impossibile condividere o copiare la nota.",
     alert_note_required: "Scrivi almeno un titolo o il testo della nota.",
     placeholder_note_title: "Titolo", placeholder_note_body: "Scrivi qui la tua nota...",
@@ -4538,6 +4654,7 @@ const I18N = {
     empty_notes: "Ainda não há notas", title_new_note: "Nova nota", title_delete_note: "Eliminar",
     confirm_delete_note: "Eliminar esta nota?",
     folder_all: "Todas", folder_default: "Pasta 1", folders_title: "Pastas", folder_new_placeholder: "Nova pasta...", folder_create: "Criar", folder_rename_prompt: "Novo nome da pasta:", folder_delete_confirm: "Eliminar a pasta \"{name}\" e todas as suas notas?", note_move_to: "Mover para...",
+    fmt_bold: "Negrito", fmt_italic: "Itálico", fmt_underline: "Sublinhado",
     note_untitled: "Sem título", note_read_more: "Ler mais", note_menu_aria: "Menu", note_discard_changes: "Não guardar as alterações", note_share: "Partilhar", note_save_prompt: "Guardar as alterações?", note_discard: "Descartar", note_copied: "Nota copiada para a área de transferência.", note_share_fail: "Não foi possível partilhar ou copiar a nota.",
     alert_note_required: "Escreve pelo menos um título ou o texto da nota.",
     placeholder_note_title: "Título", placeholder_note_body: "Escreve a tua nota aqui...",
@@ -4762,6 +4879,11 @@ if('serviceWorker' in navigator) {
     <div id="nf-title" class="note-editor-title" contenteditable="true" data-placeholder="Título"></div>
     <div id="nf-date" class="note-editor-date"></div>
     <div id="nf-body" class="note-editor-body" contenteditable="true" data-placeholder="Escribe tu nota aquí..." autocomplete="off" autocorrect="off"></div>
+    <div id="note-toolbar">
+      <button class="fmt-btn" id="fmt-bold" aria-label="Negrita" data-i18n-aria-label="fmt_bold"><b>B</b></button>
+      <button class="fmt-btn" id="fmt-italic" aria-label="Cursiva" data-i18n-aria-label="fmt_italic"><i>I</i></button>
+      <button class="fmt-btn" id="fmt-underline" aria-label="Subrayado" data-i18n-aria-label="fmt_underline"><u>U</u></button>
+    </div>
   </div>
 </div>
 
