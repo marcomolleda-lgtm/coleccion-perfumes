@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="scentic"/>
-<link rel="apple-touch-icon" href="./icon-180-v7.png"/>
+<link rel="apple-touch-icon" href="./icon-180-v8.png"/>
 <style>
   :root {
     --bg: #faf9f5;
@@ -883,7 +883,7 @@
     color:var(--text); padding:6px 8px; line-height:1;
     display:flex; align-items:center;
   }
-  .note-editor-back { font-size:26px; }
+  .note-editor-back { font-size:36px; padding:0 12px 0 8px; }
   .note-editor-back:active, .note-editor-menu:active { opacity:.6; }
   .note-editor-menu img, #nt-menu-btn img { height:28px; width:auto; display:block; }
   .note-editor-title {
@@ -3562,7 +3562,7 @@ function renderNotes() {
   _ne('nf-title').setAttribute('data-placeholder', t('placeholder_note_title'));
   _ne('nf-body').setAttribute('data-placeholder', t('placeholder_note_body'));
   if (notes.length === 0) {
-    container.innerHTML = `<div style="text-align:center;padding:24px 0;color:var(--text-light)"><div style="font-size:36px;margin-bottom:8px">📝</div><div style="font-size:12px;letter-spacing:1px">${t('empty_notes')}</div></div>`;
+    container.innerHTML = `<div style="text-align:center;padding:32px 0;color:var(--text-light);font-size:15px;letter-spacing:.3px">${t('empty_notes')}</div>`;
     return;
   }
   const CHAR_LIMIT = 118;
