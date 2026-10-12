@@ -1,63 +1,86 @@
-const CACHE = 'perfumes-v52';
-const ASSETS = ['./index.html', './manifest.json', './icon-192-v8.png', './icon-512-v8.png', './icon-192-maskable-v8.png', './icon-512-maskable-v8.png', './sample-chanel5-v1.jpg', './sample-shalimar-v1.jpg', './sample-acquadigio-v1.jpg', './sample-chanel5-2-v1.jpg', './sample-acquadigio-2-v1.jpg', './sample-shalimar-2-v1.jpg', './sample-chanel5-3-v1.jpg'];
+// notematic — service worker (uso sin conexión)
+// Al cambiar cualquier archivo de la app, sube el número de versión de abajo
+// (notematic-v2, v3...) para que los móviles descarguen la versión nueva.
+const CACHE = 'notematic-v1';
+const PRECACHE = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png'
+];
 
-self.addEventListener('install', function(e) {
-  e.waitUntil(
-    caches.open(CACHE).then(function(cache) {
-      // cache.add each file separately so one slow/missing file (e.g. a CDN
-      // propagation delay right after deploying) doesn't block the whole
-      // update — previously cache.addAll() failed all-or-nothing here.
-      return Promise.all(
-        ASSETS.map(function(url) {
-          return cache.add(url).catch(function(err) {
-            console.warn('sw: failed to precache', url, err);
-          });
-        })
-      );
-    })
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE)
+      .then((cache) => Promise.allSettled(PRECACHE.map((url) => cache.add(url))))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-self.addEventListener('activate', function(e) {
-  e.waitUntil(
-    caches.keys().then(function(keys) {
-      return Promise.all(
-        keys.filter(function(key) { return key !== CACHE; })
-            .map(function(key) { return caches.delete(key); })
-      );
-    })
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-self.addEventListener('fetch', function(e) {
-  // For the HTML page itself: always try the network first, so users get
-  // the latest version as soon as it's deployed. Only fall back to the
-  // cached copy if there's no connection (offline support).
-  var isHTML = e.request.mode === 'navigate' ||
-    (e.request.method === 'GET' && (e.request.headers.get('accept') || '').includes('text/html'));
-
-  if (isHTML) {
-    e.respondWith(
-      fetch(e.request).then(function(response) {
-        var copy = response.clone();
-        caches.open(CACHE).then(function(cache) { cache.put(e.request, copy); });
-        return response;
-      }).catch(function() {
-        return caches.match(e.request).then(function(cached) {
-          return cached || caches.match('./index.html');
-        });
+// Red primero (así siempre ves la última versión si hay internet);
+// si no hay conexión o tarda demasiado, usa la copia guardada.
+function networkFirst(request, timeoutMs) {
+  return new Promise((resolve) => {
+    let settled = false;
+    const useCache = () =>
+      caches.match(request, { ignoreSearch: true })
+        .then((hit) => hit || caches.match('./index.html'));
+    const timer = setTimeout(() => {
+      useCache().then((hit) => { if (hit && !settled) { settled = true; resolve(hit); } });
+    }, timeoutMs);
+    fetch(request.url, { cache: 'no-cache' })
+      .then((res) => {
+        clearTimeout(timer);
+        if (res && res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(request, copy));
+        }
+        if (!settled) { settled = true; resolve(res); }
       })
-    );
-    return;
-  }
+      .catch(() => {
+        clearTimeout(timer);
+        useCache().then((hit) => {
+          if (!settled) { settled = true; resolve(hit || Response.error()); }
+        });
+      });
+  });
+}
 
-  // For everything else (images, icons, manifest): cache-first is fine,
-  // these don't change often and this keeps the app fast/offline-capable.
-  e.respondWith(
-    caches.match(e.request).then(function(response) {
-      return response || fetch(e.request);
-    })
-  );
+// Caché primero para iconos y otros archivos que casi no cambian.
+function cacheFirst(request) {
+  return caches.match(request).then((hit) => {
+    if (hit) return hit;
+    return fetch(request).then((res) => {
+      if (res && res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(request, copy));
+      }
+      return res;
+    });
+  });
+}
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  const isPage = req.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/');
+  const isManifest = url.pathname.endsWith('manifest.json');
+  if (isPage || isManifest) {
+    event.respondWith(networkFirst(req, 4000));
+  } else {
+    event.respondWith(cacheFirst(req));
+  }
 });
