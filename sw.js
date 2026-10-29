@@ -1,4 +1,4 @@
-const CACHE = 'perfumes-v53';
+const CACHE = 'perfumes-v54';
 const ASSETS = ['./index.html', './manifest.json', './icon-192-v8.png', './icon-512-v8.png', './icon-192-maskable-v8.png', './icon-512-maskable-v8.png', './sample-chanel5-v1.jpg', './sample-shalimar-v1.jpg', './sample-acquadigio-v1.jpg', './sample-chanel5-2-v1.jpg', './sample-acquadigio-2-v1.jpg', './sample-shalimar-2-v1.jpg', './sample-chanel5-3-v1.jpg'];
 
 self.addEventListener('install', function(e) {
@@ -23,7 +23,7 @@ self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keys) {
       return Promise.all(
-        keys.filter(function(key) { return key !== CACHE; })
+        keys.filter(function(key) { return key.indexOf('perfumes-') === 0 && key !== CACHE; })
             .map(function(key) { return caches.delete(key); })
       );
     })

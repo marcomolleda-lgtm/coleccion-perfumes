@@ -45,8 +45,8 @@
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body { background:var(--bg); font-family:'Jost',sans-serif; color:var(--text); min-height:100vh; font-size:14px; }
   /* Evita que el gesto de tirar hacia abajo recargue la app (y la devuelva al inicio) */
-  * { overscroll-behavior-y:contain; }
   html, body { overscroll-behavior-y:none; }
+  #main { overscroll-behavior-y:contain; }
   ::-webkit-scrollbar { width:5px; }
   ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
 
