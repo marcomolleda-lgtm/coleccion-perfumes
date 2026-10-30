@@ -4913,7 +4913,22 @@ const I18N = {
     scanner_camera_error: "⚠ Não foi possível aceder à câmara. Introduz o código manualmente.",
   }
 };
-let currentLang = localStorage.getItem('scentic-lang') || 'es';
+const SUPPORTED_LANGS = ['es','en','ja','de','fr','it','pt'];
+// Idioma: 1) el que el usuario eligió en la app; 2) si no, el primero de los idiomas del teléfono que la app
+// tenga; 3) si ninguno coincide, inglés.
+function detectLang() {
+  try {
+    const saved = localStorage.getItem('scentic-lang');
+    if (saved && SUPPORTED_LANGS.indexOf(saved) !== -1) return saved;
+    const list = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || ''];
+    for (let i = 0; i < list.length; i++) {
+      const c = String(list[i]).toLowerCase().split('-')[0];
+      if (SUPPORTED_LANGS.indexOf(c) !== -1) return c;
+    }
+  } catch(e) {}
+  return 'en';
+}
+let currentLang = detectLang();
 function t(key) { return (I18N[currentLang] || I18N.es)[key] || key; }
 
 // Default (unmodified) labels for built-in fields/options, used to translate
@@ -5067,7 +5082,7 @@ function applyLanguage(lang) {
 
 (function init() {
   initState();
-  applyLanguage(localStorage.getItem('scentic-lang') || 'es');
+  applyLanguage(currentLang);
   // Every fresh app launch starts on Home, regardless of the previous view.
   _suppressHistory = true;
   _closeAllModals();
