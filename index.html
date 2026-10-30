@@ -960,13 +960,13 @@
   #modal-notes { --nt-topbar:#f0ede8; --nt-tab-shadow:rgba(112,103,81,.38); --nt-top-h:58px; --nt-tab-margin:9px; }
   #modal-notes .modal { background:var(--bg); }
   /* Círculos decorativos (guiño al logo antiguo: notas olfativas) */
-  #modal-notes { --nt-c1:rgba(251,175,0,.11); --nt-c2:rgba(255,230,0,.15); --nt-c3:rgba(241,167,249,.18); }
+  #modal-notes { --nt-c1:rgba(0,148,7,.07); --nt-c2:rgba(255,230,0,.075); --nt-c3:rgba(241,167,249,.09); }
   .nt-bg { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
   .nt-bg span { position:absolute; aspect-ratio:1; border-radius:50%; }
-  .nt-bg .c1 { width:min(58vw,330px); left:calc(min(58vw,330px) * -.55); top:12%; background:var(--nt-c1); }
+  .nt-bg .c1 { width:min(68vw,390px); left:calc(min(68vw,390px) * -.55); top:10%; background:var(--nt-c1); }
   .nt-bg .c2 { width:min(52vw,300px); right:calc(min(52vw,300px) * -.55); top:29%; background:var(--nt-c2); }
   .nt-bg .c3 { width:min(80vw,460px); left:calc(min(80vw,460px) * -.6); top:84%; background:var(--nt-c3); }
-  #nt-topbar-wrap { position:relative; flex-shrink:0; }
+  #nt-topbar-wrap { position:relative; flex-shrink:0; overflow:hidden; }
   #nt-topbar {
     position:relative; background:var(--nt-topbar);
     height:calc(var(--nt-top-h) + env(safe-area-inset-top,0px));
@@ -992,7 +992,7 @@
     display:flex; align-items:center; justify-content:center;
     background:none; border:none; cursor:pointer; font-size:24px; color:var(--text); padding:0;
   }
-  #nt-folder-name { color:var(--notes-green); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #nt-folder-name { color:var(--notes-green); line-height:1.45; padding-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   #nt-folder-count { font-weight:400; font-size:16px; color:var(--text-muted); flex-shrink:0; }
   #nt-seam { position:absolute; left:0; bottom:0; width:50%; height:18px; background:var(--bg); z-index:2; }
   #nt-actions {
