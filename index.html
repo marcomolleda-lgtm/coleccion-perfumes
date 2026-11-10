@@ -1145,6 +1145,54 @@
   }
   #home-add-btn:active { opacity: .6; }
 
+  /* ── ¿SABÍAS QUE…? (portada + entrada) ── */
+  #home-view { overflow-y: auto; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 120px); }
+  .sq-card {
+    margin-top: 34px; width: min(86vw, 340px); flex: none;
+    border: none; background: none; padding: 0; cursor: pointer; text-align: left;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sq-card:active { opacity: .7; }
+  .sq-label {
+    font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 500;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--text-light);
+  }
+  .sq-title {
+    margin-top: 10px; font-family: 'Cormorant Garamond', serif; font-weight: 700;
+    font-size: 27px; line-height: 1.12; color: var(--text);
+  }
+  .sq-teaser {
+    margin-top: 10px; font-family: 'Jost', sans-serif; font-size: 15px;
+    line-height: 1.5; color: var(--text-muted);
+  }
+  .sq-row { display: flex; align-items: flex-start; gap: 14px; margin-top: 10px; }
+  .sq-row-text { flex: 1; min-width: 0; }
+  .sq-row-text .sq-teaser { margin-top: 0; }
+  .sq-thumb {
+    flex: none; width: 48px; height: auto; margin-top: 2px; pointer-events: none;
+    filter: drop-shadow(0 3px 4px rgba(60, 40, 10, .18));
+  }
+  .sq-more {
+    margin-top: 12px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--star);
+  }
+  #modal-sq .page-inner { text-align: left; }
+  .sq-page-title { font-size: 34px; line-height: 1.1; margin: 10px 0 24px; }
+  .sq-figure { margin: 0 auto 28px; width: min(70vw, 270px); text-align: center; }
+  .sq-figure img { display: block; width: 100%; height: auto; mix-blend-mode: multiply; }
+  .sq-figure figcaption {
+    margin-top: 8px; font-family: 'Jost', sans-serif; font-size: 12px;
+    letter-spacing: .5px; color: var(--text-light);
+  }
+  #sq-body p {
+    margin: 0 0 1.1em; font-family: 'Jost', sans-serif; font-size: 17.5px;
+    line-height: 1.75; color: var(--text);
+  }
+  .sq-sign {
+    margin-top: 26px; font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-weight: 500; font-size: 21px; color: var(--text-muted);
+  }
+
   /* ── HOME DOTS MENU (import/export) ── */
   #home-dots-wrap {
     position: fixed; top: calc(env(safe-area-inset-top, 0px) + 28px); left: 24px;
@@ -1256,6 +1304,17 @@
   <div id="home-tagline" data-i18n="home_tagline">colección de perfumes</div>
   <button id="home-logo-btn" onclick="showPerfumes()" title="Ir a mis perfumes" data-i18n-title="title_go_to_perfumes">
     <img class="home-logo-new" src="data:image/svg+xml;base64,PHN2ZyBpZD0iQ2FwYV8xIiBkYXRhLW5hbWU9IkNhcGEgMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSI1MC42MjQgMTU2LjQ0NyA3MzQuMDY0IDI4Mi4zODYiPjxkZWZzPjxzdHlsZT4uY2xzLTF7ZmlsbDojZmZmO30uY2xzLTJ7ZmlsbDojMDA5NDA3O308L3N0eWxlPjwvZGVmcz48dGl0bGU+U0NFTlRJQyBsb2dvIGNlbnRpYyBlbiBuZWdybzwvdGl0bGU+PHBhdGggY2xhc3M9ImNscy0yIiBkPSJNNTAuNjI0LDQzOC44MzNzMS4zNzMtLjA2NCwzLjkyNS0uNDY2QTc0LjkzOSw3NC45MzksMCwwLDAsNjUuNCw0MzUuNzMxLDY4LjAyMSw2OC4wMjEsMCwwLDAsODEsNDI4LjQ3MWE1OC4wNjEsNTguMDYxLDAsMCwwLDE2LjA3NS0xNS4wOTNBNjAuODY5LDYwLjg2OSwwLDAsMCwxMDcuMjg4LDM4OS41YTEwNS43NTUsMTA1Ljc1NSwwLDAsMCwxLjQ3NC0yOS4xOSwxNjcuNjYyLDE2Ny42NjIsMCwwLDAtNS41NDQtMzEuMDI5Yy0yLjYyMi0xMC40NTMtNi4zNzYtMjAuNzIxLTEwLjE5My0zMS4wNzdBMjU5LjgwOCwyNTkuODA4LDAsMCwxLDg0LjEsMjY2LjI0OSwyMTEuMywyMTEuMywwLDAsMSw3OS43MDcsMjM0LjRhMTE4LjAzNywxMTguMDM3LDAsMCwxLDEuODc3LTMwLjA5LDY2Ljk0Myw2Ni45NDMsMCwwLDEsMTAuMTg4LTI1LjA3LDQ4LjEzMyw0OC4xMzMsMCwwLDEsMTYuOTg3LTE1LjIzLDU5Ljc1Niw1OS43NTYsMCwwLDEsMTYuNDgyLTUuOTMsNzcuMDQ5LDc3LjA0OSwwLDAsMSwxMS4xNTMtMS40NjRjMi41ODQtLjEsMy45NTItLjE3NCwzLjk1Mi0uMTc0cy0xLjM2Ny4xNTMtMy45NDEuNGE4NS41ODksODUuNTg5LDAsMCwwLTEwLjk4NywyLjAyMSw1Ny42NSw1Ny42NSwwLDAsMC0xNS45MDgsNi40NjksNDguNiw0OC42LDAsMCwwLTE1LjgzOSwxNS4xOSw2NC4wMjMsNjQuMDIzLDAsMCwwLTkuMTU4LDI0LjM0MSwxMjUuMiwxMjUuMiwwLDAsMC0xLjI0NCwyOS4zNDIsMjAzLjU0NywyMDMuNTQ3LDAsMCwwLDQuNTg0LDMxLjIzNiwyNTQuOTg4LDI1NC45ODgsMCwwLDAsOS4wMTksMzEuMzUsMjk4LjQ1MywyOTguNDUzLDAsMCwxLDEwLjA3NSwzMS41MywxNzEuNTI1LDE3MS41MjUsMCwwLDEsNS4zODMsMzEuNzE4LDk5LjkxNyw5OS45MTcsMCwwLDEtMi4xLDMwLjE0MkE2My42ODgsNjMuNjg4LDAsMCwxLDk4Ljk1LDQxNC43NjMsNTYuNDc0LDU2LjQ3NCwwLDAsMSw4MS44MTQsNDI5LjhhNzAuMzQ2LDcwLjM0NiwwLDAsMS0xNi4yLDYuNzA1LDY1LjU2Myw2NS41NjMsMCwwLDEtMTEuMDQsMi4wODNBMzcuMzYzLDM3LjM2MywwLDAsMSw1MC42MjQsNDM4LjgzM1oiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik01OS4zMzIsNDM4LjgzM3MxLjM3My0uMDY0LDMuOTItLjQ2NkE3NC42MTcsNzQuNjE3LDAsMCwwLDc0LjEsNDM1LjczMWE2Ny45NDEsNjcuOTQxLDAsMCwwLDE1LjYxMy03LjI2QTU4LjQ1OCw1OC40NTgsMCwwLDAsMTA1LjgsNDEzLjM3OCw2MS4wOTQsNjEuMDk0LDAsMCwwLDExNi4wMDcsMzg5LjVhMTA2LjU5NCwxMDYuNTk0LDAsMCwwLDEuNDY5LTI5LjE5LDE2OC4yMzUsMTY4LjIzNSwwLDAsMC01LjU2Ni0zMS4wMjljLTIuNjI3LTEwLjQ1My02LjM1OS0yMC43MjEtMTAuMTg4LTMxLjA3N2EyNTguODgyLDI1OC44ODIsMCwwLDEtOC45MTctMzEuOTU0LDIxMS4zODQsMjExLjM4NCwwLDAsMS00LjQtMzEuODQ0LDExNi44LDExNi44LDAsMCwxLDEuODgyLTMwLjA5LDY2Ljc0Miw2Ni43NDIsMCwwLDEsMTAuMTc3LTI1LjA3LDQ4LjIxNSw0OC4yMTUsMCwwLDEsMTctMTUuMjMsNTkuNjQxLDU5LjY0MSwwLDAsMSwxNi40NzItNS45Myw3Ni45MzgsNzYuOTM4LDAsMCwxLDExLjE0Mi0xLjQ2NGMyLjU5LS4xLDMuOTYzLS4xNzQsMy45NjMtLjE3NHMtMS4zNzMuMTUzLTMuOTQ3LjRhODUuMDYsODUuMDYsMCwwLDAtMTAuOTY1LDIuMDIxLDU3LjgxNiw1Ny44MTYsMCwwLDAtMTUuOTMsNi40NjksNDguNTM2LDQ4LjUzNiwwLDAsMC0xNS44MTgsMTUuMTlBNjQuMDI4LDY0LjAyOCwwLDAsMCw5My4yLDIwNC44NjRhMTI2LjM4NywxMjYuMzg3LDAsMCwwLTEuMjI4LDI5LjM0MiwyMDIuOTIyLDIwMi45MjIsMCwwLDAsNC41NzksMzEuMjM2LDI1NC4wMjcsMjU0LjAyNywwLDAsMCw5LjAxOSwzMS4zNSwzMDEuMDUxLDMwMS4wNTEsMCwwLDEsMTAuMDgsMzEuNTMsMTcwLjEzLDE3MC4xMywwLDAsMSw1LjM3MiwzMS43MTgsOTkuNTg2LDk5LjU4NiwwLDAsMS0yLjA5MSwzMC4xNDIsNjQuMDg0LDY0LjA4NCwwLDAsMS0xMS4yNzEsMjQuNTgxQTU2LjUzNSw1Ni41MzUsMCwwLDEsOTAuNTA1LDQyOS44YTcwLjMyNyw3MC4zMjcsMCwwLDEtMTYuMTgyLDYuNzA1LDY2LjMsNjYuMywwLDAsMS0xMS4wMzUsMi4wODNBMzcuNjE4LDM3LjYxOCwwLDAsMSw1OS4zMzIsNDM4LjgzM1oiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik02OC4wMjksNDM4LjgzM3MxLjM4My0uMDY0LDMuOTMtLjQ2NmE3NS4xMSw3NS4xMSwwLDAsMCwxMC44NDctMi42MzUsNjcuOTMsNjcuOTMsMCwwLDAsMTUuNjEzLTcuMjYsNTguNDExLDU4LjQxMSwwLDAsMCwxNi4wNy0xNS4wOTNBNjEuMDk0LDYxLjA5NCwwLDAsMCwxMjQuNywzODkuNWExMDUuNzgyLDEwNS43ODIsMCwwLDAsMS40NjktMjkuMTksMTY3LjY4NCwxNjcuNjg0LDAsMCwwLTUuNTM5LTMxLjAyOWMtMi42NDQtMTAuNDUzLTYuMzg2LTIwLjcyMS0xMC4yLTMxLjA3N2EyNjEuODkxLDI2MS44OTEsMCwwLDEtOC45MzMtMzEuOTU0QTIxMC42OTQsMjEwLjY5NCwwLDAsMSw5Ny4xMTYsMjM0LjRhMTE3LjU0NCwxMTcuNTQ0LDAsMCwxLDEuODcyLTMwLjA5YzEuOS05LjQ0OCw1LjMzNS0xOC4xMjksMTAuMTkzLTI1LjA3YTQ4LjIxMiw0OC4yMTIsMCwwLDEsMTYuOTgxLTE1LjIzLDU5LjY2Nyw1OS42NjcsMCwwLDEsMTYuNDg3LTUuOTMsNzcuMTU0LDc3LjE1NCwwLDAsMSwxMS4xMjYtMS40NjRjMi41OTUtLjEsMy45ODktLjE3NCwzLjk4OS0uMTc0cy0xLjM5NC4xNTMtMy45NTEuNGE4NS4yNSw4NS4yNSwwLDAsMC0xMC45ODcsMi4wMjEsNTcuOCw1Ny44LDAsMCwwLTE1LjkxNCw2LjQ2OSw0OC43NTEsNDguNzUxLDAsMCwwLTE1LjgzOSwxNS4xOSw2NC4xOTQsNjQuMTk0LDAsMCwwLTkuMTU4LDI0LjM0MSwxMjUuNDc5LDEyNS40NzksMCwwLDAtMS4yMzksMjkuMzQyLDIwMy41NDcsMjAzLjU0NywwLDAsMCw0LjU4NCwzMS4yMzYsMjUzLjE0OCwyNTMuMTQ4LDAsMCwwLDkuMDEzLDMxLjM1LDI5OS43LDI5OS43LDAsMCwxLDEwLjA3LDMxLjUzLDE2OS43LDE2OS43LDAsMCwxLDUuMzc4LDMxLjcxOCw5OS45MDcsOTkuOTA3LDAsMCwxLTIuMDgsMzAuMTQyLDY0LjIzOCw2NC4yMzgsMCwwLDEtMTEuMjcsMjQuNTgxQTU2Ljc2LDU2Ljc2LDAsMCwxLDk5LjIsNDI5LjhhNzAuMjQxLDcwLjI0MSwwLDAsMS0xNi4xNjYsNi43MDUsNjYuNzYyLDY2Ljc2MiwwLDAsMS0xMS4wNTYsMi4wODNBMzcuMzU5LDM3LjM1OSwwLDAsMSw2OC4wMjksNDM4LjgzM1oiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik03Ni43MjYsNDM4LjgzM3MxLjM3OC0uMDY0LDMuOTI1LS40NjZhNzQuNzEsNzQuNzEsMCwwLDAsMTAuODYzLTIuNjM1LDY3Ljk4Myw2Ny45ODMsMCwwLDAsMTUuNi03LjI2LDU4LjIxMyw1OC4yMTMsMCwwLDAsMTYuMDgtMTUuMDkzQTYxLjI1Niw2MS4yNTYsMCwwLDAsMTMzLjQwNSwzODkuNWExMDYuMTY2LDEwNi4xNjYsMCwwLDAsMS40NjktMjkuMTksMTY4LjU5LDE2OC41OSwwLDAsMC01LjU0OS0zMS4wMjljLTIuNjMzLTEwLjQ1My02LjM4Ni0yMC43MjEtMTAuMTkzLTMxLjA3N2EyNTguMDA4LDI1OC4wMDgsMCwwLDEtOC45MzMtMzEuOTU0LDIxMi42MzUsMjEyLjYzNSwwLDAsMS00LjM5MS0zMS44NDQsMTE3LjUwNiwxMTcuNTA2LDAsMCwxLDEuODkzLTMwLjA5YzEuODkzLTkuNDQ4LDUuMzE0LTE4LjEyOSwxMC4xNzEtMjUuMDdhNDguMjksNDguMjksMCwwLDEsMTYuOTkxLTE1LjIzLDU5LjgxNiw1OS44MTYsMCwwLDEsMTYuNDk0LTUuOTMsNzYuODgzLDc2Ljg4MywwLDAsMSwxMS4xMzYtMS40NjRjMi41OS0uMSwzLjk2My0uMTc0LDMuOTYzLS4xNzRzLTEuMzczLjE1My0zLjk1Mi40YTg1LjM3NCw4NS4zNzQsMCwwLDAtMTAuOTY1LDIuMDIxLDU3LjUzLDU3LjUzLDAsMCwwLTE1LjkyNSw2LjQ2OSw0OC44LDQ4LjgsMCwwLDAtMTUuODM5LDE1LjE5LDYzLjkyNyw2My45MjcsMCwwLDAtOS4xNTMsMjQuMzQxLDEyNi4wNTQsMTI2LjA1NCwwLDAsMC0xLjI1NSwyOS4zNDIsMjA1LjYxNCwyMDUuNjE0LDAsMCwwLDQuNTksMzEuMjM2LDI1NC4xMywyNTQuMTMsMCwwLDAsOS4wMTksMzEuMzUsMjk3LjE4NiwyOTcuMTg2LDAsMCwxLDEwLjA3NSwzMS41MywxNjkuNzA4LDE2OS43MDgsMCwwLDEsNS4zODMsMzEuNzE4LDk5LjM5LDk5LjM5LDAsMCwxLTIuMSwzMC4xNDIsNjMuNzYsNjMuNzYsMCwwLDEtMTEuMjcsMjQuNTgxQTU2LjU2LDU2LjU2LDAsMCwxLDEwNy45MjEsNDI5LjhhNzAuODE0LDcwLjgxNCwwLDAsMS0xNi4xODIsNi43MDUsNjYuMzMzLDY2LjMzMywwLDAsMS0xMS4wNTEsMi4wODNBMzcuNjc2LDM3LjY3NiwwLDAsMSw3Ni43MjYsNDM4LjgzM1oiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik04NS40MzMsNDM4LjgzM3MxLjM3OC0uMDY0LDMuOTM2LS40NjZhNzUuMTg5LDc1LjE4OSwwLDAsMCwxMC44MzYtMi42MzUsNjcuODI4LDY3LjgyOCwwLDAsMCwxNS42MTQtNy4yNiw1OC4xMTQsNTguMTE0LDAsMCwwLDE2LjA3LTE1LjA5M0E2MS4wNDgsNjEuMDQ4LDAsMCwwLDE0Mi4xMTMsMzg5LjVhMTA1Ljk3NCwxMDUuOTc0LDAsMCwwLDEuNDY5LTI5LjE5LDE2Ny4yNDcsMTY3LjI0NywwLDAsMC01LjU1NS0zMS4wMjljLTIuNjMzLTEwLjQ1My02LjM2NS0yMC43MjEtMTAuMTg4LTMxLjA3N2EyNjAuODgsMjYwLjg4LDAsMCwxLTguOTI3LTMxLjk1NCwyMTEuMjc0LDIxMS4yNzQsMCwwLDEtNC4zODYtMzEuODQ0LDExNi44MzEsMTE2LjgzMSwwLDAsMSwxLjg3Ny0zMC4wOSw2Ny4xLDY3LjEsMCwwLDEsMTAuMTcyLTI1LjA3LDQ4LjE0NCw0OC4xNDQsMCwwLDEsMTcuMDA3LTE1LjIzLDU5Ljc3MSw1OS43NzEsMCwwLDEsMTYuNDcyLTUuOTMsNzcuMDEyLDc3LjAxMiwwLDAsMSwxMS4xNDctMS40NjRjMi42LS4xLDMuOTYyLS4xNzQsMy45NjItLjE3NHMtMS4zNjcuMTUzLTMuOTM2LjRhODQuODQ1LDg0Ljg0NSwwLDAsMC0xMSwyLjAyMSw1Ny42ODYsNTcuNjg2LDAsMCwwLTE1LjksNi40NjksNDguNTQzLDQ4LjU0MywwLDAsMC0xNS44MzksMTUuMTksNjQuMyw2NC4zLDAsMCwwLTkuMTc0LDI0LjM0MSwxMjYuMTE5LDEyNi4xMTksMCwwLDAtMS4yMjgsMjkuMzQyLDIwMi4yNzMsMjAyLjI3MywwLDAsMCw0LjU4NCwzMS4yMzYsMjQ4LjYxLDI0OC42MSwwLDAsMCw5LjAxOSwzMS4zNSwzMDIuMjIyLDMwMi4yMjIsMCwwLDEsMTAuMDU5LDMxLjUzLDE2OS43NTMsMTY5Ljc1MywwLDAsMSw1LjM4MywzMS43MTgsOTkuOTI0LDk5LjkyNCwwLDAsMS0yLjA4NiwzMC4xNDIsNjMuNzY4LDYzLjc2OCwwLDAsMS0xMS4yNzYsMjQuNTgxQTU2LjY2Myw1Ni42NjMsMCwwLDEsMTE2LjYxMiw0MjkuOGE3MC4yOTEsNzAuMjkxLDAsMCwxLTE2LjE3Nyw2LjcwNSw2Ni41Myw2Ni41MywwLDAsMS0xMS4wNCwyLjA4M0EzNy42NzcsMzcuNjc3LDAsMCwxLDg1LjQzMyw0MzguODMzWiIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTk0LjE0MSw0MzguODMzczEuMzk0LS4wNjQsMy45MjUtLjQ2NmE3NC41NzksNzQuNTc5LDAsMCwwLDEwLjg0Mi0yLjYzNSw2Ny43NSw2Ny43NSwwLDAsMCwxNS42MTktNy4yNiw1OC4zNDMsNTguMzQzLDAsMCwwLDE2LjA3LTE1LjA5M0E2MS4wMjksNjEuMDI5LDAsMCwwLDE1MC44LDM4OS41YTEwNS4zMzgsMTA1LjMzOCwwLDAsMCwxLjQ2OS0yOS4xOSwxNjguNTQzLDE2OC41NDMsMCwwLDAtNS41MzMtMzEuMDI5Yy0yLjYzMy0xMC40NTMtNi4zODYtMjAuNzIxLTEwLjItMzEuMDc3YTI2MC44NDEsMjYwLjg0MSwwLDAsMS04LjkzOC0zMS45NTQsMjEwLjU3MywyMTAuNTczLDAsMCwxLTQuMzg2LTMxLjg0NCwxMTguNTEyLDExOC41MTIsMCwwLDEsMS44NzYtMzAuMDljMS45LTkuNDQ4LDUuMzM1LTE4LjEyOSwxMC4xOTMtMjUuMDdhNDguMTUyLDQ4LjE1MiwwLDAsMSwxNi45NzYtMTUuMjMsNjAsNjAsMCwwLDEsMTYuNDkzLTUuOTMsNzcuMjc2LDc3LjI3NiwwLDAsMSwxMS4xNDctMS40NjRjMi41ODQtLjEsMy45NTEtLjE3NCwzLjk1MS0uMTc0cy0xLjM2Ny4xNTMtMy45MzYuNGE4NS4wMzYsODUuMDM2LDAsMCwwLTEwLjk4MSwyLjAyMSw1Ny42MzcsNTcuNjM3LDAsMCwwLTE1LjkxOSw2LjQ2OSw0OC42Myw0OC42MywwLDAsMC0xNS44MzQsMTUuMTksNjQuMSw2NC4xLDAsMCwwLTkuMTUzLDI0LjM0MSwxMjQuODkyLDEyNC44OTIsMCwwLDAtMS4yNTUsMjkuMzQyLDIwNi4xOTIsMjA2LjE5MiwwLDAsMCw0LjU3OSwzMS4yMzYsMjU3LjgyMywyNTcuODIzLDAsMCwwLDkuMDE5LDMxLjM1LDI5OC42MzUsMjk4LjYzNSwwLDAsMSwxMC4wODYsMzEuNTMsMTcwLjIwNywxNzAuMjA3LDAsMCwxLDUuMzgzLDMxLjcxOCw5OS45MTgsOTkuOTE4LDAsMCwxLTIuMSwzMC4xNDIsNjQuMDEsNjQuMDEsMCwwLDEtMTEuMjc2LDI0LjU4MUE1Ni41ODMsNTYuNTgzLDAsMCwxLDEyNS4zMTUsNDI5LjhhNzAuMzcsNzAuMzcsMCwwLDEtMTYuMTcxLDYuNzA1QTY2LjE4OSw2Ni4xODksMCwwLDEsOTguMSw0MzguNTg5LDM3LjM1LDM3LjM1LDAsMCwxLDk0LjE0MSw0MzguODMzWiIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTEwMi44MzgsNDM4LjgzM3MxLjM4NC0uMDY0LDMuOTM2LS40NjZhNzQuODY3LDc0Ljg2NywwLDAsMCwxMC44MzctMi42MzUsNjgsNjgsMCwwLDAsMTUuNjI0LTcuMjYsNTguNDMzLDU4LjQzMywwLDAsMCwxNi4wNzUtMTUuMDkzQTYxLjEsNjEuMSwwLDAsMCwxNTkuNTE4LDM4OS41YTEwNS43NTYsMTA1Ljc1NiwwLDAsMCwxLjQ3NC0yOS4xOSwxNjcuNzE3LDE2Ny43MTcsMCwwLDAtNS41Ni0zMS4wMjljLTIuNjMzLTEwLjQ1My02LjM2NC0yMC43MjEtMTAuMTkzLTMxLjA3N2EyNTkuODQ5LDI1OS44NDksMCwwLDEtOC45MTctMzEuOTU0LDIwOS4yMDcsMjA5LjIwNywwLDAsMS00LjM5MS0zMS44NDQsMTE3LjUxNiwxMTcuNTE2LDAsMCwxLDEuODc3LTMwLjA5QTY2LjMxNiw2Ni4zMTYsMCwwLDEsMTQ0LDE3OS4yNDVhNDguMiw0OC4yLDAsMCwxLDE2Ljk3Ni0xNS4yMyw1OS44NDcsNTkuODQ3LDAsMCwxLDE2LjUtNS45Myw3Ni42NjMsNzYuNjYzLDAsMCwxLDExLjEzMi0xLjQ2NGMyLjU5NS0uMSwzLjk2Ny0uMTc0LDMuOTY3LS4xNzRzLTEuMzczLjE1My0zLjkzNi40YTg0LjgsODQuOCwwLDAsMC0xMC45OTEsMi4wMjEsNTcuNDUyLDU3LjQ1MiwwLDAsMC0xNS45MDksNi40NjksNDguNSw0OC41LDAsMCwwLTE1LjgzOSwxNS4xOSw2My45NDIsNjMuOTQyLDAsMCwwLTkuMTY5LDI0LjM0MSwxMjUuNTEyLDEyNS41MTIsMCwwLDAtMS4yMzMsMjkuMzQyLDIwMi4yMzEsMjAyLjIzMSwwLDAsMCw0LjU3NCwzMS4yMzYsMjU0LjIzMiwyNTQuMjMyLDAsMCwwLDkuMDQsMzEuMzUsMzAwLjg4NSwzMDAuODg1LDAsMCwxLDEwLjA1MywzMS41MywxNzEuNTYyLDE3MS41NjIsMCwwLDEsNS4zOTQsMzEuNzE4LDEwMC42MTMsMTAwLjYxMywwLDAsMS0yLjEsMzAuMTQyLDY0LjA4Myw2NC4wODMsMCwwLDEtMTEuMjc2LDI0LjU4MUE1Ni42NDgsNTYuNjQ4LDAsMCwxLDEzNC4wMjgsNDI5LjhhNzAuNjU1LDcwLjY1NSwwLDAsMS0xNi4xODcsNi43MDUsNjYuMjQxLDY2LjI0MSwwLDAsMS0xMS4wNCwyLjA4M0EzNy42MDgsMzcuNjA4LDAsMCwxLDEwMi44MzgsNDM4LjgzM1oiLz48cGF0aCBkPSJNNDUwLjYwOSwzOTMuNjI5SDQzNS4yNzRWMjA3LjI2OWM1LjEyNSwwLDEwLjI4Ny0uMDUzLDE1LjQ0NC4wODkuNDcxLjAxMywxLjEyMywxLjIwOCwxLjMzLDEuOTU0LDUuMDc5LDE4LjM0OCwxMC4wNjcsMzYuNzIsMTUuMTU3LDU1LjA2NXExMC41OSwzOC4xNjcsMjEuMjkyLDc2LjNhMS45MDksMS45MDksMCwwLDAsLjkzNSwxLjN2LTEzNC42aDE1LjIzNXYxODYuM2MtNS4wNywwLTEwLjE0Ni4wNjItMTUuMjE1LS4xLS40ODktLjAxNi0xLjE0MS0xLjM1OS0xLjM3LTIuMTgycS04Ljg3Mi0zMS45NjQtMTcuNjQ5LTYzLjk1NC05LjU3NS0zNS4wNDQtMTkuMDI2LTcwLjEyMmE2LjcsNi43LDAsMCwwLS44LTIuMDhaIi8+PHBhdGggZD0iTTc4NC4yNDksMjY1LjVINzY4LjU3MmMtLjA0NS0uODY4LS4xMjItMS43MjEtLjEzLTIuNTc0LS4wOTQtMTAuNjI2LDAtMjEuMjU4LS4zNTMtMzEuODc2YTQxLjg5LDQxLjg5LDAsMCwwLTIuMDc4LTExLjg3M2MtMS45MzktNS43NDMtNi4zNjItOC4yNjEtMTIuNy04LjIxNi02LjE4My4wNDQtMTAuNTY1LDIuNTU0LTEyLjM2Nyw4LjNhNDYuOSw0Ni45LDAsMCwwLTIuMTQzLDEzLjU3OWMtLjE4MywzNC4xNTItLjEzLDY4LjMwNi0uMTIyLDEwMi40NTksMCwxMS4zNTcuMDI1LDIyLjcxNS4xNzgsMzQuMDdhNDcuMTQzLDQ3LjE0MywwLDAsMCwuOTg1LDguNDM0YzEuNTMsNy43NSw2Ljk3NSwxMS44LDE0Ljg1OSwxMS4yNDMsOC42LS42LDEyLjc3Mi00LjgzMiwxMy4yNzctMTQuNTYxLjUtOS41NDkuMzYyLTE5LjEzMS40NzEtMjguNy4wNDYtNC4wNTIuMDA4LTguMTA2LjAwOC0xMi4zNzFINzg0LjY0YzAsLjc2NywwLDEuNjE5LDAsMi40NzEuMDA5LDEwLjQ2NS4xMTksMjAuOTMxLS4wMjUsMzEuMzk0YTU0Ljg1LDU0Ljg1LDAsMCwxLTEuMTc0LDExLjA5Yy0yLjMzMiwxMC40ODQtOS4zLDE2LjM2Mi0xOS41NjEsMTguNTc4YTQ5LjAwNyw0OS4wMDcsMCwwLDEtMjIuNDItLjU1NGMtMTAuNjEtMi42MzUtMTYuMzI0LTkuNzI4LTE4LjExOS0yMC4xODVhNjUuMjExLDY1LjIxMSwwLDAsMS0uODc5LTEwLjg5M3EtLjEtNjYuNDQxLjAzNy0xMzIuODgxYTQ1Ljk3NSw0NS45NzUsMCwwLDEsMi4yODUtMTMuNTUzYzIuMzg4LTcuNSw3Ljc1LTEyLjQxNiwxNS4zNTMtMTQuNjY5YTQ3LjA3Nyw0Ny4wNzcsMCwwLDEsMjcuMS0uMDU1YzEwLjc1NywzLjE1MiwxNS45NzQsMTEuMjYxLDE2LjcsMjEuNjMxLjkxNiwxMywuNDQ3LDI2LjA5NC41NjYsMzkuMTQ3Qzc4NC41MDksMjY1LjA3Niw3ODQuMzgyLDI2NS4yMTgsNzg0LjI0OSwyNjUuNVoiLz48cGF0aCBkPSJNMjg1LjgsMjY1LjVIMjY5LjkyNWMwLTEsMC0xLjg2NSwwLTIuNzM0cTAtMTUuODIsMC0zMS42NDFhMzAuNywzMC43LDAsMCwwLTIuNDgtMTMuMDM3Yy0yLjM2NS01LjEyOS02LjYxMy03LjA5MS0xMS45NzUtNy4xNjEtNS41NTQtLjA3My05Ljk1NSwxLjg0OC0xMi40NCw3LjE3Ni0yLjMsNC45MzQtMi41LDEwLjE5LTIuNTEyLDE1LjQ3NHEtLjAzOSwyMi4wMjctLjAwNyw0NC4wNTNjLjAyMiwzMC4wMTgtLjAwNSw2MC4wMzYuMTUsOTAuMDUzYTUwLjMsNTAuMywwLDAsMCwxLjU5MSwxMi4yNGMxLjY0NSw2LjM0NCw2LjUyMiw5LjIsMTQuMDYzLDguOTc1LDYuNjc5LS4yLDEwLjg3LTMuMjc0LDEyLjIxOC05LjY1NGE2NC43LDY0LjcsMCwwLDAsMS4zMTctMTIuMjljLjE3NC0xMS4xMDYuMDYtMjIuMjE2LjA2LTMzLjUzNmgxNi4wMTJhMTIuMzUsMTIuMzUsMCwwLDEsLjIyMSwxLjcyN2MtLjAyNywxMS41MiwwLDIzLjA0MS0uMTY2LDM0LjU1OWE0Mi41MzMsNDIuNTMzLDAsMCwxLTEuMTY1LDguNjU2Yy0yLjE3Niw5LjY0NS04LjM1NiwxNS41MS0xNy43NjQsMTguMDM2YTQ1LjgxNCw0NS44MTQsMCwwLDEtMjMuNTgzLjA3OGMtMTAuNS0yLjY5LTE2LjQtOS42NDktMTguMjE4LTIwLjE1NWE1OC44MTQsNTguODE0LDAsMCwxLS45NjEtOS45MTNxLS4wODEtNjcuMDUzLjA0LTEzNC4xMDZhNDYuMjg5LDQ2LjI4OSwwLDAsMSwxLjMzLTEwLjMzNmMyLjM0Ny0xMC4wMzUsOC42NTEtMTYuMjQ5LDE4Ljc1My0xOC41YTQ5LjY4Myw0OS42ODMsMCwwLDEsMjIuMi4wMThjMTEuNDIxLDIuNjMyLDE4LjQyOCwxMC40MDksMTkuMTQ5LDIzLjAzMS43MjksMTIuNzc1LjI1NiwyNS42MTkuMywzOC40MzNDMjg2LjA2LDI2NS4wODMsMjg1LjkzMiwyNjUuMjIzLDI4NS44LDI2NS41WiIvPjxwYXRoIGQ9Ik0zNTMuNjMsMzAxLjU3NXY4My40MDVoMzcuNTkzdjguNTcyaC01My45OFYyMDcuNDI0aDUzLjE0NXY4LjQ1OGgtMzYuNzF2NzcuMDRoMzAuNzExdjguNjUzWiIvPjxwYXRoIGQ9Ik01ODcuNzA3LDM5My42MjZoLTE2LjJWMjE1Ljk4NEg1NDguODYydi04LjU3MWg2MS4zdjguNDEyaC0yMi40NloiLz48cGF0aCBkPSJNNjU0LjIzNiwyMDcuMzg1aDE1Ljg1MVYzOTMuNTMySDY1NC4yMzZaIi8+PC9zdmc+" alt="scentic"/>
+  </button>
+  <button id="sq-home-card" class="sq-card" onclick="openSq()" style="display:none">
+    <div class="sq-label" data-i18n="sq_section">¿Sabías que…?</div>
+    <div class="sq-title" id="sq-home-title"></div>
+    <div class="sq-row">
+      <div class="sq-row-text">
+        <div class="sq-teaser" id="sq-home-teaser"></div>
+        <div class="sq-more" data-i18n="sq_more">leer más</div>
+      </div>
+      <img class="sq-thumb" id="sq-home-thumb" alt="" width="48" height="93" style="display:none">
+    </div>
   </button>
   <button id="home-add-btn" onclick="showPerfumes();openEdit(null);" title="Añadir perfume" data-i18n-title="title_add_perfume">＋</button>
 </div>
@@ -1597,6 +1656,17 @@
     <button class="page-back" onclick="closeModal('modal-classification-detail')" title="Volver" data-i18n-title="title_back"><span class="back-arrow-img"></span></button>
     <div class="page-title" id="class-mini-title"></div>
     <div id="class-mini-list"></div>
+  </div>
+</div>
+
+<div class="modal-overlay page-overlay" id="modal-sq">
+  <div class="page-inner">
+    <button class="page-back" onclick="closeModal('modal-sq')" title="Volver" data-i18n-title="title_back"><span class="back-arrow-img"></span></button>
+    <div class="sq-label" data-i18n="sq_section">¿Sabías que…?</div>
+    <div class="page-title sq-page-title" id="sq-title"></div>
+    <figure class="sq-figure"><img id="sq-img" src="" alt=""><figcaption id="sq-caption"></figcaption></figure>
+    <div id="sq-body"></div>
+    <div class="sq-sign" id="sq-sign"></div>
   </div>
 </div>
 
@@ -4278,6 +4348,7 @@ function closePanelLangMenu() {
 }
 const I18N = {
   es: {
+    sq_section: "¿Sabías que…?", sq_more: "leer más",
     menu_export: "Exportar", menu_import: "Importar",
     search_placeholder: "Buscar",
     home_search: "Buscar",
@@ -4370,6 +4441,7 @@ const I18N = {
     scanner_camera_error: "⚠ No se pudo acceder a la cámara. Introduce el código manualmente.",
   },
   en: {
+    sq_section: "Did you know…?", sq_more: "read more",
     menu_export: "Export", menu_import: "Import",
     search_placeholder: "Search",
     home_search: "Search",
@@ -4461,6 +4533,7 @@ const I18N = {
     scanner_camera_error: "⚠ Could not access the camera. Enter the code manually.",
   },
   ja: {
+    sq_section: "ご存じですか?", sq_more: "続きを読む",
     menu_export: "エクスポート", menu_import: "インポート",
     search_placeholder: "検索",
     home_search: "検索",
@@ -4546,6 +4619,7 @@ const I18N = {
     scanner_camera_error: "⚠ カメラにアクセスできませんでした。コードを手入力してください。",
   },
   de: {
+    sq_section: "Wusstest du schon…?", sq_more: "weiterlesen",
     // ── Part 1: header, home ──
     menu_export: "Exportieren", menu_import: "Importieren",
     search_placeholder: "Suchen",
@@ -4632,6 +4706,7 @@ const I18N = {
     scanner_camera_error: "⚠ Auf die Kamera konnte nicht zugegriffen werden. Gib den Code manuell ein.",
   },
   fr: {
+    sq_section: "Le saviez-vous ?", sq_more: "lire la suite",
     // ── Part 1: header, home ──
     menu_export: "Exporter", menu_import: "Importer",
     search_placeholder: "Rechercher",
@@ -4718,6 +4793,7 @@ const I18N = {
     scanner_camera_error: "⚠ Impossible d'accéder à la caméra. Saisissez le code manuellement.",
   },
   it: {
+    sq_section: "Lo sapevi che…?", sq_more: "leggi di più",
     // ── Part 1: header, home ──
     menu_export: "Esporta", menu_import: "Importa",
     search_placeholder: "Cerca",
@@ -4804,6 +4880,7 @@ const I18N = {
     scanner_camera_error: "⚠ Impossibile accedere alla fotocamera. Inserisci il codice manualmente.",
   },
   pt: {
+    sq_section: "Sabias que…?", sq_more: "ler mais",
     // ── Part 1: header, home ──
     menu_export: "Exportar", menu_import: "Importar",
     search_placeholder: "Pesquisar",
@@ -5009,6 +5086,141 @@ function setLanguage(lang) {
   applyLanguage(lang);
   closeLangMenu();
 }
+// ══ ¿SABÍAS QUE…? ══════════════════════════════════════════════
+// Primera entrada de la lista = la más reciente (es la que sale en la portada).
+const SQ_ENTRIES = [
+ {
+  "id": "joy",
+  "img": "scentic-joy-v1.jpg",
+  "thumb": "scentic-joy-thumb-v1.webp",
+  "sign": "Ukigumo",
+  "t": {
+   "es": {
+    "title": "Joy: el perfume que desafió a la crisis",
+    "teaser": "En plena Gran Depresión, Jean Patou lanzó «el perfume más caro del mundo». Y funcionó.",
+    "body": [
+     "En octubre de 1929 se hundió la bolsa de Nueva York. De pronto, muchas de las clientas estadounidenses del modisto Jean Patou ya no podían permitirse sus vestidos.",
+     "Patou tuvo una idea contraria a la lógica: si ya no podían comprar un vestido, quizá sí un frasco. Y en 1930 lanzó un perfume al que llamó, con toda la intención, Joy, «alegría». Lo anunció como «el perfume más caro del mundo».",
+     "Para presentarse así, tenía que serlo de verdad. Se cuenta que cada frasco de unos 30 ml concentraba más de diez mil flores de jazmín y cientos de rosas. Era un perfume de dos flores, jazmín y rosa, sin más artificio. Una declaración de lujo en plena época de escasez.",
+     "La jugada salió bien. Joy se vendió, y durante décadas se mantuvo entre los perfumes más reconocidos del mundo. Un buen recordatorio de que, a veces, cuando todo va mal, la gente sigue queriendo algo hermoso."
+    ],
+    "caption": "Eau de Joy, Jean Patou"
+   },
+   "en": {
+    "title": "Joy: The Perfume That Defied the Crisis",
+    "teaser": "In the midst of the Great Depression, Jean Patou launched “the costliest perfume in the world.” And it worked.",
+    "body": [
+     "In October 1929, the New York stock market collapsed. Suddenly, many of the American clients of couturier Jean Patou could no longer afford his dresses.",
+     "Patou had an idea that defied logic: if they could no longer buy a dress, perhaps they could still buy a bottle. In 1930 he launched a perfume he named, quite deliberately, Joy. He advertised it as “the costliest perfume in the world.”",
+     "To bill itself that way, it had to be true. The story goes that each bottle of about 30 ml held more than ten thousand jasmine blossoms and hundreds of roses. It was a perfume of two flowers, jasmine and rose, with no gimmicks. A statement of luxury in an age of scarcity.",
+     "The gamble paid off. Joy sold, and for decades it remained among the most recognized perfumes in the world. A good reminder that sometimes, when everything goes wrong, people still want something beautiful."
+    ],
+    "caption": "Eau de Joy, Jean Patou"
+   },
+   "de": {
+    "title": "Joy: Das Parfum, das der Krise trotzte",
+    "teaser": "Mitten in der Weltwirtschaftskrise brachte Jean Patou „das teuerste Parfum der Welt“ auf den Markt. Und es funktionierte.",
+    "body": [
+     "Im Oktober 1929 brach die New Yorker Börse zusammen. Plötzlich konnten sich viele amerikanische Kundinnen des Couturiers Jean Patou seine Kleider nicht mehr leisten.",
+     "Patou hatte eine Idee, die jeder Logik widersprach: Wenn sie kein Kleid mehr kaufen konnten, dann vielleicht noch einen Flakon. 1930 brachte er ein Parfum heraus, dem er ganz bewusst den Namen Joy gab, „Freude“. Er bewarb es als „das teuerste Parfum der Welt“.",
+     "Um sich so zu nennen, musste es wirklich so sein. Man erzählt, dass in jedem Flakon von etwa 30 ml mehr als zehntausend Jasminblüten und Hunderte von Rosen steckten. Es war ein Parfum aus zwei Blumen, Jasmin und Rose, ganz ohne Schnickschnack. Ein Bekenntnis zum Luxus in einer Zeit der Knappheit.",
+     "Der Schachzug ging auf. Joy verkaufte sich, und jahrzehntelang gehörte es zu den bekanntesten Parfums der Welt. Eine schöne Erinnerung daran, dass Menschen sich manchmal, wenn alles schiefgeht, trotzdem nach etwas Schönem sehnen."
+    ],
+    "caption": "Eau de Joy, Jean Patou"
+   },
+   "fr": {
+    "title": "Joy : le parfum qui a défié la crise",
+    "teaser": "En pleine Grande Dépression, Jean Patou lança « le parfum le plus cher du monde ». Et cela a fonctionné.",
+    "body": [
+     "En octobre 1929, la Bourse de New York s’effondra. Soudain, de nombreuses clientes américaines du couturier Jean Patou ne pouvaient plus s’offrir ses robes.",
+     "Patou eut alors une idée qui défiait la logique : si elles ne pouvaient plus acheter une robe, peut-être pouvaient-elles encore acheter un flacon. En 1930, il lança un parfum qu’il baptisa, très volontairement, Joy, « joie » en anglais. Il l’annonça comme « le parfum le plus cher du monde ».",
+     "Pour se présenter ainsi, il fallait qu’il le soit vraiment. On raconte que chaque flacon d’environ 30 ml contenait plus de dix mille fleurs de jasmin et des centaines de roses. C’était un parfum de deux fleurs, le jasmin et la rose, sans autre artifice. Une déclaration de luxe en pleine époque de pénurie.",
+     "Le pari fut gagnant. Joy se vendit et, pendant des décennies, il resta l’un des parfums les plus célèbres du monde. Un bon rappel : parfois, quand tout va mal, on continue de désirer quelque chose de beau."
+    ],
+    "caption": "Eau de Joy, Jean Patou"
+   },
+   "it": {
+    "title": "Joy: il profumo che sfidò la crisi",
+    "teaser": "In piena Grande Depressione, Jean Patou lanciò «il profumo più costoso del mondo». E funzionò.",
+    "body": [
+     "Nell’ottobre del 1929 crollò la Borsa di New York. All’improvviso, molte delle clienti americane del sarto Jean Patou non potevano più permettersi i suoi abiti.",
+     "Patou ebbe un’idea contraria alla logica: se non potevano più comprare un abito, forse potevano ancora comprare un flacone. E nel 1930 lanciò un profumo che battezzò, con tutta l’intenzione, Joy, «gioia» in inglese. Lo presentò come «il profumo più costoso del mondo».",
+     "Per presentarsi così, doveva esserlo davvero. Si racconta che ogni flacone da circa 30 ml contenesse più di diecimila fiori di gelsomino e centinaia di rose. Era un profumo di due fiori, gelsomino e rosa, senza altri artifici. Una dichiarazione di lusso in piena epoca di scarsità.",
+     "La mossa funzionò. Joy si vendette e, per decenni, rimase tra i profumi più celebri del mondo. Un bel promemoria: a volte, quando tutto va male, le persone continuano a desiderare qualcosa di bello."
+    ],
+    "caption": "Eau de Joy, Jean Patou"
+   },
+   "pt": {
+    "title": "Joy: o perfume que desafiou a crise",
+    "teaser": "Em plena Grande Depressão, Jean Patou lançou «o perfume mais caro do mundo». E resultou.",
+    "body": [
+     "Em outubro de 1929, a bolsa de Nova Iorque colapsou. De repente, muitas das clientes americanas do costureiro Jean Patou já não podiam pagar os seus vestidos.",
+     "Patou teve uma ideia contrária à lógica: se já não podiam comprar um vestido, talvez ainda pudessem comprar um frasco. E em 1930 lançou um perfume a que chamou, com toda a intenção, Joy, «alegria» em inglês. Anunciou-o como «o perfume mais caro do mundo».",
+     "Para se apresentar assim, tinha de o ser a sério. Conta-se que cada frasco de cerca de 30 ml concentrava mais de dez mil flores de jasmim e centenas de rosas. Era um perfume de duas flores, jasmim e rosa, sem mais artifícios. Uma declaração de luxo em plena época de escassez.",
+     "A jogada correu bem. Joy vendeu-se e, durante décadas, manteve-se entre os perfumes mais reconhecidos do mundo. Um bom lembrete de que, por vezes, quando tudo corre mal, as pessoas continuam a querer algo belo."
+    ],
+    "caption": "Eau de Joy, Jean Patou"
+   },
+   "ja": {
+    "title": "ジョイ ― 不況に立ち向かった香水",
+    "teaser": "世界大恐慌のさなか、ジャン・パトゥは「世界でいちばん高価な香水」を発売しました。そして、それは成功しました。",
+    "body": [
+     "1929年10月、ニューヨークの株式市場が暴落しました。クチュリエのジャン・パトゥの顧客だったアメリカ人女性の多くが、突然、彼のドレスを買えなくなってしまったのです。",
+     "パトゥは常識に反する発想をします。ドレスが買えないなら、香水の小瓶ならまだ買えるかもしれない。そして1930年、彼はあえて「ジョイ（喜び）」と名づけた香水を発売し、「世界でいちばん高価な香水」として宣伝しました。",
+     "そう名乗るからには、本当にそうでなければなりません。伝えられるところによると、約30mlのボトル1本に、1万輪を超えるジャスミンと数百本のバラが使われていたといいます。ジャスミンとバラ、二つの花だけの香水で、余計な仕掛けはありませんでした。物のない時代に掲げた、贅沢の宣言です。",
+     "この賭けは成功しました。ジョイはよく売れ、何十年ものあいだ、世界で最も知られた香水のひとつであり続けました。すべてがうまくいかないときでも、人は美しいものを求める。そんなことを思い出させてくれます。"
+    ],
+    "caption": "Eau de Joy, Jean Patou"
+   }
+  }
+ }
+];
+let _sqOpen = false;
+function _sqText(e) { return e.t[currentLang] || e.t.es; }
+function renderSq() {
+  const e = SQ_ENTRIES[0];
+  const card = document.getElementById('sq-home-card');
+  if (!e || !card) return;
+  const x = _sqText(e);
+  card.style.display = '';
+  document.getElementById('sq-home-title').textContent = x.title;
+  document.getElementById('sq-home-teaser').textContent = x.teaser;
+  const th = document.getElementById('sq-home-thumb');
+  if (th) {
+    if (e.thumb) {
+      if (th.getAttribute('src') !== e.thumb) th.setAttribute('src', e.thumb);
+      th.style.display = '';
+    } else {
+      th.style.display = 'none';
+    }
+  }
+  const page = document.getElementById('modal-sq');
+  if (page && page.classList.contains('open')) fillSq();
+}
+function fillSq() {
+  const e = SQ_ENTRIES[0]; if (!e) return;
+  const x = _sqText(e);
+  document.getElementById('sq-title').textContent = x.title;
+  const img = document.getElementById('sq-img');
+  if (img.getAttribute('src') !== e.img) img.setAttribute('src', e.img);
+  img.alt = x.caption;
+  document.getElementById('sq-caption').textContent = x.caption;
+  const body = document.getElementById('sq-body');
+  body.textContent = '';
+  x.body.forEach(function(p) {
+    const el = document.createElement('p');
+    el.textContent = p;
+    body.appendChild(el);
+  });
+  document.getElementById('sq-sign').textContent = e.sign;
+}
+function openSq() {
+  fillSq();
+  const page = document.getElementById('modal-sq');
+  page.scrollTop = 0;
+  openModal('modal-sq');
+}
+
 function applyLanguage(lang) {
   currentLang = lang;
   const dict = I18N[lang] || I18N.es;
@@ -5044,6 +5256,7 @@ function applyLanguage(lang) {
   // instead of only updating on the next natural re-render.
   const isOpen = (id) => { const el = document.getElementById(id); return !!el && el.classList.contains('open'); };
   if (typeof render === 'function') render();
+  if (typeof renderSq === 'function') renderSq();
   if (isOpen('modal-classification') && typeof renderClassification === 'function') renderClassification();
   if (isOpen('modal-fields') && typeof renderFieldMgr === 'function') renderFieldMgr();
   if (isOpen('modal-families') && typeof renderFamilyMgr === 'function') renderFamilyMgr();

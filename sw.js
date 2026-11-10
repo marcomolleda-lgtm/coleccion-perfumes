@@ -1,5 +1,5 @@
-const CACHE = 'perfumes-v65';
-const ASSETS = ['./index.html', './manifest.json', './icon-180-v10.png', './icon-192-v10.png', './icon-512-v10.png', './icon-192-maskable-v10.png', './icon-512-maskable-v10.png', './sample-chanel5-v1.jpg', './sample-chanel5-2-v1.jpg', './sample-chanel5-3-v1.jpg'];
+const CACHE = 'perfumes-v67';
+const ASSETS = ['./index.html', './manifest.json', './icon-180-v10.png', './icon-192-v10.png', './icon-512-v10.png', './icon-192-maskable-v10.png', './icon-512-maskable-v10.png', './sample-chanel5-v1.jpg', './sample-chanel5-2-v1.jpg', './sample-chanel5-3-v1.jpg', './scentic-joy-v1.jpg', './scentic-joy-thumb-v1.webp'];
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
