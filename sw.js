@@ -1,4 +1,4 @@
-const CACHE = 'perfumes-v68';
+const CACHE = 'perfumes-v69';
 const ASSETS = ['./index.html', './manifest.json', './icon-180-v10.png', './icon-192-v10.png', './icon-512-v10.png', './icon-192-maskable-v10.png', './icon-512-maskable-v10.png', './sample-chanel5-v1.jpg', './sample-chanel5-2-v1.jpg', './sample-chanel5-3-v1.jpg', './scentic-joy-v1.jpg', './scentic-joy-thumb-v1.webp', './scentic-joy-v2.webp'];
 
 self.addEventListener('install', function(e) {
