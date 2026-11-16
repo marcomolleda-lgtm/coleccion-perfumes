@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="scentic"/>
-<link rel="apple-touch-icon" href="./icon-180-v11.png"/>
+<link rel="apple-touch-icon" href="./icon-180-v12.png"/>
 <style>
   :root {
     --bg: #faf9f5;
@@ -1733,7 +1733,7 @@ function uniqueSorted(values) {
   return [...seen.values()].sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
 }
 function normalizePickerText(value) {
-  return String(value||'').trim().toLocaleLowerCase('es');
+  return String(value||'').trim(); // respeta mayúsculas tal y como las escribe el usuario
 }
 function normalizePickerCollections() {
   state.families = uniqueSorted((state.families||[]).map(normalizePickerText));
@@ -2081,6 +2081,9 @@ function openClassification() {
   classExpanded = {family:false, notes:false, tags:false, concentration:false};
   renderClassification();
   openModal('modal-classification');
+  // El aviso "ver todas" se mide con el modal visible: se recalcula ya abierto
+  renderClassification();
+  requestAnimationFrame(renderClassification);
 }
 function renderClassification() {
   renderClassCategories();
@@ -2898,7 +2901,7 @@ function openEdit(id) {
         inner += `<div id="ef-family-picker"></div>`;
       }
       else if(f.key==='gender') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${GENDERS.map(o=>`<option value="${o}"${val===o?' selected':''}>${genderLabel(o)}</option>`).join('')}</select>`;
-      else if(f.key==='inCollectionSince') inner+=`<input class="field-input" type="date" id="ef-${f.key}" value="${val}"/>`;
+      else if(f.key==='inCollectionSince') inner+=dateFieldHtml('ef-'+f.key, val);
       else inner+=`<input class="field-input" id="ef-${f.key}" value="${val}"/>`;
       div.innerHTML=inner;
       grid.appendChild(div);
@@ -3056,7 +3059,7 @@ function renderBottlesList() {
       </div>
       <div class="field-group">
         <label class="field-label">${L.inCollectionSince.toUpperCase()}</label>
-        <input class="field-input" type="date" id="eb-since-${i}" value="${b.since||''}"/>
+        ${dateFieldHtml('eb-since-'+i, b.since||'')}
       </div>
       <div class="field-group">
         <label class="field-label">${L.boughtAt.toUpperCase()}</label>
@@ -3153,6 +3156,45 @@ function togglePickerValue(type,value) {
 function removePickerValue(type,value) { togglePickerValue(type,value); }
 function togglePickerExpanded(type) { pickerExpanded[type]=!pickerExpanded[type]; refreshPicker(type); }
 function toggleFamilyChip(btn, fam) { togglePickerValue('family',fam); }
+
+/* ---- Campo de fecha propio (no depende del diálogo nativo de Android) ---- */
+function dateFieldHtml(id, val) {
+  const iso = /^\d{4}-\d{2}-\d{2}$/.test(val||'') ? val : '';
+  const shown = iso ? iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+iso.slice(0,4) : '';
+  return `<div class="date-field" style="display:flex;align-items:center;gap:6px;position:relative">
+    <input type="hidden" id="${id}" value="${iso}"/>
+    <input class="field-input" style="flex:1" id="${id}-txt" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/yyyy" maxlength="10" value="${shown}" oninput="dateFieldInput('${id}')"/>
+    <button type="button" onclick="dateFieldPick('${id}')" aria-label="Calendar" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px 6px">📅</button>
+    <input type="date" id="${id}-native" tabindex="-1" aria-hidden="true" value="${iso}" onchange="dateFieldNative('${id}')" style="position:absolute;right:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none"/>
+  </div>`;
+}
+function dateFieldInput(id) {
+  const txt = document.getElementById(id+'-txt'), hid = document.getElementById(id);
+  const d = txt.value.replace(/\D/g,'').slice(0,8);
+  let out = d.slice(0,2);
+  if (d.length>2) out += '/' + d.slice(2,4);
+  if (d.length>4) out += '/' + d.slice(4,8);
+  txt.value = out;
+  let iso = '';
+  if (d.length===8) {
+    const dd=+d.slice(0,2), mm=+d.slice(2,4), yy=+d.slice(4,8);
+    const dt = new Date(yy, mm-1, dd);
+    if (yy>=1900 && dt.getFullYear()===yy && dt.getMonth()===mm-1 && dt.getDate()===dd)
+      iso = d.slice(4,8)+'-'+d.slice(2,4)+'-'+d.slice(0,2);
+  }
+  hid.value = iso;
+  txt.style.color = (d.length===8 && !iso) ? '#b3261e' : '';
+}
+function dateFieldPick(id) {
+  const n = document.getElementById(id+'-native');
+  n.value = document.getElementById(id).value || '';
+  try { n.showPicker ? n.showPicker() : n.click(); } catch(e) { document.getElementById(id+'-txt').focus(); }
+}
+function dateFieldNative(id) {
+  const iso = document.getElementById(id+'-native').value;
+  document.getElementById(id).value = iso;
+  document.getElementById(id+'-txt').value = iso ? iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+iso.slice(0,4) : '';
+}
 
 function getFieldVal(key) {
   if(key==='family') return [...editFamilies];
