@@ -1905,6 +1905,8 @@ async function initState() {
       p.tags = Array.isArray(p.tags) ? p.tags.map(v=>String(v).trim()).filter(Boolean) : normalizePickerValues(p.tags);
     });
     state.families = uniqueSorted(state.families);
+    // Rescata familias creadas antes en Clasificación (se guardaban en state.family)
+    if (Array.isArray(state.family)) { state.families = uniqueSorted([...state.families, ...state.family]); delete state.family; }
     if (state.category === 'otro') state.category = 'probados';
     if (!state.category) state.category = 'perfumes';
     if (state.view !== 'list') state.view = 'card';
@@ -2092,6 +2094,8 @@ function deleteFamily(i) {
 const CLASS_CATEGORIES = ['perfumes','coleccion','deseo','probados'];
 let classSearch = {family:'', notes:'', tags:''};
 
+// La lista de familias vive en state.families (no en state.family)
+function classKey(type) { return type === 'family' ? 'families' : type; }
 function classFieldOf(type, p) {
   return type === 'family' ? p.family : (type === 'notes' ? p.notes : p.tags);
 }
@@ -2154,7 +2158,7 @@ let classExpanded = {family:false, notes:false, tags:false};
 function renderClassSection(type) {
   const el = document.getElementById('class-' + type + '-chips');
   if (!el) return;
-  let items = uniqueSorted(state[type] || []);
+  let items = uniqueSorted(state[classKey(type)] || []);
   const q = _stripAccents((classSearch[type]||'').toLowerCase().trim());
   if (q) items = items.filter(i => _stripAccents(i.toLowerCase()).includes(q));
   el.innerHTML = items.length ? items.map(name => {
@@ -2181,7 +2185,7 @@ function toggleClassExpanded(type) {
   renderClassSection(type);
 }
 function classPickerMatches(type, q) {
-  const items = uniqueSorted(state[type] || []);
+  const items = uniqueSorted(state[classKey(type)] || []);
   const needle = _stripAccents(String(q||'').toLowerCase().trim());
   if (!needle) return [];
   return items.filter(v => _stripAccents(v.toLowerCase()).includes(needle)).slice(0,12);
@@ -2191,7 +2195,7 @@ function onClassPickerInput(type, value) {
   renderClassSection(type);
   const box = document.getElementById('class-' + type + '-suggestions'); if (!box) return;
   const matches = classPickerMatches(type, value);
-  const exact = (state[type]||[]).some(v => v.toLowerCase() === String(value||'').trim().toLowerCase());
+  const exact = (state[classKey(type)]||[]).some(v => v.toLowerCase() === String(value||'').trim().toLowerCase());
   box.innerHTML = matches.map(v => `<button type="button" class="multi-picker-suggestion" onclick="classSelectSuggestion('${type}','${escapeHtml(v)}')">${escapeHtml(classLabel(type,v))}</button>`).join('');
   if (value.trim() && !exact) box.innerHTML += `<button type="button" class="multi-picker-suggestion" onclick="classCreateItem('${type}',document.getElementById('class-${type}-search').value)">${t('picker_create_prefix')} «${escapeHtml(value.trim())}»</button>`;
   box.classList.toggle('open', !!value.trim() && box.innerHTML.length > 0);
@@ -2206,10 +2210,10 @@ function classSelectSuggestion(type, value) {
 function classCreateItem(type, value) {
   const val = normalizePickerText(String(value||'').trim());
   if (!val) return;
-  if (!Array.isArray(state[type])) state[type] = [];
-  if (!state[type].some(x => x.toLowerCase() === val.toLowerCase())) {
-    state[type].push(val);
-    state[type] = uniqueSorted(state[type]);
+  if (!Array.isArray(state[classKey(type)])) state[classKey(type)] = [];
+  if (!state[classKey(type)].some(x => x.toLowerCase() === val.toLowerCase())) {
+    state[classKey(type)].push(val);
+    state[classKey(type)] = uniqueSorted(state[classKey(type)]);
     save();
   }
   const box = document.getElementById('class-' + type + '-suggestions'); if (box) box.classList.remove('open');
@@ -2220,7 +2224,7 @@ function classCreateItem(type, value) {
 function classPickerEnter(type, value) {
   const val = String(value||'').trim();
   if (!val) return;
-  const exact = (state[type]||[]).find(x => x.toLowerCase() === val.toLowerCase());
+  const exact = (state[classKey(type)]||[]).find(x => x.toLowerCase() === val.toLowerCase());
   if (exact) classSelectSuggestion(type, exact); else classCreateItem(type, val);
 }
 function reassignClassValue(type, oldName, newName) {
@@ -2239,7 +2243,7 @@ function renameClassItem(type, oldName) {
   if (val === null) return;
   const trimmed = normalizePickerText(val.trim());
   if (!trimmed || trimmed === oldName) return;
-  const list = state[type] || [];
+  const list = state[classKey(type)] || [];
   const existingIdx = list.findIndex(x=>x.toLowerCase()===trimmed.toLowerCase());
   const oldIdx = list.findIndex(x=>x.toLowerCase()===oldName.toLowerCase());
   // Si solo cambian las mayúsculas, existingIdx === oldIdx: se renombra, no se fusiona
@@ -2251,7 +2255,7 @@ function renameClassItem(type, oldName) {
     if (oldIdx >= 0) list[oldIdx] = trimmed;
     reassignClassValue(type, oldName, trimmed);
   }
-  state[type] = uniqueSorted(list);
+  state[classKey(type)] = uniqueSorted(list);
   save();
   renderClassSection(type);
 }
@@ -2260,7 +2264,7 @@ function deleteClassItem(type, name) {
   const msg = count > 0 ? `${t('confirm_delete_item_used_pre')}${name}${t('confirm_delete_item_used_mid')}${count}${count!==1?t('confirm_delete_item_used_post_many'):t('confirm_delete_item_used_post_one')}` : `${t('confirm_delete_item_pre')}${name}${t('confirm_delete_item_post')}`;
   if (!confirm(msg)) return;
   const lower = name.toLowerCase();
-  state[type] = (state[type]||[]).filter(x=>x.toLowerCase()!==lower);
+  state[classKey(type)] = (state[classKey(type)]||[]).filter(x=>x.toLowerCase()!==lower);
   state.perfumes.forEach(p => {
     const arr = classFieldOf(type, p);
     if (!Array.isArray(arr)) return;
