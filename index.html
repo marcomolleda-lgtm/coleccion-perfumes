@@ -2238,11 +2238,12 @@ function renameClassItem(type, oldName) {
   const val = prompt(t('prompt_rename_item'), oldName);
   if (val === null) return;
   const trimmed = normalizePickerText(val.trim());
-  if (!trimmed || trimmed.toLowerCase() === oldName.toLowerCase()) return;
+  if (!trimmed || trimmed === oldName) return;
   const list = state[type] || [];
   const existingIdx = list.findIndex(x=>x.toLowerCase()===trimmed.toLowerCase());
   const oldIdx = list.findIndex(x=>x.toLowerCase()===oldName.toLowerCase());
-  if (existingIdx >= 0) {
+  // Si solo cambian las mayúsculas, existingIdx === oldIdx: se renombra, no se fusiona
+  if (existingIdx >= 0 && existingIdx !== oldIdx) {
     if (!confirm(`${t('confirm_merge_pre')}${list[existingIdx]}${t('confirm_merge_mid1')}${oldName}${t('confirm_merge_mid2')}${list[existingIdx]}${t('confirm_merge_post')}`)) return;
     reassignClassValue(type, oldName, list[existingIdx]);
     if (oldIdx >= 0) list.splice(oldIdx,1);
@@ -2351,7 +2352,7 @@ function renameClassConc(oldName) {
   const val = prompt(t('prompt_rename_item'), oldName);
   if (val === null) return;
   const trimmed = val.trim();
-  if (!trimmed || trimmed.toLowerCase() === oldName.toLowerCase()) return;
+  if (!trimmed || trimmed === oldName) return;
   const list = state.concentrations || [];
   const existingIdx = list.findIndex(x=>x.toLowerCase()===trimmed.toLowerCase());
   const oldIdx = list.findIndex(x=>x.toLowerCase()===oldName.toLowerCase());
