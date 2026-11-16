@@ -1699,9 +1699,11 @@ let state = {
     {key:"gender",label:"Género",visible:true},
     {key:"boughtAt",label:"Comprado en",visible:true},
     {key:"price",label:"Precio",visible:true},
+    {key:"inCollectionSince",label:"En colección desde",visible:true},
     {key:"barcode",label:"Código de barras",visible:true},
     {key:"batchNumber",label:"No. de Batch",visible:true},
-    {key:"inCollectionSince",label:"En colección desde",visible:true},
+    {key:"productionDate",label:"Fecha de producción",visible:true},
+    {key:"expiryDate",label:"Fecha de caducidad",visible:true},
     {key:"status",label:"Categoría",visible:true},
     {key:"comments",label:"Comentarios",visible:true,required:true},
     {key:"rating",label:"Valoración",visible:true,required:true},
@@ -1847,6 +1849,23 @@ function deletePhotos(perfumeId) {
 
 function load(k) { try { const v=localStorage.getItem(k); return v?JSON.parse(v):null; } catch(e){ return null; } }
 
+// Migración única: "En colección desde" tras Precio y campos nuevos de lote
+function migrateFieldsV2() {
+  if (!Array.isArray(state.fields) || state.fieldsMigV2) return;
+  const si = state.fields.findIndex(f=>f.key==='inCollectionSince');
+  if (si>=0 && state.fields.some(f=>f.key==='price')) {
+    const moved = state.fields.splice(si,1)[0];
+    const ip = state.fields.findIndex(f=>f.key==='price');
+    state.fields.splice(ip+1,0,moved);
+  }
+  let at = state.fields.findIndex(f=>f.key==='batchNumber');
+  at = at>=0 ? at+1 : (state.fields.findIndex(f=>f.key==='status')>=0 ? state.fields.findIndex(f=>f.key==='status') : state.fields.length);
+  [['productionDate','Fecha de producción'],['expiryDate','Fecha de caducidad']].forEach(([k,l])=>{
+    if (!state.fields.some(f=>f.key===k)) state.fields.splice(at++,0,{key:k,label:l,visible:true});
+  });
+  state.fieldsMigV2 = true;
+}
+
 // Load state and rehydrate photos from IndexedDB
 async function initState() {
   const saved = load('pf_state');
@@ -1867,6 +1886,7 @@ async function initState() {
       const oldField = state.fields.find(f=>f.key==='inCollection');
       if (oldField) { oldField.key = 'status'; oldField.label = 'Categoría'; }
       state.fields = state.fields.filter(f=>f.key!=='myOpinion');
+      migrateFieldsV2();
     }
     state.perfumes.forEach(p => {
       if (p.status === 'otro') p.status = 'probados';
@@ -2727,11 +2747,13 @@ function renderBottlesDetailHtml(p) {
     const items = [
       ['concentration', b.concentration ? concentrationLabel(b.concentration) : ''],
       ['capacity', b.capacity],
-      ['since', b.since],
       ['boughtAt', b.boughtAt],
       ['price', b.price],
+      ['since', fmtDateDisplay(b.since)],
       ['barcode', b.barcode],
       ['batchNumber', b.batchNumber],
+      ['productionDate', fmtDateDisplay(b.productionDate)],
+      ['expiryDate', fmtDateDisplay(b.expiryDate)],
     ].filter(([,v])=>v!==undefined && v!==null && v!=='');
     const labelFor = (k) => k==='since' ? L.inCollectionSince : k==='barcode' ? t('field_barcode') : L[k];
     return items.map(([k,v])=>`
@@ -2797,7 +2819,7 @@ function openDetail(id) {
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
           <div>
             <div class="detail-field-label">${fieldLabel(f)}</div>
-            <div class="detail-field-value">${f.key==='family'?(Array.isArray(p.family)?p.family.map(v=>classLabel('family',v)).join(' · '):(p.family?classLabel('family',p.family):'')):f.key==='concentration'?concentrationLabel(p[f.key]):f.key==='gender'?genderLabel(p[f.key]):p[f.key]}</div>
+            <div class="detail-field-value">${f.key==='family'?(Array.isArray(p.family)?p.family.map(v=>classLabel('family',v)).join(' · '):(p.family?classLabel('family',p.family):'')):f.key==='concentration'?concentrationLabel(p[f.key]):f.key==='gender'?genderLabel(p[f.key]):['inCollectionSince','productionDate','expiryDate'].includes(f.key)?fmtDateDisplay(p[f.key]):p[f.key]}</div>
           </div>`).join('')}
       </div>
       ${renderBottlesDetailHtml(p)}
@@ -2870,8 +2892,8 @@ function openEdit(id) {
   // static blocks (notas, código de barras, categoría...) to match the
   // requested field order.
   const SEG_A = ['perfumer','launch','concentration','capacity','bottleDesigner','family'];
-  const SEG_B = ['gender','boughtAt','price'];
-  const SEG_C = ['batchNumber','inCollectionSince'];
+  const SEG_B = ['gender','boughtAt','price','inCollectionSince'];
+  const SEG_C = ['batchNumber','productionDate','expiryDate'];
 
   function renderFieldSegment(containerId, keys, includeNameBrand) {
     const grid = document.getElementById(containerId);
@@ -2901,7 +2923,7 @@ function openEdit(id) {
         inner += `<div id="ef-family-picker"></div>`;
       }
       else if(f.key==='gender') inner+=`<select class="field-select" id="ef-${f.key}"><option value="">—</option>${GENDERS.map(o=>`<option value="${o}"${val===o?' selected':''}>${genderLabel(o)}</option>`).join('')}</select>`;
-      else if(f.key==='inCollectionSince') inner+=dateFieldHtml('ef-'+f.key, val);
+      else if(['inCollectionSince','productionDate','expiryDate'].includes(f.key)) inner+=dateFieldHtml('ef-'+f.key, val);
       else inner+=`<input class="field-input" id="ef-${f.key}" value="${val}"/>`;
       div.innerHTML=inner;
       grid.appendChild(div);
@@ -3015,7 +3037,7 @@ function bottleLabelPlain(i) {
 }
 
 function addBottle() {
-  editBottles.push({ concentration:'', capacity:'', since:'', boughtAt:'', price:'', barcode:'', batchNumber:'', comments:'' });
+  editBottles.push({ concentration:'', capacity:'', since:'', boughtAt:'', price:'', barcode:'', batchNumber:'', productionDate:'', expiryDate:'', comments:'' });
   renderBottlesList();
 }
 
@@ -3035,6 +3057,8 @@ function collectBottlesFromForm() {
     price: (document.getElementById('eb-price-'+i)||{}).value || '',
     barcode: (document.getElementById('eb-barcode-'+i)||{}).value || '',
     batchNumber: (document.getElementById('eb-batch-'+i)||{}).value || '',
+    productionDate: (document.getElementById('eb-prod-'+i)||{}).value || '',
+    expiryDate: (document.getElementById('eb-exp-'+i)||{}).value || '',
     comments: (document.getElementById('eb-comments-'+i)||{}).value || '',
   }));
 }
@@ -3058,10 +3082,6 @@ function renderBottlesList() {
         <input class="field-input" id="eb-capacity-${i}" value="${escapeHtml(b.capacity||'')}"/>
       </div>
       <div class="field-group">
-        <label class="field-label">${L.inCollectionSince.toUpperCase()}</label>
-        ${dateFieldHtml('eb-since-'+i, b.since||'')}
-      </div>
-      <div class="field-group">
         <label class="field-label">${L.boughtAt.toUpperCase()}</label>
         <input class="field-input" id="eb-boughtAt-${i}" value="${escapeHtml(b.boughtAt||'')}"/>
       </div>
@@ -3070,12 +3090,24 @@ function renderBottlesList() {
         <input class="field-input" id="eb-price-${i}" value="${escapeHtml(b.price||'')}"/>
       </div>
       <div class="field-group">
+        <label class="field-label">${L.inCollectionSince.toUpperCase()}</label>
+        ${dateFieldHtml('eb-since-'+i, b.since||'')}
+      </div>
+      <div class="field-group">
         <label class="field-label">${t('field_barcode')}</label>
         <input class="field-input" id="eb-barcode-${i}" value="${escapeHtml(b.barcode||'')}"/>
       </div>
       <div class="field-group">
         <label class="field-label">${L.batchNumber.toUpperCase()}</label>
         <input class="field-input" id="eb-batch-${i}" value="${escapeHtml(b.batchNumber||'')}"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">${L.productionDate.toUpperCase()}</label>
+        ${dateFieldHtml('eb-prod-'+i, b.productionDate||'')}
+      </div>
+      <div class="field-group">
+        <label class="field-label">${L.expiryDate.toUpperCase()}</label>
+        ${dateFieldHtml('eb-exp-'+i, b.expiryDate||'')}
       </div>
       <div class="field-group">
         <label class="field-label">${L.comments.toUpperCase()}</label>
@@ -3158,6 +3190,9 @@ function togglePickerExpanded(type) { pickerExpanded[type]=!pickerExpanded[type]
 function toggleFamilyChip(btn, fam) { togglePickerValue('family',fam); }
 
 /* ---- Campo de fecha propio (no depende del diálogo nativo de Android) ---- */
+function fmtDateDisplay(v) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(v||'') ? v.slice(8,10)+'/'+v.slice(5,7)+'/'+v.slice(0,4) : (v||'');
+}
 function dateFieldHtml(id, val) {
   const iso = /^\d{4}-\d{2}-\d{2}$/.test(val||'') ? val : '';
   const shown = iso ? iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+iso.slice(0,4) : '';
@@ -3230,6 +3265,11 @@ function savePerfume() {
     if(['rating','status','notes','comments','barcode'].includes(f.key)) return;
     obj[f.key]=getFieldVal(f.key);
   });
+
+  // Las familias, notas y etiquetas nuevas pasan ya a Gestionar campos > Clasificación
+  state.families = uniqueSorted([...(state.families||[]), ...(obj.family||[])]);
+  state.notes = uniqueSorted([...(state.notes||[]), ...obj.notes]);
+  state.tags = uniqueSorted([...(state.tags||[]), ...obj.tags]);
 
   if(editId) {
     state.perfumes=state.perfumes.map(p=>p.id===editId?obj:p);
@@ -5030,13 +5070,13 @@ function t(key) { return (I18N[currentLang] || I18N.es)[key] || key; }
 // Default (unmodified) labels for built-in fields/options, used to translate
 // display only when the user hasn't renamed/customized them.
 const DEFAULT_FIELD_LABELS = {
-  es: {name:"Nombre",brand:"Marca",concentration:"Concentración",capacity:"Capacidad",launch:"Lanzamiento",perfumer:"Perfumista",bottleDesigner:"Diseñador del frasco",family:"Familia olfativa",gender:"Género",notes:"Notas olfativas",boughtAt:"Comprado en",price:"Precio",inCollectionSince:"En colección desde",rating:"Valoración",batchNumber:"No. de Batch",comments:"Comentarios",status:"Categoría",barcode:"Código de barras"},
-  en: {name:"Name",brand:"Brand",concentration:"Concentration",capacity:"Size",launch:"Release year",perfumer:"Perfumer",bottleDesigner:"Bottle designer",family:"Olfactory family",gender:"Gender",notes:"Olfactory notes",boughtAt:"Purchased at",price:"Price",inCollectionSince:"In collection since",rating:"Rating",batchNumber:"Batch No.",comments:"Comments",status:"Category",barcode:"Barcode"},
-  ja: {name:"名前",brand:"ブランド",concentration:"濃度",capacity:"容量",launch:"発売年",perfumer:"調香師",bottleDesigner:"ボトルデザイナー",family:"香りの系統",gender:"性別",notes:"香りのノート",boughtAt:"購入場所",price:"価格",inCollectionSince:"コレクション登録日",rating:"評価",batchNumber:"バッチ番号",comments:"コメント",status:"カテゴリー",barcode:"バーコード"},
-  de: {name:"Name",brand:"Marke",concentration:"Konzentration",capacity:"Größe",launch:"Erscheinungsjahr",perfumer:"Parfümeur",bottleDesigner:"Flakon-Designer",family:"Duftfamilie",gender:"Geschlecht",notes:"Duftnoten",boughtAt:"Gekauft bei",price:"Preis",inCollectionSince:"In Sammlung seit",rating:"Bewertung",batchNumber:"Chargennummer",comments:"Kommentare",status:"Kategorie",barcode:"Barcode"},
-  fr: {name:"Nom",brand:"Marque",concentration:"Concentration",capacity:"Contenance",launch:"Année de sortie",perfumer:"Parfumeur",bottleDesigner:"Designer du flacon",family:"Famille olfactive",gender:"Genre",notes:"Notes olfactives",boughtAt:"Acheté chez",price:"Prix",inCollectionSince:"Dans la collection depuis",rating:"Note",batchNumber:"N° de lot",comments:"Commentaires",status:"Catégorie",barcode:"Code-barres"},
-  it: {name:"Nome",brand:"Marca",concentration:"Concentrazione",capacity:"Formato",launch:"Anno di lancio",perfumer:"Profumiere",bottleDesigner:"Designer del flacone",family:"Famiglia olfattiva",gender:"Genere",notes:"Note olfattive",boughtAt:"Acquistato presso",price:"Prezzo",inCollectionSince:"In collezione da",rating:"Valutazione",batchNumber:"N. di lotto",comments:"Commenti",status:"Categoria",barcode:"Codice a barre"},
-  pt: {name:"Nome",brand:"Marca",concentration:"Concentração",capacity:"Capacidade",launch:"Ano de lançamento",perfumer:"Perfumista",bottleDesigner:"Designer do frasco",family:"Família olfativa",gender:"Género",notes:"Notas olfativas",boughtAt:"Comprado em",price:"Preço",inCollectionSince:"Na coleção desde",rating:"Avaliação",batchNumber:"N.º de lote",comments:"Comentários",status:"Categoria",barcode:"Código de barras"}
+  es: {name:"Nombre",brand:"Marca",concentration:"Concentración",capacity:"Capacidad",launch:"Lanzamiento",perfumer:"Perfumista",bottleDesigner:"Diseñador del frasco",family:"Familia olfativa",gender:"Género",notes:"Notas olfativas",boughtAt:"Comprado en",price:"Precio",inCollectionSince:"En colección desde",rating:"Valoración",batchNumber:"No. de Batch",productionDate:"Fecha de producción",expiryDate:"Fecha de caducidad",comments:"Comentarios",status:"Categoría",barcode:"Código de barras"},
+  en: {name:"Name",brand:"Brand",concentration:"Concentration",capacity:"Size",launch:"Release year",perfumer:"Perfumer",bottleDesigner:"Bottle designer",family:"Olfactory family",gender:"Gender",notes:"Olfactory notes",boughtAt:"Purchased at",price:"Price",inCollectionSince:"In collection since",rating:"Rating",batchNumber:"Batch No.",productionDate:"Production date",expiryDate:"Expiry date",comments:"Comments",status:"Category",barcode:"Barcode"},
+  ja: {name:"名前",brand:"ブランド",concentration:"濃度",capacity:"容量",launch:"発売年",perfumer:"調香師",bottleDesigner:"ボトルデザイナー",family:"香りの系統",gender:"性別",notes:"香りのノート",boughtAt:"購入場所",price:"価格",inCollectionSince:"コレクション登録日",rating:"評価",batchNumber:"バッチ番号",productionDate:"製造日",expiryDate:"使用期限",comments:"コメント",status:"カテゴリー",barcode:"バーコード"},
+  de: {name:"Name",brand:"Marke",concentration:"Konzentration",capacity:"Größe",launch:"Erscheinungsjahr",perfumer:"Parfümeur",bottleDesigner:"Flakon-Designer",family:"Duftfamilie",gender:"Geschlecht",notes:"Duftnoten",boughtAt:"Gekauft bei",price:"Preis",inCollectionSince:"In Sammlung seit",rating:"Bewertung",batchNumber:"Chargennummer",productionDate:"Herstellungsdatum",expiryDate:"Haltbar bis",comments:"Kommentare",status:"Kategorie",barcode:"Barcode"},
+  fr: {name:"Nom",brand:"Marque",concentration:"Concentration",capacity:"Contenance",launch:"Année de sortie",perfumer:"Parfumeur",bottleDesigner:"Designer du flacon",family:"Famille olfactive",gender:"Genre",notes:"Notes olfactives",boughtAt:"Acheté chez",price:"Prix",inCollectionSince:"Dans la collection depuis",rating:"Note",batchNumber:"N° de lot",productionDate:"Date de production",expiryDate:"Date de péremption",comments:"Commentaires",status:"Catégorie",barcode:"Code-barres"},
+  it: {name:"Nome",brand:"Marca",concentration:"Concentrazione",capacity:"Formato",launch:"Anno di lancio",perfumer:"Profumiere",bottleDesigner:"Designer del flacone",family:"Famiglia olfattiva",gender:"Genere",notes:"Note olfattive",boughtAt:"Acquistato presso",price:"Prezzo",inCollectionSince:"In collezione da",rating:"Valutazione",batchNumber:"N. di lotto",productionDate:"Data di produzione",expiryDate:"Data di scadenza",comments:"Commenti",status:"Categoria",barcode:"Codice a barre"},
+  pt: {name:"Nome",brand:"Marca",concentration:"Concentração",capacity:"Capacidade",launch:"Ano de lançamento",perfumer:"Perfumista",bottleDesigner:"Designer do frasco",family:"Família olfativa",gender:"Género",notes:"Notas olfativas",boughtAt:"Comprado em",price:"Preço",inCollectionSince:"Na coleção desde",rating:"Avaliação",batchNumber:"N.º de lote",productionDate:"Data de produção",expiryDate:"Data de validade",comments:"Comentários",status:"Categoria",barcode:"Código de barras"}
 };
 function fieldLabel(f) {
   const esDefault = DEFAULT_FIELD_LABELS.es[f.key];
