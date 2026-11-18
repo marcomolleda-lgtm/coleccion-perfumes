@@ -495,6 +495,18 @@
   .detail-block { padding-top:16px; margin-top:16px; border-top:1px solid #ededec; }
   .detail-block-label { font-size:11px; color:var(--text-light); letter-spacing:1.5px; font-family:'Jost',sans-serif; font-weight:500; margin-bottom:6px; text-transform:uppercase; }
   .detail-block-value { font-size:16px; color:var(--text-muted); font-family:'Jost',sans-serif; font-style:italic; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+  /* ── DIARIO DE USO + COMPARTIR ── */
+  #modal-wear { z-index:1100; }
+  .wear-summary { font-size:15px; color:var(--text-muted); margin-bottom:8px; }
+  .wear-row { display:flex; gap:14px; align-items:baseline; padding:9px 0; border-bottom:1px solid #ededec; cursor:pointer; }
+  .wear-date { font-size:14px; color:var(--text); font-weight:500; flex-shrink:0; }
+  .wear-note { font-size:15px; color:var(--text-muted); font-style:italic; word-break:break-word; }
+  .wear-more { display:block; background:none; border:none; padding:8px 0 0; font-family:'Jost',sans-serif; font-size:13px; color:var(--text-light); cursor:pointer; text-decoration:underline; }
+  .wear-add-btn { display:block; margin-top:14px; padding:11px 22px; border-radius:999px; border:1px solid var(--accent); background:none; color:var(--text); font-family:'Jost',sans-serif; font-size:14px; font-weight:500; cursor:pointer; }
+  .wear-add-btn:active { opacity:.7; }
+  .wear-del-btn { background:none; border:none; color:var(--danger); font-family:'Jost',sans-serif; font-size:14px; cursor:pointer; padding:14px 0 0; }
+  .share-btn-sec { width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:none; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text); flex-shrink:0; }
+  .share-btn-sec:active { opacity:.7; }
   .detail-edit-btn {
     position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
     padding:14px 36px; border-radius:999px;
@@ -1552,6 +1564,22 @@
       <button class="modal-close" onclick="closeModal('modal-category')">✕</button>
     </div>
     <div class="modal-body" id="category-picker-list"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-wear">
+  <div class="modal" style="max-width:340px">
+    <div class="modal-header">
+      <span class="modal-title" data-i18n="wear_title">Diario de uso</span>
+      <button class="modal-close" onclick="closeModal('modal-wear')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-block-label" data-i18n="wear_date">Fecha</div>
+      <div id="wear-date-wrap" style="margin-bottom:16px"></div>
+      <input class="field-input" id="wear-note" type="text" maxlength="80" placeholder="Nota breve (opcional)" data-i18n-placeholder="wear_note_ph"/>
+      <button class="btn-primary" style="width:100%;margin-top:18px" onclick="saveWear()" data-i18n="btn_save">Guardar</button>
+      <button class="wear-del-btn" id="wear-delete-btn" onclick="deleteWear()" data-i18n="wear_delete">Eliminar registro</button>
+    </div>
   </div>
 </div>
 
@@ -2804,6 +2832,7 @@ function openDetail(id) {
   const p = state.perfumes.find(x=>x.id===id);
   if(!p) return;
   currentDetailId = id;
+  window._wearShowAll = false;
   const vf = state.fields.filter(f=>f.visible&&!['name','rating','status','myOpinion','comments','notes'].includes(f.key));
   const rawPhotos = (p.photos||[]).filter(Boolean);
   const ci = p.coverIndex||0;
@@ -2827,7 +2856,10 @@ function openDetail(id) {
           ${starsHTML(p.rating||0)}
           <span class="badge-out cat-${p.status||'coleccion'}" onclick="openPerfumeCategoryPicker(${p.id})">${catLabel(p.status||'coleccion')}</span>
         </div>
-        <button class="offer-btn-main" onclick="openOffersSearch(${p.id})">${t('title_offers')}</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="share-btn-sec" onclick="shareCard(${p.id})" title="${t('share_title')}" aria-label="${t('share_title')}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg></button>
+          <button class="offer-btn-main" onclick="openOffersSearch(${p.id})">${t('title_offers')}</button>
+        </div>
       </div>
       <div class="detail-fields">
         ${vf.filter(f=>f.key==='family'?(Array.isArray(p.family)?p.family.length:p.family):(p[f.key]!==undefined&&p[f.key]!==''&&p[f.key]!==null)).map(f=>`
@@ -2851,11 +2883,225 @@ function openDetail(id) {
       })():''}
       ${p.comments?`<div class="detail-block"><div class="detail-block-label">${t('field_comments')}</div><div class="detail-block-value">${p.comments}</div></div>`:''}
       ${p.photoCredit?`<div class="detail-block"><div class="detail-block-label">${t('field_photo_credit')}</div><div class="detail-block-value">${p.photoCredit}</div></div>`:''}
+      ${wearBlockHtml(p)}
       <button class="detail-edit-btn" onclick="openEdit(${p.id})">${t('btn_edit')}</button>
     </div>`;
   openModal('modal-detail');
   history.replaceState({view:'perfumes', modal:'modal-detail', detailId:id}, '');
 }
+// ── DIARIO DE USO ──
+let _wearTargetId = null, _wearEditIdx = null;
+function wearToday() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function sortedWears(p) {
+  return (p.wears||[]).map((w,i)=>({d:w.d, n:w.n, i})).sort((a,b)=> a.d<b.d ? 1 : a.d>b.d ? -1 : b.i-a.i);
+}
+function wearBlockHtml(p) {
+  const all = sortedWears(p);
+  const open = !!window._wearShowAll;
+  const list = open ? all : all.slice(0,3);
+  return `<div class="detail-block" id="wear-block">
+    <div class="detail-block-label">${t('wear_title')}</div>
+    ${all.length
+      ? `<div class="wear-summary">${t('wear_uses')}: ${all.length} · ${t('wear_last')}: ${fmtDateDisplay(all[0].d)}</div>`
+      : `<div class="detail-block-value">${t('wear_none')}</div>`}
+    ${list.map(w=>`<div class="wear-row" onclick="openWear(${p.id},${w.i})"><span class="wear-date">${fmtDateDisplay(w.d)}</span><span class="wear-note">${escapeHtml(w.n||'')}</span></div>`).join('')}
+    ${all.length>3 ? `<button class="wear-more" onclick="toggleWearAll()">${open ? t('wear_show_less') : t('wear_show_all')+' ('+all.length+')'}</button>` : ''}
+    <button class="wear-add-btn" onclick="openWear(${p.id},null)">${t('wear_add')}</button>
+  </div>`;
+}
+function refreshWearBlock(p) {
+  const el = document.getElementById('wear-block');
+  if (el) el.outerHTML = wearBlockHtml(p);
+}
+function toggleWearAll() {
+  window._wearShowAll = !window._wearShowAll;
+  const p = state.perfumes.find(x=>x.id===currentDetailId);
+  if (p) refreshWearBlock(p);
+}
+function openWear(id, idx) {
+  const p = state.perfumes.find(x=>x.id===id);
+  if (!p) return;
+  _wearTargetId = id; _wearEditIdx = idx;
+  const w = (idx !== null && idx !== undefined) ? (p.wears||[])[idx] : null;
+  document.getElementById('wear-date-wrap').innerHTML = dateFieldHtml('wear-date', w ? w.d : wearToday());
+  document.getElementById('wear-note').value = w ? (w.n||'') : '';
+  document.getElementById('wear-delete-btn').style.display = w ? '' : 'none';
+  openModal('modal-wear');
+}
+function saveWear() {
+  const p = state.perfumes.find(x=>x.id===_wearTargetId);
+  if (!p) return;
+  const d = document.getElementById('wear-date').value || wearToday();
+  const n = document.getElementById('wear-note').value.trim().slice(0,80);
+  p.wears = p.wears || [];
+  if (_wearEditIdx !== null && _wearEditIdx !== undefined && p.wears[_wearEditIdx]) p.wears[_wearEditIdx] = {d, n};
+  else p.wears.push({d, n});
+  save();
+  closeModal('modal-wear');
+  refreshWearBlock(p);
+  showToast(t('wear_saved'), 1800);
+}
+function deleteWear() {
+  const p = state.perfumes.find(x=>x.id===_wearTargetId);
+  if (!p || _wearEditIdx === null || _wearEditIdx === undefined) return;
+  (p.wears||[]).splice(_wearEditIdx, 1);
+  save();
+  closeModal('modal-wear');
+  refreshWearBlock(p);
+}
+
+// ── TARJETA COMPARTIBLE ──
+function _loadImg(src) {
+  return new Promise(res => {
+    if (!src) return res(null);
+    const im = new Image();
+    im.onload = () => res(im);
+    im.onerror = () => res(null);
+    im.src = src;
+  });
+}
+function _wrapLines(ctx, text, maxW, maxLines) {
+  const words = String(text).split(/\s+/).filter(Boolean);
+  const lines = []; let cur = '';
+  for (const w of words) {
+    const test = cur ? cur + ' ' + w : w;
+    if (!cur || ctx.measureText(test).width <= maxW) cur = test;
+    else { lines.push(cur); cur = w; }
+  }
+  if (cur) lines.push(cur);
+  if (lines.length > maxLines) {
+    const kept = lines.slice(0, maxLines);
+    let last = kept[maxLines-1];
+    while (ctx.measureText(last + '…').width > maxW && last.length > 1) last = last.slice(0, -1);
+    kept[maxLines-1] = last + '…';
+    return kept;
+  }
+  return lines;
+}
+function _rrect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+async function shareCard(id) {
+  const p = state.perfumes.find(x=>x.id===id);
+  if (!p) return;
+  try {
+    await Promise.all([
+      document.fonts.load("500 40px 'Cormorant Garamond'"),
+      document.fonts.load("400 30px 'Jost'"),
+      document.fonts.load("500 30px 'Jost'")
+    ]);
+  } catch(e) {}
+  const ci = p.coverIndex || 0;
+  const src = (p.photos && p.photos[ci]) || (p.photos||[]).find(Boolean) || null;
+  const img = await _loadImg(src);
+
+  const W = 1080, H = 1350, M = 90, CX = W/2;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#faf9f5';
+  ctx.fillRect(0, 0, W, H);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+
+  // Marca de la app
+  ctx.fillStyle = '#9c9a95';
+  ctx.font = "500 26px 'Jost', sans-serif";
+  try { ctx.letterSpacing = '9px'; } catch(e) {}
+  ctx.fillText('SCENTIC', CX + 4, 92);
+  try { ctx.letterSpacing = '0px'; } catch(e) {}
+
+  // Foto
+  const px = M, py = 140, pw = W - 2*M, ph = 700;
+  ctx.save();
+  _rrect(ctx, px, py, pw, ph, 28);
+  ctx.clip();
+  ctx.fillStyle = '#f0ede8';
+  ctx.fillRect(px, py, pw, ph);
+  if (img) {
+    const k = Math.max(pw/img.width, ph/img.height);
+    const dw = img.width*k, dh = img.height*k;
+    ctx.drawImage(img, px + (pw-dw)/2, py + (ph-dh)/2, dw, dh);
+  } else {
+    ctx.fillStyle = '#d8d8d5';
+    ctx.font = "500 360px 'Cormorant Garamond', serif";
+    ctx.fillText((p.name||'?').trim().charAt(0).toUpperCase(), CX, py + ph/2 + 120);
+  }
+  ctx.restore();
+
+  let y = py + ph + 72;
+
+  // Marca del perfume
+  if (p.brand) {
+    ctx.fillStyle = '#726f6a';
+    ctx.font = "500 28px 'Jost', sans-serif";
+    try { ctx.letterSpacing = '5px'; } catch(e) {}
+    ctx.fillText(String(p.brand).toUpperCase(), CX + 2, y);
+    try { ctx.letterSpacing = '0px'; } catch(e) {}
+    y += 20;
+  }
+
+  // Nombre
+  ctx.fillStyle = '#1a1a18';
+  ctx.font = "500 68px 'Cormorant Garamond', serif";
+  const nameLines = _wrapLines(ctx, p.name || '', W - 2*M, 2);
+  nameLines.forEach(l => { y += 70; ctx.fillText(l, CX, y); });
+
+  // Estrellas
+  if (p.rating > 0) {
+    y += 62;
+    ctx.font = "400 42px 'Jost', sans-serif";
+    for (let i = 0; i < 5; i++) {
+      ctx.fillStyle = i < p.rating ? '#3299cd' : '#dddddd';
+      ctx.fillText('★', CX + (i-2)*50, y);
+    }
+  }
+
+  // Notas olfativas
+  const notesArr = Array.isArray(p.notes) ? p.notes : (p.notes ? [p.notes] : []);
+  if (notesArr.length) {
+    ctx.fillStyle = '#726f6a';
+    ctx.font = "400 28px 'Jost', sans-serif";
+    const txt = notesArr.slice(0, 6).map(v => classLabel('notes', v)).join(' · ');
+    y += 22;
+    _wrapLines(ctx, txt, W - 2*M, 2).forEach(l => { y += 40; ctx.fillText(l, CX, y); });
+  }
+
+  // Usos
+  const nw = (p.wears||[]).length;
+  if (nw > 0) {
+    ctx.fillStyle = '#3299cd';
+    ctx.font = "500 26px 'Jost', sans-serif";
+    y += 28;
+    ctx.fillText(nw === 1 ? t('share_used_1') : t('share_used_n').replace('{n}', nw), CX, y + 22);
+  }
+
+  const blob = await new Promise(res => c.toBlob(res, 'image/png'));
+  if (!blob) { showToast(t('share_error'), 3000); return; }
+  const fname = ((p.name||'scentic').replace(/[^\w\-]+/g, '_').slice(0, 40) || 'scentic') + '.png';
+  const file = new File([blob], fname, {type: 'image/png'});
+  if (navigator.canShare && navigator.canShare({files: [file]})) {
+    try { await navigator.share({files: [file], title: p.name || 'Scentic'}); } catch(e) {}
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
 function onHeroScroll(){
   const el = document.getElementById('hero-carousel');
   const dots = document.getElementById('hero-dots');
@@ -3273,6 +3519,7 @@ function savePerfume() {
     photoCredit: document.getElementById('f-photo-credit').value,
     videoUrl: document.getElementById('f-video').value.trim(),
     bottles: [...editBottles],
+    wears: editId ? [...((state.perfumes.find(p=>p.id===editId)||{}).wears||[])] : [],
   };
 
   state.fields.forEach(f=>{
@@ -4474,6 +4721,7 @@ const I18N = {
     field_concentration: "Concentración",
     picker_add_new_concentration: "＋ Añadir nueva...", prompt_new_concentration: "Nueva concentración",
     btn_edit: "Editar",
+    wear_title: "Diario de uso", wear_add: "Me lo he puesto hoy", wear_none: "Aún sin registros", wear_uses: "Usos", wear_last: "Último", wear_date: "Fecha", wear_note_ph: "Nota breve (opcional)", wear_delete: "Eliminar registro", wear_show_all: "Ver todos", wear_show_less: "Ver menos", wear_saved: "Registro guardado", share_title: "Compartir", share_used_1: "Usado 1 vez", share_used_n: "Usado {n} veces", share_error: "No se pudo crear la imagen",
     edit_title_new: "Nuevo perfume", edit_title_edit: "Editar perfume",
     label_photos: "FOTOS (hasta 6)", photo_word: "FOTO",
     comments_placeholder: "Añade comentarios...", photo_credit_placeholder: "Autor y licencia de la foto...",
@@ -4566,6 +4814,7 @@ const I18N = {
     field_concentration: "Concentration",
     picker_add_new_concentration: "＋ Add new...", prompt_new_concentration: "New concentration",
     btn_edit: "Edit",
+    wear_title: "Wear log", wear_add: "I wore it today", wear_none: "No entries yet", wear_uses: "Uses", wear_last: "Last", wear_date: "Date", wear_note_ph: "Short note (optional)", wear_delete: "Delete entry", wear_show_all: "Show all", wear_show_less: "Show less", wear_saved: "Entry saved", share_title: "Share", share_used_1: "Worn once", share_used_n: "Worn {n} times", share_error: "Couldn't create the image",
     edit_title_new: "New perfume", edit_title_edit: "Edit perfume",
     label_photos: "PHOTOS (up to 6)", photo_word: "PHOTO",
     comments_placeholder: "Add comments...", photo_credit_placeholder: "Photo author and license...",
@@ -4652,6 +4901,7 @@ const I18N = {
     field_concentration: "濃度",
     picker_add_new_concentration: "＋ 新規追加...", prompt_new_concentration: "新しい濃度",
     btn_edit: "編集",
+    wear_title: "使用記録", wear_add: "今日つけた", wear_none: "まだ記録がありません", wear_uses: "使用回数", wear_last: "最終", wear_date: "日付", wear_note_ph: "短いメモ（任意）", wear_delete: "記録を削除", wear_show_all: "すべて表示", wear_show_less: "閉じる", wear_saved: "記録を保存しました", share_title: "共有", share_used_1: "1回使用", share_used_n: "{n}回使用", share_error: "画像を作成できませんでした",
     edit_title_new: "新しい香水", edit_title_edit: "香水を編集",
     label_photos: "写真（最大6枚）", photo_word: "写真",
     comments_placeholder: "コメントを追加...", photo_credit_placeholder: "写真の作者とライセンス...",
@@ -4739,6 +4989,7 @@ const I18N = {
     field_concentration: "Konzentration",
     picker_add_new_concentration: "＋ Neue hinzufügen...", prompt_new_concentration: "Neue Konzentration",
     btn_edit: "Bearbeiten",
+    wear_title: "Tragetagebuch", wear_add: "Heute getragen", wear_none: "Noch keine Einträge", wear_uses: "Anwendungen", wear_last: "Zuletzt", wear_date: "Datum", wear_note_ph: "Kurze Notiz (optional)", wear_delete: "Eintrag löschen", wear_show_all: "Alle anzeigen", wear_show_less: "Weniger anzeigen", wear_saved: "Eintrag gespeichert", share_title: "Teilen", share_used_1: "1× getragen", share_used_n: "{n}× getragen", share_error: "Bild konnte nicht erstellt werden",
     edit_title_new: "Neues Parfum", edit_title_edit: "Parfum bearbeiten",
     label_photos: "FOTOS (bis zu 6)", photo_word: "FOTO",
     comments_placeholder: "Kommentar hinzufügen...", photo_credit_placeholder: "Fotograf und Lizenz...",
@@ -4826,6 +5077,7 @@ const I18N = {
     field_concentration: "Concentration",
     picker_add_new_concentration: "＋ Ajouter une nouvelle...", prompt_new_concentration: "Nouvelle concentration",
     btn_edit: "Modifier",
+    wear_title: "Journal de port", wear_add: "Porté aujourd'hui", wear_none: "Aucune entrée", wear_uses: "Utilisations", wear_last: "Dernier", wear_date: "Date", wear_note_ph: "Note brève (facultatif)", wear_delete: "Supprimer l'entrée", wear_show_all: "Tout voir", wear_show_less: "Réduire", wear_saved: "Entrée enregistrée", share_title: "Partager", share_used_1: "Porté 1 fois", share_used_n: "Porté {n} fois", share_error: "Impossible de créer l'image",
     edit_title_new: "Nouveau parfum", edit_title_edit: "Modifier le parfum",
     label_photos: "PHOTOS (jusqu'à 6)", photo_word: "PHOTO",
     comments_placeholder: "Ajouter un commentaire...", photo_credit_placeholder: "Auteur et licence de la photo...",
@@ -4913,6 +5165,7 @@ const I18N = {
     field_concentration: "Concentrazione",
     picker_add_new_concentration: "＋ Aggiungi nuova...", prompt_new_concentration: "Nuova concentrazione",
     btn_edit: "Modifica",
+    wear_title: "Diario d'uso", wear_add: "L'ho messo oggi", wear_none: "Nessuna voce", wear_uses: "Utilizzi", wear_last: "Ultimo", wear_date: "Data", wear_note_ph: "Nota breve (facoltativa)", wear_delete: "Elimina voce", wear_show_all: "Mostra tutti", wear_show_less: "Mostra meno", wear_saved: "Voce salvata", share_title: "Condividi", share_used_1: "Usato 1 volta", share_used_n: "Usato {n} volte", share_error: "Impossibile creare l'immagine",
     edit_title_new: "Nuovo profumo", edit_title_edit: "Modifica profumo",
     label_photos: "FOTO (fino a 6)", photo_word: "FOTO",
     comments_placeholder: "Aggiungi un commento...", photo_credit_placeholder: "Autore e licenza della foto...",
@@ -5000,6 +5253,7 @@ const I18N = {
     field_concentration: "Concentração",
     picker_add_new_concentration: "＋ Adicionar nova...", prompt_new_concentration: "Nova concentração",
     btn_edit: "Editar",
+    wear_title: "Diário de uso", wear_add: "Usei hoje", wear_none: "Sem registos", wear_uses: "Usos", wear_last: "Último", wear_date: "Data", wear_note_ph: "Nota breve (opcional)", wear_delete: "Eliminar registo", wear_show_all: "Ver todos", wear_show_less: "Ver menos", wear_saved: "Registo guardado", share_title: "Partilhar", share_used_1: "Usado 1 vez", share_used_n: "Usado {n} vezes", share_error: "Não foi possível criar a imagem",
     edit_title_new: "Novo perfume", edit_title_edit: "Editar perfume",
     label_photos: "FOTOS (até 6)", photo_word: "FOTO",
     comments_placeholder: "Adicionar comentários...", photo_credit_placeholder: "Autor e licença da foto...",
