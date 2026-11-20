@@ -1205,6 +1205,23 @@
     font-weight: 500; font-size: 21px; color: var(--text-muted);
   }
 
+  /* ── ATLAS ── */
+  #modal-atlas .page-inner, #modal-atlas-entry .page-inner { text-align: left; }
+  .atlas-item { display: flex; align-items: center; gap: 16px; width: 100%; padding: 14px 0; border: none; border-bottom: 1px solid var(--border, #e4e2dc); background: none; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .atlas-item:active { opacity: .7; }
+  .atlas-item img { flex: none; width: 64px; height: auto; mix-blend-mode: multiply; }
+  .atlas-item-title { font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 26px; line-height: 1.1; color: var(--text); }
+  .atlas-item-teaser { margin-top: 5px; font-family: 'Jost', sans-serif; font-size: 15px; line-height: 1.4; color: var(--text-muted); }
+  .atlas-card { display: flex; align-items: center; gap: 18px; }
+  .atlas-card .sq-title { margin-top: 6px; }
+  .atlas-card-img { flex: none; width: 72px; height: auto; pointer-events: none; filter: drop-shadow(0 3px 4px rgba(60, 40, 10, .18)); }
+  .atlas-h { margin: 34px 0 12px; font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 26px; line-height: 1.15; color: var(--text); }
+  #atlas-body p.atlas-li { padding-left: 14px; border-left: 2px solid var(--border, #e4e2dc); }
+  #atlas-body p.atlas-li strong { font-weight: 600; }
+  #atlas-body p.atlas-outro { margin-top: 30px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 500; font-size: 21px; line-height: 1.5; color: var(--text-muted); }
+  .atlas-all { display: block; margin-top: 28px; padding: 0; border: none; background: none; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--star); cursor: pointer; }
+  #atlas-body p { margin: 0 0 1.1em; font-family: 'Jost', sans-serif; font-size: 17.5px; line-height: 1.75; color: var(--text); }
+
   /* ── HOME DOTS MENU (import/export) ── */
   #home-dots-wrap {
     position: fixed; top: calc(env(safe-area-inset-top, 0px) + 28px); left: 24px;
@@ -1336,6 +1353,10 @@
       </div>
       <img class="sq-thumb" id="sq-home-thumb" alt="" width="48" height="93" style="display:none">
     </div>
+  </button>
+  <button id="atlas-home-card" class="sq-card atlas-card" onclick="openAtlasEntry()">
+    <img class="atlas-card-img" id="atlas-home-img" src="notas/rosa.webp" alt="">
+    <div><div class="sq-label" data-i18n="atlas_card_title">Notas olfativas</div><div class="sq-title" id="atlas-home-title">La rosa</div></div>
   </button>
   <button id="home-add-btn" onclick="showPerfumes();openEdit(null);" title="Añadir perfume" data-i18n-title="title_add_perfume">＋</button>
 </div>
@@ -1704,6 +1725,26 @@
     <figure class="sq-figure"><img id="sq-img" src="" alt=""><figcaption id="sq-caption"></figcaption></figure>
     <div id="sq-body"></div>
     <div class="sq-sign" id="sq-sign"></div>
+  </div>
+</div>
+
+<div class="modal-overlay page-overlay" id="modal-atlas">
+  <div class="page-inner">
+    <button class="page-back" onclick="closeModal('modal-atlas')" title="Volver" data-i18n-title="title_back"><span class="back-arrow-img"></span></button>
+    <div class="sq-label" data-i18n="atlas_section">Atlas</div>
+    <div class="page-title sq-page-title" data-i18n="atlas_card_title">Notas olfativas</div>
+    <div id="atlas-list"></div>
+  </div>
+</div>
+<div class="modal-overlay page-overlay" id="modal-atlas-entry">
+  <div class="page-inner">
+    <button class="page-back" onclick="closeModal('modal-atlas-entry')" title="Volver" data-i18n-title="title_back"><span class="back-arrow-img"></span></button>
+    <div class="sq-label" id="atlas-entry-label"></div>
+    <div class="page-title sq-page-title" id="atlas-title"></div>
+    <figure class="sq-figure"><img id="atlas-img" src="" alt=""><figcaption id="atlas-caption"></figcaption></figure>
+    <div id="atlas-body"></div>
+    <div class="sq-sign" id="atlas-sign"></div>
+    <button class="atlas-all" onclick="openAtlas()" data-i18n="atlas_all">Todas las notas olfativas</button>
   </div>
 </div>
 
@@ -4778,6 +4819,7 @@ function closePanelLangMenu() {
 const I18N = {
   es: {
     sq_section: "¿Sabías que…?", sq_more: "leer más",
+    atlas_section: "Atlas", atlas_card_title: "Notas olfativas", atlas_card_teaser: "Una guía para conocer, una a una, las notas que dan forma a los perfumes.", atlas_more: "explorar", atlas_all: "Todas las notas olfativas",
     menu_export: "Exportar", menu_import: "Importar",
     search_placeholder: "Buscar",
     home_search: "Buscar",
@@ -4872,6 +4914,7 @@ const I18N = {
   },
   en: {
     sq_section: "Did you know…?", sq_more: "read more",
+    atlas_section: "Atlas", atlas_card_title: "Olfactory notes", atlas_card_teaser: "A guide to the notes that shape perfumes, one at a time.", atlas_more: "explore", atlas_all: "All olfactory notes",
     menu_export: "Export", menu_import: "Import",
     search_placeholder: "Search",
     home_search: "Search",
@@ -4965,6 +5008,7 @@ const I18N = {
   },
   ja: {
     sq_section: "ご存じですか?", sq_more: "続きを読む",
+    atlas_section: "Atlas", atlas_card_title: "Olfactory notes", atlas_card_teaser: "A guide to the notes that shape perfumes, one at a time.", atlas_more: "explore", atlas_all: "All olfactory notes",
     menu_export: "エクスポート", menu_import: "インポート",
     search_placeholder: "検索",
     home_search: "検索",
@@ -5052,6 +5096,7 @@ const I18N = {
   },
   de: {
     sq_section: "Wusstest du schon…?", sq_more: "weiterlesen",
+    atlas_section: "Atlas", atlas_card_title: "Olfactory notes", atlas_card_teaser: "A guide to the notes that shape perfumes, one at a time.", atlas_more: "explore", atlas_all: "All olfactory notes",
     // ── Part 1: header, home ──
     menu_export: "Exportieren", menu_import: "Importieren",
     search_placeholder: "Suchen",
@@ -5140,6 +5185,7 @@ const I18N = {
   },
   fr: {
     sq_section: "Le saviez-vous ?", sq_more: "lire la suite",
+    atlas_section: "Atlas", atlas_card_title: "Olfactory notes", atlas_card_teaser: "A guide to the notes that shape perfumes, one at a time.", atlas_more: "explore", atlas_all: "All olfactory notes",
     // ── Part 1: header, home ──
     menu_export: "Exporter", menu_import: "Importer",
     search_placeholder: "Rechercher",
@@ -5228,6 +5274,7 @@ const I18N = {
   },
   it: {
     sq_section: "Lo sapevi che…?", sq_more: "leggi di più",
+    atlas_section: "Atlas", atlas_card_title: "Olfactory notes", atlas_card_teaser: "A guide to the notes that shape perfumes, one at a time.", atlas_more: "explore", atlas_all: "All olfactory notes",
     // ── Part 1: header, home ──
     menu_export: "Esporta", menu_import: "Importa",
     search_placeholder: "Cerca",
@@ -5316,6 +5363,7 @@ const I18N = {
   },
   pt: {
     sq_section: "Sabias que…?", sq_more: "ler mais",
+    atlas_section: "Atlas", atlas_card_title: "Olfactory notes", atlas_card_teaser: "A guide to the notes that shape perfumes, one at a time.", atlas_more: "explore", atlas_all: "All olfactory notes",
     // ── Part 1: header, home ──
     menu_export: "Exportar", menu_import: "Importar",
     search_placeholder: "Pesquisar",
@@ -5657,6 +5705,231 @@ function openSq() {
   openModal('modal-sq');
 }
 
+// ══ ATLAS ══════════════════════════════════════════════════════
+const ATLAS_ENTRIES = [
+{
+ "id": "rosa",
+ "img": "notas/rosa-grande.webp",
+ "thumb": "notas/rosa.webp",
+ "sign": "Ukigumo",
+ "t": {
+  "es": {
+   "title": "La rosa",
+   "caption": "",
+   "sections": [
+    {
+     "h": "Descripción olfativa",
+     "c": [
+      "En términos generales, se coincide en describir la rosa como una nota floral, dulce y con un punto afrutado o ligeramente cítrico, que puede inclinarse hacia lo verde, empolvado, especiado o mielado según cómo se obtenga.",
+      "Detrás de esos matices hay compuestos muy concretos:",
+      [
+       "Citronelol, geraniol y nerol",
+       "Son alcoholes terpénicos clave que sostienen el cuerpo floral. Aportan desde una limpieza fresca y un ligero toque cítrico hasta una calidez dulce y luminosa."
+      ],
+      [
+       "Alcohol feniletílico",
+       "Da ese carácter suave, de pétalo tierno y ligeramente mielado que asociamos a la flor recién cortada. Como se disuelve bien en agua, suele quedarse en mayor medida en las aguas florales o en los extractos obtenidos con disolventes."
+      ],
+      [
+       "β-damascenona",
+       "Aunque aparece en cantidades minúsculas, tiene un impacto enorme: aporta ese matiz frutado, jugoso y casi licoroso que hace que la rosa se sienta viva y natural, y no plana."
+      ],
+      [
+       "Matices secundarios",
+       "Pequeñas trazas de otros compuestos añaden el guiño verde, un leve calor especiado o una textura más densa y cerosa."
+      ]
+     ]
+    },
+    {
+     "h": "Producción y obtención",
+     "c": [
+      "Las flores suelen recogerse a mano a primera hora de la mañana, antes de que el sol haga perder parte de su aroma, y se llevan pronto a procesar para que no se deterioren.",
+      [
+       "Destilación",
+       "Muy habitual para obtener aceite esencial. El vapor arrastra los componentes aromáticos y luego se separan. El resultado suele ser más vivo, algo especiado y con un perfil distinto al del pétalo crudo por efecto del calor."
+      ],
+      [
+       "Extracción con disolventes",
+       "Permite obtener el llamado absoluto, un extracto más denso y profundo que suele capturar con mayor fidelidad el lado dulce, ceroso y fresco de la flor. Frente al aceite esencial, más ágil y luminoso, el absoluto se siente más cálido y cercano al perfume íntimo de la flor."
+      ],
+      [
+       "Extracción con CO₂",
+       "Utiliza dióxido de carbono (en estado supercrítico) en condiciones controladas para extraer aromas con temperaturas más suaves y un perfil limpio, muy cercano a la materia original."
+      ],
+      [
+       "Síntesis y reconstrucción",
+       "Hoy es muy común combinar extractos naturales con moléculas aisladas o sintéticas para mantener un aroma estable cosecha tras cosecha, ajustar precios o respetar límites de alérgenos."
+      ]
+     ]
+    },
+    {
+     "h": "Variedades y extractos principales",
+     "c": [
+      [
+       "Rosa damascena (Rosa de Damasco)",
+       "Cultivada sobre todo en lugares como Bulgaria, Turquía o Irán, y también en Marruecos. Suele percibirse más brillante, algo especiada y con una estructura clásica muy reconocible en perfumería fina. Es la más extendida, y de ella procede casi todo el aceite esencial de rosa."
+      ],
+      [
+       "Rosa centifolia (Rosa de Mayo o de Grasse)",
+       "Muy ligada al sur de Francia, Marruecos o Egipto. Tiende a sentirse más redonda, melosa y envolvente, con un aire más cremoso y de pétalo abundante. Por la delicadeza de sus pétalos se trabaja sobre todo como absoluto."
+      ]
+     ]
+    },
+    {
+     "h": "Historia",
+     "c": [
+      "La rosa acompaña a la perfumería desde la Antigüedad en Oriente Medio y el Mediterráneo, donde primero se aprovechaba en aguas aromáticas y aceites perfumados. Con el desarrollo de la destilación con refrigeración en el mundo islámico medieval se abrió paso la producción regular de agua de rosas y aceite esencial, una tradición que luego encontró en regiones como Grasse un terreno fértil para perfeccionar extracciones más delicadas.",
+      "Con el tiempo, la llegada de las extracciones con disolventes permitió capturar mejor el aroma del pétalo fresco, y el avance de la química ayudó a entender qué moléculas forman ese olor. Eso permitió recrear notas de rosa con mayor precisión, dar consistencia entre cosechas y responder a las exigencias actuales de coste y regulación."
+     ]
+    },
+    {
+     "h": "Curiosidad",
+     "c": [
+      "Un solo kilo de aceite esencial de rosa necesita varios miles de kilos de pétalos (las cifras habituales van de 3.000 a 5.000, según la fuente), y de ahí su precio. Y es una nota de perfumes históricos: en el N.º 5 de Chanel la rosa de mayo de Grasse se une al jazmín, y Joy, de Jean Patou, es un perfume de solo dos flores: jazmín y rosa."
+     ]
+    }
+   ],
+   "outro": "Pocos ingredientes resumen tan bien la historia de la perfumería como la rosa: un aroma inmediato y familiar que, al mirarlo de cerca, mezcla botánica delicada, oficio artesanal y química de precisión."
+  },
+  "en": {
+   "title": "The rose",
+   "caption": "",
+   "sections": [
+    {
+     "h": "Olfactory description",
+     "c": [
+      "In general terms, the rose is described as a floral, sweet note with a fruity or slightly citrusy touch, which can lean green, powdery, spicy or honeyed depending on how it is obtained.",
+      "Behind those nuances are very specific compounds:",
+      [
+       "Citronellol, geraniol and nerol",
+       "Key terpene alcohols that hold up the floral body. They bring everything from a fresh cleanliness and a slight citrus touch to a sweet, luminous warmth."
+      ],
+      [
+       "Phenylethyl alcohol",
+       "Gives that soft, tender-petal, slightly honeyed character we associate with a freshly cut flower. Because it dissolves well in water, it tends to stay more in floral waters or in solvent extracts."
+      ],
+      [
+       "β-damascenone",
+       "Though present in minuscule amounts, it has an enormous impact: it adds a fruity, juicy, almost liqueur-like nuance that makes the rose feel alive and natural rather than flat."
+      ],
+      [
+       "Secondary nuances",
+       "Small traces of other compounds add the green wink, a slight spicy warmth or a denser, waxier texture."
+      ]
+     ]
+    },
+    {
+     "h": "Production and extraction",
+     "c": [
+      "The flowers are usually picked by hand early in the morning, before the sun makes them lose part of their scent, and are taken quickly to be processed so they don't deteriorate.",
+      [
+       "Distillation",
+       "Very common for obtaining essential oil. Steam carries off the aromatic components, which are then separated. The result tends to be livelier and a little spicy, with a profile different from the raw petal because of the heat."
+      ],
+      [
+       "Solvent extraction",
+       "Yields the so-called absolute, a denser, deeper extract that usually captures more faithfully the sweet, waxy and fresh side of the flower. Compared with the essential oil, which is more agile and luminous, the absolute feels warmer and closer to the flower's intimate scent."
+      ],
+      [
+       "CO₂ extraction",
+       "Uses carbon dioxide (in a supercritical state) under controlled conditions to extract aromas at gentler temperatures, with a clean profile very close to the original material."
+      ],
+      [
+       "Synthesis and reconstruction",
+       "Today it is very common to combine natural extracts with isolated or synthetic molecules to keep a stable aroma harvest after harvest, adjust prices or respect allergen limits."
+      ]
+     ]
+    },
+    {
+     "h": "Main varieties and extracts",
+     "c": [
+      [
+       "Rosa damascena (Damask rose)",
+       "Grown mainly in places such as Bulgaria, Turkey or Iran, and also in Morocco. It tends to be perceived as brighter, a little spicy, with a classic structure very recognisable in fine perfumery. It is the most widespread, and almost all rose essential oil comes from it."
+      ],
+      [
+       "Rosa centifolia (May rose or Grasse rose)",
+       "Closely linked to the south of France, Morocco or Egypt. It tends to feel rounder, honeyed and enveloping, with a creamier air and abundant petals. Because its petals are so delicate, it is worked mostly as an absolute."
+      ]
+     ]
+    },
+    {
+     "h": "History",
+     "c": [
+      "The rose has accompanied perfumery since antiquity in the Middle East and the Mediterranean, where it was first used in aromatic waters and perfumed oils. With the development of distillation with cooling in the medieval Islamic world, regular production of rose water and essential oil took hold, a tradition that later found in regions such as Grasse fertile ground to perfect more delicate extractions.",
+      "In time, solvent extraction made it possible to capture the aroma of the fresh petal better, and advances in chemistry helped to understand which molecules form that scent. This made it possible to recreate rose notes with greater precision, to give consistency between harvests and to meet today's demands of cost and regulation."
+     ]
+    },
+    {
+     "h": "A curious fact",
+     "c": [
+      "A single kilo of rose essential oil takes several thousand kilos of petals (the usual figures run from 3,000 to 5,000, depending on the source), which explains its price. And it is a note in historic perfumes: in Chanel No. 5 the May rose of Grasse joins jasmine, and Joy, by Jean Patou, is a perfume of just two flowers: jasmine and rose."
+     ]
+    }
+   ],
+   "outro": "Few ingredients sum up the history of perfumery as well as the rose: an immediate, familiar scent that, looked at closely, blends delicate botany, artisan craft and precision chemistry."
+  }
+ }
+}
+];
+let _atlasCur = null;
+function _atlasText(e) { return e.t[currentLang] || e.t.en; }
+function _atlasLast() { return ATLAS_ENTRIES[ATLAS_ENTRIES.length - 1]; }
+function renderAtlas() {
+  const last = _atlasLast();
+  if (last) {
+    const t = document.getElementById('atlas-home-title'), im = document.getElementById('atlas-home-img');
+    if (t) t.textContent = _atlasText(last).title;
+    if (im && im.getAttribute('src') !== last.thumb) im.setAttribute('src', last.thumb);
+  }
+  const list = document.getElementById('atlas-list'); if (!list) return;
+  list.textContent = '';
+  ATLAS_ENTRIES.slice().reverse().forEach(function(e) {
+    const b = document.createElement('button'); b.className = 'atlas-item';
+    b.onclick = function() { openAtlasEntry(e.id); };
+    b.innerHTML = '<img alt="" src="' + e.thumb + '"><div class="atlas-item-title"></div>';
+    b.querySelector('.atlas-item-title').textContent = _atlasText(e).title;
+    list.appendChild(b);
+  });
+}
+function fillAtlasEntry() {
+  const e = ATLAS_ENTRIES.find(function(z) { return z.id === _atlasCur; }); if (!e) return;
+  const x = _atlasText(e), d = I18N[currentLang] || I18N.en;
+  document.getElementById('atlas-entry-label').textContent = 'Atlas · ' + (d.atlas_card_title || I18N.en.atlas_card_title);
+  document.getElementById('atlas-title').textContent = x.title;
+  const img = document.getElementById('atlas-img');
+  if (img.getAttribute('src') !== e.img) img.setAttribute('src', e.img);
+  img.alt = x.title;
+  document.getElementById('atlas-caption').textContent = x.caption || '';
+  const body = document.getElementById('atlas-body'); body.textContent = '';
+  x.sections.forEach(function(sec, i) {
+    const h = document.createElement('h3'); h.className = 'atlas-h'; h.textContent = sec.h;
+    if (i === 0) h.style.marginTop = '0';
+    body.appendChild(h);
+    sec.c.forEach(function(it) {
+      const p = document.createElement('p');
+      if (Array.isArray(it)) {
+        p.className = 'atlas-li';
+        const st = document.createElement('strong'); st.textContent = it[0] + ': ';
+        p.appendChild(st); p.appendChild(document.createTextNode(it[1]));
+      } else { p.textContent = it; }
+      body.appendChild(p);
+    });
+  });
+  if (x.outro) { const o = document.createElement('p'); o.className = 'atlas-outro'; o.textContent = x.outro; body.appendChild(o); }
+  document.getElementById('atlas-sign').textContent = e.sign;
+}
+function openAtlas() {
+  renderAtlas();
+  document.getElementById('modal-atlas').scrollTop = 0;
+  openModal('modal-atlas');
+}
+function openAtlasEntry(id) {
+  _atlasCur = id || _atlasLast().id; fillAtlasEntry();
+  document.getElementById('modal-atlas-entry').scrollTop = 0;
+  openModal('modal-atlas-entry');
+}
+
 function applyLanguage(lang) {
   currentLang = lang;
   const dict = I18N[lang] || I18N.es;
@@ -5693,6 +5966,7 @@ function applyLanguage(lang) {
   const isOpen = (id) => { const el = document.getElementById(id); return !!el && el.classList.contains('open'); };
   if (typeof render === 'function') render();
   if (typeof renderSq === 'function') renderSq();
+  if (typeof renderAtlas === 'function') { renderAtlas(); if (isOpen('modal-atlas-entry')) fillAtlasEntry(); }
   if (isOpen('modal-classification') && typeof renderClassification === 'function') renderClassification();
   if (isOpen('modal-fields') && typeof renderFieldMgr === 'function') renderFieldMgr();
   if (isOpen('modal-families') && typeof renderFamilyMgr === 'function') renderFamilyMgr();
