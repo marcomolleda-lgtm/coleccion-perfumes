@@ -1,5 +1,5 @@
-const CACHE = 'perfumes-v78';
-const ASSETS = ['./index.html', './manifest.json', './icon-180-v12.png', './icon-192-v12.png', './icon-512-v12.png', './icon-192-maskable-v12.png', './icon-512-maskable-v12.png', './sample-chanel5-v1.jpg', './sample-chanel5-2-v1.jpg', './sample-chanel5-3-v1.jpg', './scentic-joy-v1.jpg', './scentic-joy-thumb-v1.webp', './scentic-joy-v2.webp', './notas/rosa.webp', './notas/rosa-grande.webp', './notas/violeta.webp', './notas/violeta-grande.webp'];
+const CACHE = 'perfumes-v79';
+const ASSETS = ['./index.html', './manifest.json', './icon-180-v12.png', './icon-192-v12.png', './icon-512-v12.png', './icon-192-maskable-v12.png', './icon-512-maskable-v12.png', './sample-chanel5-v1.jpg', './sample-chanel5-2-v1.jpg', './sample-chanel5-3-v1.jpg', './scentic-joy-v1.jpg', './scentic-joy-thumb-v1.webp', './scentic-joy-v2.webp', './notas/rosa.webp', './notas/rosa-grande.webp', './notas/violeta.webp', './notas/violeta-grande.webp', './notas/vetiver.webp', './notas/vetiver-grande.webp'];
 
 self.addEventListener('install', function(e) {
   e.waitUntil(

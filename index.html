@@ -1218,7 +1218,7 @@
   .atlas-h { margin: 34px 0 12px; font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 26px; line-height: 1.15; color: var(--text); }
   #atlas-body p.atlas-li { padding-left: 14px; border-left: 2px solid var(--border, #e4e2dc); }
   #atlas-body p.atlas-li strong { font-weight: 600; }
-  #atlas-body p.atlas-outro { margin-top: 30px; font-family: 'Jost', sans-serif; font-style: italic; font-weight: 400; font-size: 17.5px; line-height: 1.7; color: var(--text); }
+  #atlas-body p.atlas-outro { margin-top: 30px; font-family: 'Jost', sans-serif; font-style: italic; font-weight: 400; font-size: 18.5px; line-height: 1.7; color: var(--text); }
   .atlas-all { display: block; margin-top: 28px; padding: 0; border: none; background: none; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--star); cursor: pointer; }
   #atlas-body p { margin: 0 0 1.1em; font-family: 'Jost', sans-serif; font-size: 17.5px; line-height: 1.75; color: var(--text); }
 
@@ -1744,7 +1744,7 @@
     <figure class="sq-figure"><img id="atlas-img" src="" alt=""><figcaption id="atlas-caption"></figcaption></figure>
     <div id="atlas-body"></div>
     <div class="sq-sign" id="atlas-sign"></div>
-    <button class="atlas-all" onclick="openAtlas()" data-i18n="atlas_all">Todas las notas olfativas</button>
+    <button class="atlas-all" onclick="atlasBackToList()" data-i18n="atlas_all">Todas las notas olfativas</button>
   </div>
 </div>
 
@@ -6028,6 +6028,154 @@ const ATLAS_ENTRIES = [
    "outro": "The violet flower is the art of the subtle: a discreet, powdery scent that hints, withdraws for a moment and makes itself noticed again with a quiet elegance."
   }
  }
+},
+{
+ "id": "vetiver",
+ "img": "notas/vetiver-grande.webp",
+ "thumb": "notas/vetiver.webp",
+ "sign": "Scentic",
+ "t": {
+  "es": {
+   "title": "Vetiver",
+   "caption": "",
+   "sections": [
+    {
+     "h": "Descripción olfativa",
+     "c": [
+      "El vetiver es una nota amaderada, terrosa y de raíz seca y profunda, con una fijación excepcional. Según el origen y la destilación puede mostrar matices ahumados, verdes, de pomelo, ligeramente dulces o de corteza y cuero suave. A diferencia de las maderas cremosas o resinosas, su aroma nace de una densa red de raíces y se sostiene en moléculas pesadas, responsables de su gran persistencia en el secado. Sus pilares químicos son los sesquiterpenos y compuestos emparentados:",
+      [
+       "Vetivonas (α-vetivona y β-vetivona)",
+       "cetonas sesquiterpénicas que dan el cuerpo amaderado, seco y terroso. La α-vetivona se suele considerar la más importante para el aroma."
+      ],
+      [
+       "Khusimol",
+       "alcohol emparentado con los sesquiterpenos y otro de los componentes característicos del aceite."
+      ],
+      "En el aceite, el khusimol ronda el 3–14 % y la α-vetivona el 2,5–6 %, según la fuente."
+     ]
+    },
+    {
+     "h": "Producción y obtención",
+     "c": [
+      "El aroma no está en las hojas, sino en las raíces de esta gramínea perenne (Chrysopogon zizanioides), que forman una maraña densa y profunda, de 1 m o más. Se cosechan tras 12–18 meses de cultivo, según la fuente: se afloja el suelo, se arrancan las matas y se cortan y lavan las raíces. El rendimiento va del 0,3 al 2 % de aceite sobre raíz fresca, según la fuente.",
+      [
+       "Destilación por arrastre de vapor",
+       "es el método estándar. Los compuestos pesados tardan en pasar al vapor, así que la destilación dura de unas 10 a más de 24 horas, según el origen y el método. El aceite resultante es espeso, de color ámbar a pardo verdoso."
+      ],
+      [
+       "Extracción con CO₂",
+       "da extractos concentrados de perfil limpio y evita las alteraciones térmicas de las destilaciones muy largas."
+      ],
+      [
+       "Fraccionamiento y reconstrucción",
+       "además del aceite natural se usan fracciones destiladas al vacío (para suavizar el ahumado o resaltar lo limpio) y acordes que combinan ingredientes naturales y sintéticos, para ganar estabilidad y controlar costes."
+      ]
+     ]
+    },
+    {
+     "h": "Orígenes: Haití, Java y Réunión",
+     "c": [
+      "Los compuestos principales son bastante parecidos entre países. Lo que cambia el carácter del aceite son los componentes minoritarios, el cultivo y la destilación.",
+      [
+       "Haití",
+       "referente de la perfumería fina. Se percibe limpio y luminoso, con un punto cítrico de pomelo, un amargor fresco y un fondo amaderado pulido; el lado ahumado y terroso es más contenido. Funciona tanto en composiciones frescas como en estructuras clásicas."
+      ],
+      [
+       "Java (Indonesia)",
+       "más terroso, oscuro e intenso, con un carácter ahumado marcado. Aporta peso y rusticidad, y a menudo se fracciona para evitar el exceso de humo o de aspereza."
+      ],
+      [
+       "Réunión (Bourbon)",
+       "históricamente célebre y considerado el de mayor calidad. Ofrece un perfil rico y redondo dentro de su estructura amaderada, aunque su disponibilidad comercial es más limitada."
+      ]
+     ]
+    },
+    {
+     "h": "Historia",
+     "c": [
+      "El vetiver es originario de la India, donde se conoce como khus y se usa desde antiguo: se tejían esteras y cortinas de raíz que perfumaban y refrescaban el aire al humedecerse, y se destilaba en aceites aromáticos. Su cultivo se extendió después a regiones tropicales como Réunión, Haití o Java. En la perfumería moderna pasó de componente de fondo discreto a nota protagonista, capaz de sostener desde fórmulas sobrias y terrosas hasta amaderados aromáticos contemporáneos."
+     ]
+    },
+    {
+     "h": "Curiosidad",
+     "c": [
+      "En Haití las matas se arrancan con pico y la misma planta se replanta para la cosecha siguiente. Remover el suelo hasta unos 40 cm de profundidad lo deja expuesto a la erosión, sobre todo en las laderas."
+     ]
+    }
+   ],
+   "outro": "El vetiver es la firmeza de lo que crece bajo tierra: una raíz tenaz que da profundidad, calma y arraigo a una fragancia cuando todo lo demás ya ha empezado a despegarse."
+  },
+  "en": {
+   "title": "Vetiver",
+   "caption": "",
+   "sections": [
+    {
+     "h": "Olfactory description",
+     "c": [
+      "Vetiver is a woody, earthy note with a root-like character, dry and deep, with exceptional staying power. Depending on its origin and distillation, it can show smoky, green, grapefruit, slightly sweet, or soft bark and leather nuances. Unlike creamy or resinous woods, its scent comes from a dense network of roots and rests on heavy molecules, which explain its great persistence in the drydown. Its chemical backbone is made of sesquiterpenes and related compounds:",
+      [
+       "Vetivones (α-vetivone and β-vetivone)",
+       "sesquiterpene ketones that give the woody, dry and earthy body. α-vetivone is usually considered the most important for the aroma."
+      ],
+      [
+       "Khusimol",
+       "an alcohol related to the sesquiterpenes and another of the oil's characteristic components."
+      ],
+      "In the oil, khusimol is around 3–14% and α-vetivone 2.5–6%, depending on the source."
+     ]
+    },
+    {
+     "h": "Production and extraction",
+     "c": [
+      "The aroma is not in the leaves but in the roots of this perennial grass (Chrysopogon zizanioides), which form a dense, deep tangle of 1 m or more. They are harvested after 12–18 months of growth, depending on the source: the soil is loosened, the clumps are pulled up, and the roots are cut and washed. Yield ranges from 0.3 to 2% oil on fresh root, depending on the source.",
+      [
+       "Steam distillation",
+       "the standard method. Heavy compounds take a long time to pass into the steam, so distillation lasts from about 10 to over 24 hours, depending on origin and method. The resulting oil is thick, amber to greenish brown."
+      ],
+      [
+       "CO₂ extraction",
+       "gives concentrated extracts with a clean profile and avoids the thermal changes of very long distillations."
+      ],
+      [
+       "Fractionation and reconstruction",
+       "besides the natural oil, perfumers use vacuum-distilled fractions (to soften the smokiness or bring out the clean side) and accords that combine natural and synthetic ingredients, for stability and cost control."
+      ]
+     ]
+    },
+    {
+     "h": "Origins: Haiti, Java and Réunion",
+     "c": [
+      "The main compounds are fairly similar from country to country. What changes the oil's character are the minor components, the cultivation and the distillation.",
+      [
+       "Haiti",
+       "a benchmark of fine perfumery. It smells clean and luminous, with a citrusy grapefruit touch, a fresh bitterness and a polished woody base; the smoky, earthy side is more restrained. It works in both fresh compositions and classic structures."
+      ],
+      [
+       "Java (Indonesia)",
+       "more earthy, dark and intense, with a marked smoky character. It adds weight and rusticity, and is often fractionated to avoid too much smoke or roughness."
+      ],
+      [
+       "Réunion (Bourbon)",
+       "historically famous and considered the highest quality. It offers a rich, round profile within its woody structure, although its commercial availability is more limited."
+      ]
+     ]
+    },
+    {
+     "h": "History",
+     "c": [
+      "Vetiver is native to India, where it is known as khus and has been used since ancient times: mats and curtains of roots were woven that perfumed and cooled the air when dampened, and the roots were distilled into aromatic oils. Its cultivation later spread to tropical regions such as Réunion, Haiti and Java. In modern perfumery it went from a discreet base ingredient to a leading note, able to carry everything from sober, earthy formulas to contemporary aromatic woody ones."
+     ]
+    },
+    {
+     "h": "A curious fact",
+     "c": [
+      "In Haiti the clumps are pulled up with a pickaxe and the same plant is replanted for the next harvest. Turning over the soil to a depth of about 40 cm leaves it exposed to erosion, especially on hillsides."
+     ]
+    }
+   ],
+   "outro": "Vetiver is the firmness of what grows underground: a tenacious root that gives a fragrance depth, calm and grounding when everything else has already begun to drift away."
+  }
+ }
 }
 ];
 let _atlasCur = null;
@@ -6081,6 +6229,18 @@ function openAtlas() {
   renderAtlas();
   document.getElementById('modal-atlas').scrollTop = 0;
   openModal('modal-atlas');
+}
+// Desde una ficha, el enlace «Todas las notas» debe dejar el listado visible.
+// El listado está antes que la ficha en el HTML, así que si ambos están abiertos
+// la ficha lo tapa: hay que cerrar la ficha (sin dejar historial desfasado).
+function atlasBackToList() {
+  const list = document.getElementById('modal-atlas');
+  if (list.classList.contains('open')) {
+    closeModal('modal-atlas-entry');        // el listado ya estaba debajo
+  } else {
+    document.getElementById('modal-atlas-entry').classList.remove('open');
+    openAtlas();
+  }
 }
 function openAtlasEntry(id) {
   _atlasCur = id || _atlasLast().id; fillAtlasEntry();
