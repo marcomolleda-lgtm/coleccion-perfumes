@@ -1221,6 +1221,14 @@
   #atlas-body p.atlas-outro { margin-top: 30px; font-family: 'Jost', sans-serif; font-style: italic; font-weight: 400; font-size: 18.5px; line-height: 1.7; color: var(--text); }
   .atlas-crumb { cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
   .atlas-all { display: block; margin-top: 28px; padding: 0; border: none; background: none; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--star); cursor: pointer; }
+  .atlas-search-btn { position: absolute; top: 18px; right: 16px; padding: 6px; border: none; background: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; -webkit-tap-highlight-color: transparent; }
+  .atlas-search-btn:active { opacity: .6; }
+  .atlas-search-btn svg { width: 20px; height: 20px; }
+  .atlas-search-box { margin: -8px 0 14px; }
+  .atlas-search-box[hidden] { display: none; }
+  .atlas-search-input { width: 100%; box-sizing: border-box; padding: 8px 2px; border: none; border-bottom: 1px solid var(--border, #e4e2dc); border-radius: 0; background: transparent; -webkit-appearance: none; appearance: none; font-family: 'Jost', sans-serif; font-size: 16px; color: var(--text); outline: none; }
+  .atlas-search-input:focus { border-bottom-color: var(--text-muted); }
+  .atlas-none { padding: 18px 0; font-family: 'Jost', sans-serif; font-size: 15px; color: var(--text-muted); }
   #atlas-body p { margin: 0 0 1.1em; font-family: 'Jost', sans-serif; font-size: 17.5px; line-height: 1.75; color: var(--text); }
 
   /* ── HOME DOTS MENU (import/export) ── */
@@ -1728,7 +1736,9 @@
   <div class="page-inner">
     <button class="page-back" onclick="closeModal('modal-atlas')" title="Volver" data-i18n-title="title_back"><span class="back-arrow-img"></span></button>
     <div class="sq-label" data-i18n="atlas_section">Atlas</div>
+    <button class="atlas-search-btn" id="atlas-search-btn" onclick="atlasToggleSearch()" title="Buscar" aria-label="Buscar" aria-expanded="false" data-i18n-title="atlas_search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg></button>
     <div class="page-title sq-page-title" data-i18n="atlas_card_title">Notas olfativas</div>
+    <div class="atlas-search-box" id="atlas-search-box" hidden><input class="atlas-search-input" id="atlas-search-input" type="text" placeholder="Buscar" data-i18n-placeholder="atlas_search" autocomplete="off" autocapitalize="off" spellcheck="false" oninput="renderAtlas()" onkeydown="if(event.key==='Escape')atlasToggleSearch(false)"/></div>
     <div id="atlas-list"></div>
   </div>
 </div>
@@ -4840,6 +4850,7 @@ const I18N = {
     offers_edit_hint_done: "¡Listo!", toast_copied: "Copiado", title_copy: "Copiar",
     add_photo_line1: "AÑADIR", add_photo_line2: "IMAGEN", add_image_alt: "Añadir imagen",
     title_back: "Volver",
+    atlas_search: "Buscar", atlas_none: "Sin resultados.",
     video_thumbnail_alt: "Miniatura del vídeo",
     field_notes: "Notas olfativas", field_comments: "Comentarios", field_photo_credit: "Créditos de la foto", video_label_short: "Vídeo",
     field_concentration: "Concentración",
@@ -4934,6 +4945,7 @@ const I18N = {
     offers_edit_hint_done: "Done!", toast_copied: "Copied", title_copy: "Copy",
     add_photo_line1: "ADD", add_photo_line2: "PHOTO", add_image_alt: "Add image",
     title_back: "Back",
+    atlas_search: "Search", atlas_none: "No results.",
     video_thumbnail_alt: "Video thumbnail",
     field_notes: "Olfactory notes", field_comments: "Comments", field_photo_credit: "Photo credit", video_label_short: "Video",
     field_concentration: "Concentration",
@@ -8207,6 +8219,13 @@ const ATLAS_ENTRIES = [
 ];
 let _atlasCur = null;
 function _atlasText(e) { return e.t[currentLang] || e.t.en; }
+function _atlasNorm(s) { return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+function atlasToggleSearch(force) {
+  const box = document.getElementById('atlas-search-box'), inp = document.getElementById('atlas-search-input'), btn = document.getElementById('atlas-search-btn');
+  const open = (typeof force === 'boolean') ? force : box.hidden;
+  box.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) { inp.focus(); } else { inp.value = ''; inp.blur(); renderAtlas(); }
+}
 function _atlasLast() { return ATLAS_ENTRIES[ATLAS_ENTRIES.length - 1]; }
 function renderAtlas() {
   const last = _atlasLast();
@@ -8217,7 +8236,20 @@ function renderAtlas() {
   }
   const list = document.getElementById('atlas-list'); if (!list) return;
   list.textContent = '';
-  ATLAS_ENTRIES.slice().reverse().forEach(function(e) {
+  const inp = document.getElementById('atlas-search-input');
+  const q = _atlasNorm(inp ? inp.value : '').trim();
+  const items = ATLAS_ENTRIES.slice().sort(function(a, b) {
+    return _atlasText(a).title.localeCompare(_atlasText(b).title, currentLang, { sensitivity: 'base' });
+  }).filter(function(e) {
+    if (!q) return true;
+    return Object.keys(e.t).some(function(l) { return _atlasNorm(e.t[l].title).indexOf(q) > -1; });
+  });
+  if (!items.length) {
+    const n = document.createElement('div'); n.className = 'atlas-none';
+    n.textContent = (I18N[currentLang] || I18N.en).atlas_none || I18N.en.atlas_none;
+    list.appendChild(n);
+  }
+  items.forEach(function(e) {
     const b = document.createElement('button'); b.className = 'atlas-item';
     b.onclick = function() { openAtlasEntry(e.id); };
     b.innerHTML = '<img alt="" src="' + e.thumb + '"><div class="atlas-item-title"></div>';
@@ -8259,6 +8291,8 @@ function fillAtlasEntry() {
   document.getElementById('atlas-sign').textContent = e.sign;
 }
 function openAtlas() {
+  const bx = document.getElementById('atlas-search-box'), bi = document.getElementById('atlas-search-input'), bb = document.getElementById('atlas-search-btn');
+  if (bx) { bx.hidden = true; bi.value = ''; bb.setAttribute('aria-expanded', 'false'); }
   renderAtlas();
   document.getElementById('modal-atlas').scrollTop = 0;
   openModal('modal-atlas');
