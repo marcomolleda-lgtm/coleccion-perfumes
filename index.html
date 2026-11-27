@@ -1219,6 +1219,8 @@
   #atlas-body p.atlas-li { padding-left: 14px; border-left: 2px solid var(--border, #e4e2dc); }
   #atlas-body p.atlas-li strong { font-weight: 600; }
   #atlas-body p.atlas-outro { margin-top: 30px; font-family: 'Jost', sans-serif; font-style: italic; font-weight: 400; font-size: 18.5px; line-height: 1.7; color: var(--text); }
+  .atlas-syn { margin: -6px 0 14px; font-family: 'Jost', sans-serif; font-size: 14px; line-height: 1.4; color: var(--text-light); }
+  .atlas-syn[hidden] { display: none; }
   .atlas-crumb { cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
   .atlas-all { display: block; margin-top: 28px; padding: 0; border: none; background: none; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--star); cursor: pointer; }
   .atlas-search-btn { position: absolute; top: 18px; right: 16px; padding: 6px; border: none; background: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; -webkit-tap-highlight-color: transparent; }
@@ -1747,6 +1749,7 @@
     <button class="page-back" onclick="closeModal('modal-atlas-entry')" title="Volver" data-i18n-title="title_back"><span class="back-arrow-img"></span></button>
     <div class="sq-label" id="atlas-entry-label"></div>
     <div class="page-title sq-page-title" id="atlas-title"></div>
+    <div class="atlas-syn" id="atlas-syn" hidden></div>
     <figure class="sq-figure"><img id="atlas-img" src="" alt=""><figcaption id="atlas-caption"></figcaption></figure>
     <div id="atlas-body"></div>
     <div class="sq-sign" id="atlas-sign"></div>
@@ -5191,6 +5194,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/rosa-grande.webp",
   "thumb": "notas/rosa.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "La rosa",
@@ -5355,6 +5362,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/violeta-grande.webp",
   "thumb": "notas/violeta.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Flor de violeta",
@@ -5513,6 +5524,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/vetiver-grande.webp",
   "thumb": "notas/vetiver.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Vetiver",
@@ -5661,6 +5676,12 @@ const ATLAS_ENTRIES = [
   "img": "notas/algalia-grande.webp",
   "thumb": "notas/algalia.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [
+    "civeta"
+   ],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Algalia",
@@ -5803,6 +5824,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/limon-grande.webp",
   "thumb": "notas/limon.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Limón",
@@ -5961,6 +5986,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/canela-grande.webp",
   "thumb": "notas/canela.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Canela",
@@ -6145,6 +6174,12 @@ const ATLAS_ENTRIES = [
   "img": "notas/castoreo-grande.webp",
   "thumb": "notas/castoreo.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [
+    "castor"
+   ],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Castóreo",
@@ -6305,6 +6340,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/ambar-grande.webp",
   "thumb": "notas/ambar.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Ámbar",
@@ -6467,6 +6506,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/manzana-grande.webp",
   "thumb": "notas/manzana.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Manzana",
@@ -6631,6 +6674,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/vainilla-grande.webp",
   "thumb": "notas/vainilla.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Vainilla",
@@ -6857,6 +6904,12 @@ const ATLAS_ENTRIES = [
   "img": "notas/clavel-grande.webp",
   "thumb": "notas/clavel.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [
+    "dianthus"
+   ],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Clavel",
@@ -7041,6 +7094,12 @@ const ATLAS_ENTRIES = [
   "img": "notas/lavanda-grande.webp",
   "thumb": "notas/lavanda.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [
+    "espliego"
+   ],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Lavanda",
@@ -7197,6 +7256,13 @@ const ATLAS_ENTRIES = [
   "img": "notas/pachuli-grande.webp",
   "thumb": "notas/pachuli.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [
+    "pachulí",
+    "patchouli"
+   ],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Pachuli",
@@ -7375,6 +7441,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/naranja-grande.webp",
   "thumb": "notas/naranja.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Naranja",
@@ -7539,6 +7609,12 @@ const ATLAS_ENTRIES = [
   "img": "notas/neroli-grande.webp",
   "thumb": "notas/neroli.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [
+    "flor de naranjo amargo"
+   ],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Neroli",
@@ -7719,6 +7795,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/melon-grande.webp",
   "thumb": "notas/melon.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Melón",
@@ -7873,6 +7953,14 @@ const ATLAS_ENTRIES = [
   "img": "notas/iris-grande.webp",
   "thumb": "notas/iris.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [
+    "orris",
+    "lirio florentino",
+    "raíz de iris"
+   ],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Iris",
@@ -8049,6 +8137,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/cedro-grande.webp",
   "thumb": "notas/cedro.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Cedro",
@@ -8221,6 +8313,12 @@ const ATLAS_ENTRIES = [
   "img": "notas/tuberosa-grande.webp",
   "thumb": "notas/tuberosa.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [
+    "nardo"
+   ],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Tuberosa",
@@ -8405,6 +8503,12 @@ const ATLAS_ENTRIES = [
   "img": "notas/jazmin-grande.webp",
   "thumb": "notas/jazmin.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [
+    "jasmín"
+   ],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Jazmín",
@@ -8563,6 +8667,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/gardenia-grande.webp",
   "thumb": "notas/gardenia.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Gardenia",
@@ -8715,6 +8823,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/magnolia-grande.webp",
   "thumb": "notas/magnolia.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Magnolia",
@@ -8875,6 +8987,10 @@ const ATLAS_ENTRIES = [
   "img": "notas/jacinto-grande.webp",
   "thumb": "notas/jacinto.webp",
   "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
   "t": {
    "es": {
     "title": "Jacinto",
@@ -9029,6 +9145,627 @@ const ATLAS_ENTRIES = [
     "outro": "Green and sweet at once, hyacinth is spring at its most intense: a flower that is hard to capture and that perfumery learned to reconstruct."
    }
   }
+ },
+ {
+  "id": "cistus",
+  "img": "notas/cistus-grande.webp",
+  "thumb": "notas/cistus.webp",
+  "sign": "Scentic",
+  "syn": {
+   "es": [
+    "jara",
+    "ládano",
+    "labdanum",
+    "cisto",
+    "jara pringosa"
+   ],
+   "en": [
+    "labdanum",
+    "rockrose"
+   ]
+  },
+  "t": {
+   "es": {
+    "title": "Cistus",
+    "caption": "",
+    "sections": [
+     {
+      "h": "Descripción olfativa",
+      "c": [
+       "El cistus es una de las notas más complejas, ricas y misteriosas de la perfumería natural. Procede de un arbusto, pero su perfil no es verde ni floral: pertenece de lleno a la familia ambarina, balsámica y resinosa. Su aroma es denso, cálido y profundamente terroso, con un inconfundible matiz dulce que recuerda a la miel oscura y al tabaco, y con un fuerte carácter animal y un punto de cuero que le otorgan una gran sensualidad. Evoluciona de manera espectacular: la salida puede rozar lo herbáceo y alcanforado, y después se asienta en un fondo balsámico, casi ahumado, que evoca el calor de la tierra mediterránea y la madera vieja.",
+       "La riqueza de este aroma procede de una mezcla de compuestos naturales:",
+       [
+        "Monoterpenos (como el α-pineno y el canfeno)",
+        "responsables del primer impacto, resinoso, fresco y algo rústico, con matices de bosque, pino y conífera."
+       ],
+       [
+        "Sesquiterpenos y sus alcoholes",
+        "aportan el cuerpo pesado, amaderado y persistente."
+       ],
+       [
+        "Diterpenos de tipo labdano (como el labdanol)",
+        "son el verdadero corazón del ládano. Le confieren su textura pegajosa y buena parte de su calidez resinosa y ambarina, y se aferran con fuerza a la piel."
+       ],
+       [
+        "Compuestos fenólicos y ácidos",
+        "aportan los matices ásperos, terrosos, ahumados y balsámicos que le dan ese aire tan salvaje y natural."
+       ]
+      ]
+     },
+     {
+      "h": "Producción y obtención",
+      "c": [
+       "Obtener el cistus y el ládano es un proceso laborioso, muy ligado al verano mediterráneo, cuando la planta (Cistus ladanifer) exuda una resina pegajosa para protegerse del calor extremo.",
+       [
+        "Destilación al vapor",
+        "para obtener el aceite esencial de cistus (o «ciste») se recolectan las ramas y las hojas y se destilan con vapor de agua. El resultado es un líquido móvil, de aroma más herbáceo, balsámico, algo afrutado y con un toque de pino."
+       ],
+       [
+        "Extracción de la resina (ládano)",
+        "históricamente se recogía de las barbas y la lana de las cabras que pastaban entre los arbustos, donde la resina quedaba atrapada. Hoy las ramas se cosechan y se hierven en agua, a menudo alcalina (con carbonato de sodio), para separar la resina. Otra vía es tratar la planta con disolventes volátiles para obtener un concreto y, tras purificarlo con alcohol, el absoluto de ládano: una masa densa, oscura y viscosa que guarda el olor más rico, dulce, ambarino, de cuero y balsámico."
+       ],
+       [
+        "Resinoide de ládano",
+        "se obtiene extrayendo directamente la resina natural con disolventes calientes. Es un excelente fijador, por su volatilidad extremadamente baja."
+       ]
+      ]
+     },
+     {
+      "h": "Cistus frente a ládano",
+      "c": [
+       "En perfumería es habitual usar ambos nombres casi como sinónimos, pero técnicamente designan productos distintos de la misma planta:",
+       [
+        "Aceite esencial de cistus (ciste)",
+        "se destila de las hojas y ramas frescas. Es más ligero y dinámico, con un inicio algo medicinal, ambarino y de bosque. Se usa para aportar vibración, carácter agreste y matices naturales en las notas de salida y de corazón."
+       ],
+       [
+        "Ládano (labdanum)",
+        "es la resina que exuda la planta. Sus extractos (absolutos y resinoides) son el alma de los acordes ámbar, el clásico acorde oriental. Pesados, de fondo, dulces, de cuero y balsámicos, son un anclaje insustituible para las fragancias complejas."
+       ]
+      ]
+     },
+     {
+      "h": "Historia",
+      "c": [
+       "El ládano tiene una historia que se hunde en la Antigüedad. Se suele identificar con una de las resinas aromáticas mencionadas en la Biblia y aparece en las culturas del Mediterráneo, como la egipcia, la griega y la romana, donde se quemaba como incienso en rituales sagrados, se empleaba en medicina y se valoraba por su poder fijador en ungüentos y aceites aromáticos. El historiador griego Heródoto ya describía su recogida del pelaje de los machos cabríos, uno de los métodos de obtención de materias primas más antiguos que se conocen.",
+       "Su uso en perfumería, por tanto, es antiquísimo y no puede fecharse con precisión. Como referencia aproximada para la perfumería moderna, se consolida a comienzos del siglo XX: Chypre de Coty (1917) dio nombre a la familia chypre, que combina el ládano con la bergamota y el musgo de roble, y el ládano pasó a ser la base de los acordes ámbar y oriental. Su capacidad para evocar la calidez del escaso y costoso ámbar gris, de origen animal, lo convirtió en un recurso insustituible."
+      ]
+     }
+    ],
+    "outro": "El cistus es el calor del secano mediterráneo encerrado en un frasco: una nota indómita y resinosa que da alma, misterio y fijación a la perfumería más refinada."
+   },
+   "en": {
+    "title": "Cistus",
+    "caption": "",
+    "sections": [
+     {
+      "h": "Olfactory description",
+      "c": [
+       "Cistus is one of the most complex, rich and mysterious notes in natural perfumery. It comes from a shrub, yet its profile is neither green nor floral: it belongs squarely to the amber, balsamic and resinous family. Its scent is dense, warm and deeply earthy, with an unmistakable sweet nuance reminiscent of dark honey and tobacco, and a strong animal character and a touch of leather that give it great sensuality. It evolves spectacularly: the opening can verge on the herbal and camphoraceous, then settles into a balsamic, almost smoky base that evokes the warmth of Mediterranean earth and old wood.",
+       "The richness of this scent comes from a blend of natural compounds:",
+       [
+        "Monoterpenes (such as α-pinene and camphene)",
+        "responsible for the first impact: resinous, fresh and somewhat rustic, with nuances of forest, pine and conifer."
+       ],
+       [
+        "Sesquiterpenes and their alcohols",
+        "provide the heavy, woody and lasting body."
+       ],
+       [
+        "Labdane-type diterpenes (such as labdanol)",
+        "the true heart of labdanum. They give it its sticky texture and a good part of its warm, resinous, ambery character, and they cling firmly to the skin."
+       ],
+       [
+        "Phenolic compounds and acids",
+        "bring the rough, earthy, smoky and balsamic nuances that give it such a wild, natural air."
+       ]
+      ]
+     },
+     {
+      "h": "Production and extraction",
+      "c": [
+       "Obtaining cistus and labdanum is a laborious process, closely tied to the Mediterranean summer, when the plant (Cistus ladanifer) exudes a sticky resin to protect itself from extreme heat.",
+       [
+        "Steam distillation",
+        "to obtain the cistus essential oil (also called “ciste”), the branches and leaves are harvested and distilled with steam. The result is a mobile liquid with a more herbal, balsamic, slightly fruity scent and a hint of pine."
+       ],
+       [
+        "Extraction of the resin (labdanum)",
+        "historically it was collected from the beards and wool of goats grazing among the shrubs, where the resin got trapped. Today the branches are harvested and boiled in water, often alkaline (with sodium carbonate), to separate the resin. Another route is to treat the plant with volatile solvents to obtain a concrete and, after purifying it with alcohol, the labdanum absolute: a dense, dark, viscous mass that holds the richest, sweetest, most ambery, leathery and balsamic scent."
+       ],
+       [
+        "Labdanum resinoid",
+        "obtained by extracting the natural resin directly with hot solvents. It is an excellent fixative, thanks to its extremely low volatility."
+       ]
+      ]
+     },
+     {
+      "h": "Cistus versus labdanum",
+      "c": [
+       "In perfumery both names are often used almost interchangeably, but technically they refer to different products of the same plant:",
+       [
+        "Cistus essential oil (ciste)",
+        "distilled from fresh leaves and branches. It is lighter and more dynamic, with a slightly medicinal, ambery and woodland opening. It is used to add vibrancy, a rugged character and natural nuances in the top and heart notes."
+       ],
+       [
+        "Labdanum",
+        "the resin the plant exudes. Its extracts (absolutes and resinoids) are the soul of amber accords, the classic oriental accord. Heavy, deep, sweet, leathery and balsamic, they are an irreplaceable anchor for complex fragrances."
+       ]
+      ]
+     },
+     {
+      "h": "History",
+      "c": [
+       "Labdanum has a history that reaches deep into Antiquity. It is usually identified with one of the aromatic resins mentioned in the Bible and appears in Mediterranean cultures such as the Egyptian, Greek and Roman, where it was burned as incense in sacred rituals, used in medicine and valued for its fixing power in ointments and aromatic oils. The Greek historian Herodotus already described how it was gathered from the coats of male goats, one of the oldest known ways of obtaining a raw material.",
+       "Its use in perfumery is therefore very ancient and cannot be dated precisely. As an approximate reference for modern perfumery, it was consolidated in the early 20th century: Coty’s Chypre (1917) gave its name to the chypre family, which combines labdanum with bergamot and oakmoss, and labdanum became the foundation of amber and oriental accords. Its ability to evoke the warmth of scarce, costly ambergris, which is of animal origin, made it an indispensable resource."
+      ]
+     }
+    ],
+    "outro": "Cistus is the warmth of the Mediterranean scrubland sealed in a bottle: an untamed, resinous note that gives soul, mystery and staying power to the most refined perfumery."
+   }
+  }
+ },
+ {
+  "id": "habatonka",
+  "img": "notas/habatonka-grande.webp",
+  "thumb": "notas/habatonka.webp",
+  "sign": "Scentic",
+  "syn": {
+   "es": [
+    "tonka",
+    "haba de tonka",
+    "sarrapia"
+   ],
+   "en": [
+    "tonka",
+    "tonquin bean",
+    "cumaru"
+   ]
+  },
+  "t": {
+   "es": {
+    "title": "Haba tonka",
+    "caption": "",
+    "sections": [
+     {
+      "h": "Descripción olfativa",
+      "c": [
+       "El haba tonka es una de las notas más reconfortantes, golosas y seductoras de la perfumería actual. Se asocia a menudo con la vainilla, pero su aroma es mucho más complejo e intrigante. Cálido y balsámico, se describe como una mezcla rica de vainilla, almíbar y almendra amarga, con acusados matices de heno recién cortado, tabaco rubio y un toque de canela y clavo. Es una nota de fondo densa, de textura empolvada y aterciopelada, que envuelve las composiciones con una dulzura profunda y ligeramente oscura.",
+       "La clave de este hechizo olfativo reside sobre todo en una molécula:",
+       [
+        "Cumarina",
+        "es el componente principal; en el absoluto natural suele representar, según la fuente, entre una quinta parte y la mitad de su composición. Su olor define el heno seco, dulce, con recuerdos de almendra, tabaco y vainilla."
+       ],
+       [
+        "Dihidrocumarina",
+        "pariente cercana de la cumarina, de carácter más suave y cremoso, con ecos de coco y de almendra."
+       ],
+       [
+        "Compuestos minoritarios (como el eugenol y el β-cariofileno)",
+        "aportan los matices de fondo especiados y amaderados, con recuerdos de clavo y de tabaco, que le dan su característica profundidad."
+       ]
+      ]
+     },
+     {
+      "h": "Producción y obtención",
+      "c": [
+       "El haba tonka es la semilla del árbol Dipteryx odorata, un gigante botánico nativo de la selva amazónica (sobre todo en Venezuela, Brasil y las Guayanas).",
+       [
+        "Cosecha",
+        "los frutos caen al suelo cuando están maduros y se recogen a mano. Tras romper su dura cáscara, se extraen las semillas: las habas, alargadas, arrugadas y de color oscuro."
+       ],
+       [
+        "Maceración y secado",
+        "para potenciar su aroma, las semillas se sumergen tradicionalmente en alcohol (a menudo ron) durante unas horas y después se secan lentamente. En este proceso las habas se cubren de una fina capa blanquecina y cristalizada de cumarina natural, y es entonces cuando alcanzan su pleno potencial aromático."
+       ],
+       [
+        "Extracción con disolventes",
+        "las semillas curadas se procesan con disolventes volátiles para obtener el absoluto de haba tonka, un material rico, viscoso y semisólido a temperatura ambiente que se usa en dilución para dar a las fragancias su inconfundible calidez."
+       ]
+      ]
+     },
+     {
+      "h": "Del absoluto natural a la cumarina de síntesis",
+      "c": [
+       "Un aspecto fascinante del haba tonka es su doble vida entre la naturaleza y la química.",
+       [
+        "El absoluto natural",
+        "es extremadamente complejo, con una textura olfativa que incluye matices terrosos, ahumados y de frutos secos que la síntesis difícilmente reproduce por completo. Es muy codiciado en la perfumería de lujo."
+       ],
+       [
+        "La cumarina sintética",
+        "es una de las moléculas más célebres de la historia del perfume: barata, estable, con ese lado dulce, limpio y de heno seco. En muchos perfumes que anuncian la nota tonka, lo que en realidad hay es sobre todo cumarina, y los perfumistas suelen combinar ambas para unir la riqueza del extracto natural con la precisión y la potencia del compuesto sintético."
+       ]
+      ]
+     },
+     {
+      "h": "Historia",
+      "c": [
+       "El uso tradicional del haba tonka se atribuye a los pueblos originarios de la cuenca amazónica, que la empleaban como amuleto, como remedio y para perfumar estancias o el tabaco.",
+       "Su uso en la perfumería occidental moderna se sitúa, como referencia aproximada, en la segunda mitad del siglo XIX. En 1868 el químico William Henry Perkin logró sintetizar la cumarina por primera vez en un laboratorio, y esta se convirtió en una de las primeras moléculas sintéticas empleadas en perfumería. Con ella, el perfumista Paul Parquet creó en 1882 Fougère Royale de Houbigant, donde la cumarina, combinada con lavanda y musgo de roble, dio origen a la célebre familia olfativa fougère (helecho). Desde entonces, el haba tonka y su cumarina son pilares no solo de esta vertiente masculina, sino también de las fragancias orientales, gourmand e invernales que hoy disfrutamos."
+      ]
+     }
+    ],
+    "outro": "El haba tonka es el abrazo olfativo de la perfumería: la dulzura de la vainilla, el misterio del tabaco y el eco de la almendra en una sola semilla."
+   },
+   "en": {
+    "title": "Tonka bean",
+    "caption": "",
+    "sections": [
+     {
+      "h": "Olfactory description",
+      "c": [
+       "Tonka bean is one of the most comforting, indulgent and seductive notes in perfumery today. It is often associated with vanilla, but its scent is far more complex and intriguing. Warm and balsamic, it is described as a rich blend of vanilla, syrup and bitter almond, with pronounced nuances of freshly cut hay, blond tobacco and a hint of cinnamon and clove. It is a dense base note with a powdery, velvety texture that wraps compositions in a deep, slightly dark sweetness.",
+       "The key to this olfactory spell lies above all in one molecule:",
+       [
+        "Coumarin",
+        "the main component; in the natural absolute it usually accounts, depending on the source, for between a fifth and a half of its composition. Its scent defines dry, sweet hay, with memories of almond, tobacco and vanilla."
+       ],
+       [
+        "Dihydrocoumarin",
+        "a close relative of coumarin, softer and creamier, with echoes of coconut and almond."
+       ],
+       [
+        "Minor compounds (such as eugenol and β-caryophyllene)",
+        "bring the spicy, woody background nuances, reminiscent of clove and tobacco, that give it its characteristic depth."
+       ]
+      ]
+     },
+     {
+      "h": "Production and extraction",
+      "c": [
+       "Tonka bean is the seed of the tree Dipteryx odorata, a botanical giant native to the Amazon rainforest (mainly Venezuela, Brazil and the Guianas).",
+       [
+        "Harvest",
+        "the fruits fall to the ground when ripe and are gathered by hand. After the hard shell is broken, the seeds are extracted: the beans, which are elongated, wrinkled and dark."
+       ],
+       [
+        "Maceration and drying",
+        "to bring out their scent, the seeds are traditionally soaked in alcohol (often rum) for a few hours and then dried slowly. During this process the beans become covered with a fine, whitish, crystallized layer of natural coumarin, and that is when they reach their full aromatic potential."
+       ],
+       [
+        "Solvent extraction",
+        "the cured seeds are processed with volatile solvents to obtain the tonka bean absolute, a rich, viscous material that is semi-solid at room temperature and is used in dilution to give fragrances their unmistakable warmth."
+       ]
+      ]
+     },
+     {
+      "h": "From natural absolute to synthetic coumarin",
+      "c": [
+       "A fascinating aspect of tonka bean is its double life between nature and chemistry.",
+       [
+        "The natural absolute",
+        "is extremely complex, with an olfactory texture that includes earthy, smoky and nutty nuances that synthesis can hardly reproduce completely. It is highly prized in luxury perfumery."
+       ],
+       [
+        "Synthetic coumarin",
+        "one of the most celebrated molecules in the history of perfume: cheap, stable, with that sweet, clean, dry-hay side. In many perfumes that list a tonka note, what is actually in the bottle is mostly coumarin, and perfumers often combine both to join the richness of the natural extract with the precision and power of the synthetic compound."
+       ]
+      ]
+     },
+     {
+      "h": "History",
+      "c": [
+       "The traditional use of tonka bean is attributed to the native peoples of the Amazon basin, who used it as an amulet, as a remedy and to perfume rooms or tobacco.",
+       "Its use in modern Western perfumery is placed, as an approximate reference, in the second half of the 19th century. In 1868 the chemist William Henry Perkin synthesized coumarin in a laboratory for the first time, and it became one of the first synthetic molecules used in perfumery. With it, the perfumer Paul Parquet created Houbigant’s Fougère Royale in 1882, in which coumarin, combined with lavender and oakmoss, gave rise to the celebrated fougère (fern) olfactory family. Since then, tonka bean and its coumarin have been pillars not only of this masculine branch but also of the oriental, gourmand and wintry fragrances we enjoy today."
+      ]
+     }
+    ],
+    "outro": "Tonka bean is perfumery’s olfactory embrace: the sweetness of vanilla, the mystery of tobacco and the echo of almond in a single seed."
+   }
+  }
+ },
+ {
+  "id": "albahaca",
+  "img": "notas/albahaca-grande.webp",
+  "thumb": "notas/albahaca.webp",
+  "sign": "Scentic",
+  "syn": {
+   "es": [],
+   "en": []
+  },
+  "t": {
+   "es": {
+    "title": "Albahaca",
+    "caption": "",
+    "sections": [
+     {
+      "h": "Descripción olfativa",
+      "c": [
+       "La albahaca aporta a la perfumería un frescor verde complejo, lleno de carácter y muy distinto al de las hierbas puramente cítricas o mentoladas. Su aroma combina el verdor jugoso de la hoja recién partida con un matiz anisado y ligeramente especiado (que recuerda al clavo y al estragón), un fondo cálido y balsámico y un toque sutilmente mentolado.",
+       "Esta riqueza de matices se explica por varios grupos químicos bien diferenciados:",
+       [
+        "Estragol (metilchavicol)",
+        "es el responsable de esa faceta dulce, anisada, aromática y ligeramente picante que caracteriza a las variedades más exóticas."
+       ],
+       [
+        "Linalol",
+        "muy abundante en la albahaca dulce mediterránea, aporta luminosidad, suavidad floral-herbal y un frescor limpio que facilita su unión con cítricos y flores."
+       ],
+       [
+        "Eugenol",
+        "presente en pequeñas proporciones, suma una calidez especiada que recuerda al clavo y da cuerpo y textura al corazón de la fragancia."
+       ],
+       [
+        "1,8-cineol y alcanfor",
+        "aportan un impulso inicial fresco, aéreo y ligeramente balsámico que despeja la salida y refuerza su carácter verde."
+       ]
+      ]
+     },
+     {
+      "h": "Producción y obtención",
+      "c": [
+       "El aceite esencial se extrae de las hojas y las sumidades floridas de la planta (Ocimum basilicum), cosechadas en pleno verano, cuando el sol ha concentrado sus aceites aromáticos.",
+       [
+        "Destilación al vapor",
+        "es el procedimiento habitual. Se emplea planta fresca o ligeramente oreada para evitar que las hojas fermenten y pierdan su brillo verde. El rendimiento es bajo, por lo que hace falta una gran cantidad de materia vegetal para obtener un litro de esencia."
+       ],
+       [
+        "Extracción con CO₂",
+        "se utiliza cada vez más en la perfumería de autor para captar el perfil exacto de la hoja cruda y conservar matices verdes y jugosos que el calor del vapor suele suavizar."
+       ],
+       [
+        "Control de quimiotipos",
+        "como la composición química de la albahaca cambia mucho según el clima y el suelo, los productores seleccionan y analizan cuidadosamente el origen para garantizar un perfil olfativo constante."
+       ]
+      ]
+     },
+     {
+      "h": "Quimiotipos principales: albahaca dulce frente a exótica",
+      "c": [
+       "En perfumería es fundamental distinguir los dos grandes perfiles de albahaca, porque dan resultados muy distintos:",
+       [
+        "Albahaca dulce o mediterránea (quimiotipo linalol)",
+        "se cultiva en regiones como Egipto, Francia o Italia. Es más suave, verde, luminosa y ligeramente floral, con menos peso anisado. Combina de maravilla con bergamota, neroli, lavanda y notas amaderadas limpias."
+       ],
+       [
+        "Albahaca exótica o de Reunión (quimiotipo estragol)",
+        "se produce sobre todo en Madagascar, Comoras, Vietnam o India. Es mucho más intensa, anisada, especiada y cálida, y aporta un carácter profundo y envolvente a los perfumes aromáticos, fougère o especiados."
+       ]
+      ]
+     },
+     {
+      "h": "Historia",
+      "c": [
+       "La albahaca es una planta venerada desde la Antigüedad. En la India, la albahaca sagrada o tulsi (Ocimum tenuiflorum, una especie distinta de la albahaca común) formaba parte de rituales y ungüentos, y griegos y romanos también la usaron en aceites perfumados y aguas aromáticas.",
+       "En la perfumería clásica europea entró, como referencia aproximada, a partir del siglo XIX, impulsada por la destilación comercial en el sur de Francia y, más tarde, en las islas del océano Índico. Durante el siglo XX se consolidó como ingrediente clave para dar brillo natural y nervio verde a las grandes aguas de colonia mediterráneas y a las fragancias masculinas aromáticas y fougère, con un contraste vegetal elegante frente a las maderas y el musgo."
+      ]
+     }
+    ],
+    "outro": "La albahaca demuestra que una hierba cotidiana puede convertirse en un acorde de alta perfumería: un puente natural entre el frescor verde del jardín y la calidez de las especias."
+   },
+   "en": {
+    "title": "Basil",
+    "caption": "",
+    "sections": [
+     {
+      "h": "Olfactory description",
+      "c": [
+       "Basil brings to perfumery a complex green freshness, full of character and very different from that of purely citrusy or minty herbs. Its scent combines the juicy greenness of a freshly torn leaf with an anisic, slightly spicy nuance (reminiscent of clove and tarragon), a warm, balsamic background and a subtly minty touch.",
+       "This richness of nuances is explained by several well-differentiated chemical groups:",
+       [
+        "Estragole (methyl chavicol)",
+        "responsible for the sweet, anisic, aromatic and slightly peppery facet that characterizes the more exotic varieties."
+       ],
+       [
+        "Linalool",
+        "very abundant in Mediterranean sweet basil, it brings luminosity, a soft floral-herbal quality and a clean freshness that makes it blend easily with citrus and flowers."
+       ],
+       [
+        "Eugenol",
+        "present in small proportions, it adds a spicy warmth reminiscent of clove and gives body and texture to the heart of the fragrance."
+       ],
+       [
+        "1,8-cineole and camphor",
+        "provide a fresh, airy, slightly balsamic initial lift that clears the opening and reinforces its green character."
+       ]
+      ]
+     },
+     {
+      "h": "Production and extraction",
+      "c": [
+       "The essential oil is extracted from the leaves and flowering tops of the plant (Ocimum basilicum), harvested in high summer, when the sun has concentrated its aromatic oils.",
+       [
+        "Steam distillation",
+        "the usual procedure. Fresh or lightly wilted plant is used to keep the leaves from fermenting and losing their green brightness. The yield is low, so a large amount of plant material is needed to obtain a liter of essence."
+       ],
+       [
+        "CO₂ extraction",
+        "increasingly used in niche perfumery to capture the exact profile of the raw leaf, preserving green, juicy nuances that the heat of steam tends to soften."
+       ],
+       [
+        "Chemotype control",
+        "because the chemical composition of basil changes greatly with climate and soil, producers carefully select and analyze the origin to guarantee a consistent olfactory profile."
+       ]
+      ]
+     },
+     {
+      "h": "Main chemotypes: sweet versus exotic basil",
+      "c": [
+       "In perfumery it is essential to distinguish the two main basil profiles, because they give very different results:",
+       [
+        "Sweet or Mediterranean basil (linalool chemotype)",
+        "grown in regions such as Egypt, France or Italy. It is softer, greener, brighter and slightly floral, with less anisic weight. It blends wonderfully with bergamot, neroli, lavender and clean woody notes."
+       ],
+       [
+        "Exotic or Réunion basil (estragole chemotype)",
+        "produced mainly in Madagascar, the Comoros, Vietnam or India. It is much more intense, anisic, spicy and warm, and gives a deep, enveloping character to aromatic, fougère or spicy perfumes."
+       ]
+      ]
+     },
+     {
+      "h": "History",
+      "c": [
+       "Basil is a plant revered since Antiquity. In India, holy basil or tulsi (Ocimum tenuiflorum, a different species from common basil) was part of rituals and ointments, and the Greeks and Romans also used basil in perfumed oils and aromatic waters.",
+       "It entered classic European perfumery, as an approximate reference, from the 19th century onward, driven by commercial distillation in the south of France and, later, on the islands of the Indian Ocean. During the 20th century it became established as a key ingredient for giving natural brightness and green vigor to the great Mediterranean colognes and to aromatic and fougère men’s fragrances, offering an elegant plant-based contrast to woods and moss."
+      ]
+     }
+    ],
+    "outro": "Basil shows that an everyday herb can become a high-perfumery accord: a natural bridge between the green freshness of the garden and the warmth of spices."
+   }
+  }
+ },
+ {
+  "id": "menta",
+  "img": "notas/menta-grande.webp",
+  "thumb": "notas/menta.webp",
+  "sign": "Scentic",
+  "syn": {
+   "es": [
+    "menta piperita",
+    "hierbabuena"
+   ],
+   "en": [
+    "peppermint",
+    "spearmint"
+   ]
+  },
+  "t": {
+   "es": {
+    "title": "Menta",
+    "caption": "",
+    "sections": [
+     {
+      "h": "Descripción olfativa",
+      "c": [
+       "La menta es la nota aromática y herbal por excelencia asociada a la sensación de frescor inmediato. Su olor es verde, vibrante, penetrante y limpio, con un efecto refrescante casi físico en las vías respiratorias. Según la variedad, puede mostrarse más picante, alcanforada y helada, o más dulce, redonda y herbácea, con un ligero matiz de clorofila recién cortada.",
+       "Detrás de esa sensación de frío intervienen moléculas muy definidas:",
+       [
+        "Mentol",
+        "es el compuesto estrella de la menta piperita. Además de su olor herbal y fresco, activa directamente los receptores nerviosos del frío (TRPM8) en la piel y en la nariz, y crea esa sensación helada tan característica."
+       ],
+       [
+        "Mentona",
+        "acompaña al mentol con un matiz más verde, ligeramente amargo y con un punto amaderado que da estructura al conjunto."
+       ],
+       [
+        "Carvona (L-carvona)",
+        "es la molécula dominante en la hierbabuena (Mentha spicata). No tiene el golpe glacial del mentol y ofrece en su lugar un frescor dulce, tierno y vegetal, con ecos de hoja machacada."
+       ],
+       [
+        "1,8-cineol (eucaliptol) y acetato de mentilo",
+        "añaden, respectivamente, un impulso balsámico y alcanforado en la salida y un toque afrutado, suave y ligeramente floral que redondea el perfil."
+       ]
+      ]
+     },
+     {
+      "h": "Producción y obtención",
+      "c": [
+       "La menta es una planta robusta y generosa en aceite esencial, que se concentra en las glándulas microscópicas de sus hojas y sumidades floridas.",
+       [
+        "Cosecha y presecado",
+        "se recolecta generalmente justo antes de la floración, cuando la concentración de aceite esencial es máxima. A menudo se deja orear unas horas en el campo para reducir el exceso de agua antes de procesarla."
+       ],
+       [
+        "Destilación por arrastre de vapor",
+        "es el método estándar y más eficaz. El vapor extrae con rapidez el aceite esencial de las hojas y da un líquido pálido o amarillento, de aroma intenso y muy fiel a la planta fresca."
+       ],
+       [
+        "Rectificación y fraccionamiento",
+        "el aceite crudo suele someterse a una segunda destilación para eliminar notas sulfurosas o demasiado terrosas de cabeza, o bien para aislar mentol puro, muy demandado en perfumería, cosmética y alimentación."
+       ]
+      ]
+     },
+     {
+      "h": "Variedades principales en perfumería",
+      "c": [
+       [
+        "Menta piperita (Mentha × piperita)",
+        "rica en mentol y mentona. Es intensa, helada, incisiva y con un punto picante. Aporta un choque de energía inmediato en las notas de salida y realza los acordes cítricos o aromáticos."
+       ],
+       [
+        "Hierbabuena o menta verde (Mentha spicata)",
+        "dominada por la L-carvona. Es mucho más dulce, amable, verde y jugosa, sin sensación de frío extremo. Resulta ideal para acordes de té verde, cócteles frescos (como el mojito) o composiciones herbales luminosas."
+       ],
+       [
+        "Menta de campo (Mentha arvensis)",
+        "cultivada masivamente en India y China, tiene el mayor contenido de mentol natural y es la principal fuente industrial de cristales de mentol puro."
+       ]
+      ]
+     },
+     {
+      "h": "Historia",
+      "c": [
+       "El uso aromático de la menta se remonta a la Antigüedad y está documentado en el antiguo Egipto, Grecia y Roma, donde sus hojas se empleaban en baños perfumados, ungüentos medicinales y aceites corporales para refrescar el cuerpo y purificar los ambientes.",
+       "En cuanto a la perfumería moderna, como referencia aproximada su integración sistemática se sitúa entre los siglos XVIII y XIX, en las estructuras clásicas de las aguas de colonia y las aguas aromáticas inglesas y francesas, donde se combinaba con lavanda, romero y cítricos. En las últimas décadas, el refinamiento de los aceites rectificados de hierbabuena y menta piperita la ha sacado del ámbito puramente funcional o higiénico y la ha convertido en un recurso sofisticado de la perfumería contemporánea."
+      ]
+     }
+    ],
+    "outro": "Pocas materias primas despiertan los sentidos con tanta rapidez como la menta: un destello verde y cristalino que aporta aire, movimiento y claridad a cualquier composición."
+   },
+   "en": {
+    "title": "Mint",
+    "caption": "",
+    "sections": [
+     {
+      "h": "Olfactory description",
+      "c": [
+       "Mint is the aromatic, herbal note par excellence associated with the sensation of instant freshness. Its scent is green, vibrant, penetrating and clean, with an almost physical cooling effect on the airways. Depending on the variety, it can appear sharper, more camphoraceous and icy, or sweeter, rounder and more herbal, with a slight hint of freshly cut chlorophyll.",
+       "Behind that sensation of cold, very well-defined molecules are at work:",
+       [
+        "Menthol",
+        "the star compound of peppermint. Beyond its fresh, herbal scent, it directly activates the cold-sensing nerve receptors (TRPM8) in the skin and nose, creating that characteristic icy sensation."
+       ],
+       [
+        "Menthone",
+        "accompanies menthol with a greener, slightly bitter nuance and a woody touch that gives structure to the whole."
+       ],
+       [
+        "Carvone (L-carvone)",
+        "the dominant molecule in spearmint (Mentha spicata). It lacks the glacial punch of menthol and offers instead a sweet, tender, vegetal freshness, with echoes of crushed leaf."
+       ],
+       [
+        "1,8-cineole (eucalyptol) and menthyl acetate",
+        "add, respectively, a balsamic, camphoraceous lift in the opening and a soft, fruity, slightly floral touch that rounds out the profile."
+       ]
+      ]
+     },
+     {
+      "h": "Production and extraction",
+      "c": [
+       "Mint is a robust plant, generous in essential oil, which is concentrated in the microscopic glands of its leaves and flowering tops.",
+       [
+        "Harvest and pre-drying",
+        "it is usually harvested just before flowering, when the concentration of essential oil is at its peak. It is often left to wilt for a few hours in the field to reduce excess water before processing."
+       ],
+       [
+        "Steam distillation",
+        "the standard and most efficient method. The steam quickly extracts the essential oil from the leaves, yielding a pale or yellowish liquid with an intense scent that is very faithful to the fresh plant."
+       ],
+       [
+        "Rectification and fractionation",
+        "the crude oil is often distilled a second time to remove sulfurous or overly earthy head notes, or to isolate pure menthol, which is in high demand in perfumery, cosmetics and food."
+       ]
+      ]
+     },
+     {
+      "h": "Main varieties in perfumery",
+      "c": [
+       [
+        "Peppermint (Mentha × piperita)",
+        "rich in menthol and menthone. It is intense, icy, incisive and slightly spicy. It brings an immediate jolt of energy to top notes and enhances citrus or aromatic accords."
+       ],
+       [
+        "Spearmint (Mentha spicata)",
+        "dominated by L-carvone. It is much sweeter, friendlier, greener and juicier, without the extreme cold sensation. It is ideal for green tea accords, fresh cocktails (such as the mojito) or luminous herbal compositions."
+       ],
+       [
+        "Corn mint (Mentha arvensis)",
+        "grown on a massive scale in India and China, it has the highest natural menthol content and is the main industrial source of pure menthol crystals."
+       ]
+      ]
+     },
+     {
+      "h": "History",
+      "c": [
+       "The aromatic use of mint goes back to Antiquity and is documented in ancient Egypt, Greece and Rome, where its leaves were used in perfumed baths, medicinal ointments and body oils to refresh the body and purify the air.",
+       "As for modern perfumery, as an approximate reference its systematic integration is placed between the 18th and 19th centuries, in the classic structures of eau de cologne and English and French aromatic waters, where it was combined with lavender, rosemary and citrus. In recent decades, the refinement of rectified spearmint and peppermint oils has taken it out of the purely functional or hygienic realm and turned it into a sophisticated resource in contemporary perfumery."
+      ]
+     }
+    ],
+    "outro": "Few raw materials awaken the senses as quickly as mint: a green, crystalline flash that brings air, movement and clarity to any composition."
+   }
+  }
  }
 ];
 let _atlasCur = null;
@@ -9040,6 +9777,7 @@ function atlasToggleSearch(force) {
   box.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   if (open) { inp.focus(); } else { inp.value = ''; inp.blur(); renderAtlas(); }
 }
+function _atlasSyn(e, l) { return (e.syn && (e.syn[l] || e.syn.en)) || []; }
 function _atlasLast() { return ATLAS_ENTRIES[ATLAS_ENTRIES.length - 1]; }
 function renderAtlas() {
   const last = _atlasLast();
@@ -9056,7 +9794,8 @@ function renderAtlas() {
     return _atlasText(a).title.localeCompare(_atlasText(b).title, currentLang, { sensitivity: 'base' });
   }).filter(function(e) {
     if (!q) return true;
-    return Object.keys(e.t).some(function(l) { return _atlasNorm(e.t[l].title).indexOf(q) > -1; });
+    if (Object.keys(e.t).some(function(l) { return _atlasNorm(e.t[l].title).indexOf(q) > -1; })) return true;
+    return Object.keys(e.syn || {}).some(function(l) { return e.syn[l].some(function(w) { return _atlasNorm(w).indexOf(q) > -1; }); });
   });
   if (!items.length) {
     const n = document.createElement('div'); n.className = 'atlas-none';
@@ -9082,6 +9821,8 @@ function fillAtlasEntry() {
   cr.onkeydown = function(ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); atlasBackToList(); } };
   lab.appendChild(cr);
   document.getElementById('atlas-title').textContent = x.title;
+  const sy = document.getElementById('atlas-syn');
+  if (sy) { const sl = _atlasSyn(e, currentLang); sy.textContent = sl.length ? '(' + sl.join(', ') + ')' : ''; sy.hidden = !sl.length; }
   const img = document.getElementById('atlas-img');
   if (img.getAttribute('src') !== e.img) img.setAttribute('src', e.img);
   img.alt = x.title;
