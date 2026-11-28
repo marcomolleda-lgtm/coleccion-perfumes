@@ -1219,7 +1219,7 @@
   #atlas-body p.atlas-li { padding-left: 14px; border-left: 2px solid var(--border, #e4e2dc); }
   #atlas-body p.atlas-li strong { font-weight: 600; }
   #atlas-body p.atlas-outro { margin-top: 30px; font-family: 'Jost', sans-serif; font-style: italic; font-weight: 400; font-size: 18.5px; line-height: 1.7; color: var(--text); }
-  .atlas-syn { margin: -6px 0 16px; font-family: 'Jost', sans-serif; font-size: 19px; font-weight: 600; line-height: 1.4; color: var(--text-light); }
+  .atlas-syn { margin: -6px 0 16px; font-family: 'Jost', sans-serif; font-size: 19px; font-weight: 400; line-height: 1.4; color: #000; }
   .atlas-syn[hidden] { display: none; }
   .atlas-crumb { cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
   .atlas-all { display: block; margin-top: 28px; padding: 0; border: none; background: none; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--star); cursor: pointer; }
@@ -10923,7 +10923,7 @@ function fillAtlasEntry() {
   lab.appendChild(cr);
   document.getElementById('atlas-title').textContent = x.title;
   const sy = document.getElementById('atlas-syn');
-  if (sy) { const sl = _atlasSyn(e, currentLang); sy.textContent = sl.length ? '(' + sl.join(', ') + ')' : ''; sy.hidden = !sl.length; }
+  if (sy) { const sl = _atlasSyn(e, currentLang); sy.textContent = sl.length ? sl.join(', ') : ''; sy.hidden = !sl.length; }
   const img = document.getElementById('atlas-img');
   if (img.getAttribute('src') !== e.img) img.setAttribute('src', e.img);
   img.alt = x.title;
